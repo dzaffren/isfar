@@ -47,15 +47,15 @@ The brief explains the tokens, `styles.css` turns them into classes, and the gui
 | `tokens/tokens-type.css` | Fonts, sizes and the text styles |
 | `tokens/tokens-space.css` | Space, sizes and corners |
 | `tokens/tokens-motion.css` | Durations, the curve, and the reduced-motion values |
-| `tokens/fonts.css` | The font import |
+| `tokens/fonts.css` | The `@font-face` rules for the files in `fonts/` |
+| `fonts/` | Nunito 500 and 800, Amiri 400, and their licences. The site ships them, and sends no request to Google (D21). |
 | `styles.css` | Materials and primitives: button, step panel, beads, language switch, Arabic block, note, notice, answer option, scene card |
 | `guidelines/` | One small page for each foundation, and one for the primitives |
 
 ## Not here yet
 
-- **Components in code.** The primitives are CSS classes. The `walking-skeleton` spec chooses the stack.
+- **A component library.** The primitives are CSS classes. The site wraps the ones it uses in React components in `src/components/`.
 - **3D tokens.** The 3D scene is content. Its budget belongs to the `walking-skeleton` spec.
-- **Hosted fonts.** `fonts.css` loads from Google Fonts. The `walking-skeleton` spec decides how the site hosts them.
 
 ## Glossary
 
