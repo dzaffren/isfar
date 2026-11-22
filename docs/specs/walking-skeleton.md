@@ -1,6 +1,6 @@
 # Walking skeleton
 
-**Version:** v1 · **Status:** Refined · **Type:** Skeleton · **Project type:** Web UI
+**Version:** v1 · **Status:** Built · **Type:** Skeleton · **Project type:** Web UI
 
 **Shape doc:** docs/specs/virtual-hajj/shape.md
 **Depends on:** None
@@ -472,6 +472,9 @@ Recorded as D4, D5, D6, D7, D8, D9, D10, D11, D12, D13, D14, D15, D16, D17, D18,
 | O37 | A scripted desktop Chrome on the dev machine draws 3D with the CPU slowed, so scenario 5 can run as a script. | unproven | spec p3 | user | Accepted risk | /build writes the script. If scripted Chrome cannot draw 3D, the hand check in DevTools replaces it. `/poc` was rejected. 2026-11-23 |
 | O38 | What moves the seven beads in the loading card? | question | spec p3 | user | Resolved | They light one by one in a loop. Under reduced motion they stay still and unlit. No beads and still beads were rejected. 2026-11-23 |
 | O39 | O36 said /build makes one commit on `main` with the existing docs. The zuko hook `block-dangerous.sh` blocks each commit on `main`. | flag | build | user | Decided alone | Chose: the docs commit `55178e7` is the first commit on `feat/walking-skeleton`, and no local `main` exists yet. Other: a docs commit on `main`, then a branch. Undo: at /ship, push `55178e7` as `main` before the PR, so the PR holds only the slice. 2026-11-23 |
+| O40 | Scenario 5 said "a desktop Chrome" proves 30 frames a second. The dev machine is a cloud VM with no graphics chip. Its Chrome draws with SwiftShader, at 18 frames a second with or without the CPU slow-down, so its frame rate says nothing about a phone. | flag | build | user | Decided alone | Chose: `e2e/speed.spec.ts` measures the load time, then fails on a software renderer and names it. The frame-rate half needs a machine with a graphics chip at /ship. The load-time half passed here: 1293 ms against a local build. Other: accept the software frame rate as the proof. Undo: delete the renderer check in `e2e/speed.spec.ts`. 2026-11-23 |
+| O41 | O37 said scripted Chrome on the dev machine may not draw 3D. | flag | build | user | Decided alone | Chose: no change. Scripted Chrome draws 3D here, but only in software (O40). Headless Chromium here still loses the WebGL context, so the Chromium project runs in CI only. Other: run the Chromium project here with launch flags. Undo: none needed. 2026-11-23 |
+| O42 | The loading card said the beads light "about half a second apart". | flag | build | user | Decided alone | Chose: 320 ms apart, the `--vh-dur-step` token, so no new token. Other: a new 500 ms token through /design-system. Undo: add the token and use it in `.vh-beads--busy` in `styles.css`. 2026-11-23 |
 
 _Never delete this section or its rows. See references/ledger.md._
 
@@ -503,6 +506,8 @@ _Never delete this section or its rows. See references/ledger.md._
 - **Smoke step** — one quick check that the live site answers.
 - **Preview address** — a separate address that shows one branch before it merges.
 - **Secret** — a value such as an API token, held by GitHub and hidden from the logs.
+- **SwiftShader** — Chrome's software renderer. It draws 3D on the CPU when there is no graphics chip.
+- **Cloud VM** — a computer that runs inside a data centre, often with no graphics chip.
 - **Fast 4G** — a network profile in Chrome that limits the speed to about 9 Mbps.
 - **Frames a second** — how many times a second the browser draws the 3D place. 30 looks smooth.
 - **Kaabah** — the cube-shaped building that pilgrims walk around.
