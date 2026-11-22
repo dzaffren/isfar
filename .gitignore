@@ -1,2 +1,6 @@
 docs/specs/.pages/
 .taste-skill/
+node_modules/
+dist/
+test-results/
+playwright-report/
