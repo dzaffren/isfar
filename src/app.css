@@ -1,0 +1,44 @@
+/* The layout of the one screen. Each colour, size and radius comes from the design system. */
+html,
+body,
+#root {
+  height: 100%;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.app { min-height: 100%; display: grid; grid-template-rows: auto 1fr; }
+.app__main { display: grid; align-content: start; gap: var(--vh-space-4); padding-bottom: var(--vh-space-6); }
+.app__side { display: grid; grid-auto-rows: max-content; align-content: start; gap: var(--vh-space-3); padding: 0 var(--vh-space-4); }
+
+.scene__frame { height: calc(var(--vh-tile) * 4); overflow: hidden; border-bottom: var(--vh-stroke) solid var(--vh-edge); display: grid; }
+.scene__frame > * { grid-area: 1 / 1; }
+.scene__view { display: block; width: 100%; height: 100%; }
+.scene__load { align-self: center; margin: 0 var(--vh-space-4); max-width: calc(var(--vh-tile) * 4); }
+
+/* The 3D place fades in when its first frame is drawn. Opacity only, so it stays under reduced motion. */
+.scene__canvas { transition: opacity var(--vh-dur-press) var(--vh-ease-out); }
+[data-state="loading"] .scene__canvas { opacity: 0; }
+
+.scene__sky { fill: var(--vh-cloth); }
+.scene__rim { fill: var(--vh-sunken); stroke: var(--vh-edge); stroke-width: 1; }
+.scene__floor { fill: var(--vh-marble); }
+.scene__joint { stroke: var(--vh-joint); stroke-width: 2; fill: none; }
+.scene__shade { fill: var(--vh-kiswah-edge); opacity: 0.12; }
+.scene__face { fill: var(--vh-kiswah); }
+.scene__face--far { fill: var(--vh-kiswah-edge); }
+.scene__band { fill: var(--vh-gold); }
+.scene__door { fill: var(--vh-gold); stroke: var(--vh-gold-edge); stroke-width: 1.5; }
+.scene__foot { fill: var(--vh-sunken); stroke: var(--vh-edge); stroke-width: 1; }
+
+/* A projector or a laptop, and a 1920x1080 projector zoomed to 200% (D17). */
+@media (orientation: landscape) and (min-width: 800px) {
+  .app { height: 100%; }
+  .app__main { grid-template-columns: 1fr min(calc(var(--vh-tile) * 6), 50%); gap: 0; padding-bottom: 0; align-content: stretch; min-height: 0; }
+  .app__side { padding: var(--vh-space-6); overflow: auto; }
+  .scene { border-right: var(--vh-stroke) solid var(--vh-edge); }
+  .scene__frame { height: 100%; border-bottom: 0; }
+  .scene__load { justify-self: center; width: 100%; margin: 0; }
+}
