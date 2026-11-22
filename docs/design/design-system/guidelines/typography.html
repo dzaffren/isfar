@@ -1,0 +1,27 @@
+<!-- @dsCard group="Foundations" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Typography</title>
+<link rel="stylesheet" href="../styles.css">
+<style>
+  .guide { max-width: calc(var(--vh-tile) * 8); margin: 0 auto; padding: var(--vh-space-6) var(--vh-space-4) var(--vh-space-12); display: grid; gap: var(--vh-space-6); }
+  .guide p { margin: 0; }
+  .guide .name { font: var(--vh-text-caption); color: var(--vh-ink-muted); }
+  .guide .sample { display: grid; gap: var(--vh-space-1); }
+</style>
+</head>
+<body class="vh-marble">
+<main class="guide">
+<div class="sample"><p class="name">text-title · Nunito 800 · 32px, 40px on a wide screen</p><p style="font: var(--vh-text-title)">Keep the Kaabah on your left</p></div>
+<div class="sample"><p class="name">text-question · Nunito 800 · 20px</p><p style="font: var(--vh-text-question)">Which side is the Kaabah on while you walk?</p></div>
+<div class="sample"><p class="name">text-body · Nunito 500 · 18px</p><p style="font: var(--vh-text-body)">Start in line with the Black Stone corner. Walk around the Kaabah seven times, and keep it on your left for the whole walk.</p></div>
+<div class="sample"><p class="name">text-button · Nunito 800 · 18px</p><p style="font: var(--vh-text-button)">Next</p></div>
+<div class="sample"><p class="name">text-label · Nunito 800 · 16px</p><p style="font: var(--vh-text-label)">Tawaf · Step 3 of 7</p></div>
+<div class="sample"><p class="name">text-caption · Nunito 500 · 16px. No text is smaller.</p><p style="font: var(--vh-text-caption)">This can take a moment on mobile data.</p></div>
+<div class="sample"><p class="name">text-arabic · Amiri 400 · 30px. Its own line, right to left, with lang="ar" and dir="rtl".</p><p lang="ar" dir="rtl" style="font: var(--vh-text-arabic)">بِسْمِ اللهِ وَاللهُ أَكْبَرُ</p></div>
+</main>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!-- @dsCard group="Foundations" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Motion</title>
+<link rel="stylesheet" href="../styles.css">
+<style>
+  .guide { max-width: calc(var(--vh-tile) * 8); margin: 0 auto; padding: var(--vh-space-6) var(--vh-space-4) var(--vh-space-12); display: grid; gap: var(--vh-space-6); }
+  .guide h2 { margin: 0 0 var(--vh-space-3); font: var(--vh-text-label); color: var(--vh-ink-muted); }
+  .rows { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--vh-space-3); font: var(--vh-text-caption); }
+</style>
+</head>
+<body class="vh-marble">
+<main class="guide">
+
+<section>
+<h2>Press it</h2>
+<button type="button" class="vh-button">Next</button>
+</section>
+
+<section>
+<h2>Tokens</h2>
+<ul class="rows">
+<li>dur-press · 160ms · a press, an open note</li>
+<li>dur-step · 320ms · the panel changes to the next step</li>
+<li>ease-out · each move starts fast and settles</li>
+<li>move · 12px · the furthest a part of the interface travels</li>
+</ul>
+</section>
+
+<section>
+<h2>Rules</h2>
+<ul class="rows">
+<li>The ceiling is tier 2: planned step changes, no more.</li>
+<li>Animate transform and opacity only.</li>
+<li>A press moves the control down by its lip, and the lip goes away.</li>
+<li>With reduced motion, a step change is a short cross-fade and nothing travels. The camera cuts, it does not fly.</li>
+</ul>
+</section>
+
+</main>
+</body>
+</html>

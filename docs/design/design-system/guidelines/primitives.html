@@ -1,0 +1,127 @@
+<!-- @dsCard group="Components" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Primitives</title>
+<link rel="stylesheet" href="../styles.css">
+<style>
+  .guide { max-width: calc(var(--vh-tile) * 8); margin: 0 auto; padding: var(--vh-space-6) var(--vh-space-4) var(--vh-space-12); display: grid; gap: var(--vh-space-8); }
+  .guide section { display: grid; gap: var(--vh-space-3); }
+  .guide h2 { margin: 0; font: var(--vh-text-label); color: var(--vh-ink-muted); }
+  .guide .row { display: flex; flex-wrap: wrap; gap: var(--vh-space-4); }
+  .guide .stack { display: grid; gap: var(--vh-space-4); }
+</style>
+</head>
+<body class="vh-marble">
+<main class="guide">
+
+<section>
+<h2>Button: rest, off</h2>
+<div class="row">
+<button type="button" class="vh-button">Next</button>
+<button type="button" class="vh-button" disabled>Next</button>
+<button type="button" class="vh-button vh-button--quiet">Back</button>
+<button type="button" class="vh-button vh-button--quiet" disabled>Back</button>
+</div>
+</section>
+
+<section>
+<h2>Step panel, with progress beads, language switch, Arabic block and a note</h2>
+<article class="vh-panel vh-cloth">
+<header class="vh-panel__head vh-kiswah">
+<div class="vh-panel__progress">
+<div class="vh-panel__where">
+<svg class="vh-mark-kaabah" role="img" aria-label="Kaabah" viewBox="0 0 28 28"><rect x="3.75" y="4.75" width="20.5" height="19.5" rx="3"></rect><rect class="vh-mark-kaabah__band" x="4" y="9" width="20" height="3.5"></rect></svg>
+Tawaf · Step 3 of 7
+</div>
+<div class="vh-beads" aria-hidden="true">
+<span class="vh-bead vh-bead--done"></span>
+<span class="vh-bead vh-bead--done"></span>
+<span class="vh-bead vh-bead--now"></span>
+<span class="vh-bead"></span>
+<span class="vh-bead"></span>
+<span class="vh-bead"></span>
+<span class="vh-bead"></span>
+</div>
+</div>
+<div class="vh-switch" role="group" aria-label="Language">
+<button type="button" aria-pressed="false">BM</button>
+<button type="button" aria-pressed="true">EN</button>
+</div>
+</header>
+<div class="vh-panel__body">
+<div class="stack">
+<h1 class="vh-title">Keep the Kaabah on your left</h1>
+<p class="vh-text">Start in line with the Black Stone corner. Walk around the Kaabah seven times, and keep it on your left for the whole walk.</p>
+</div>
+<div class="vh-arabic vh-kiswah">
+<p class="vh-arabic__text" lang="ar" dir="rtl">بِسْمِ اللهِ وَاللهُ أَكْبَرُ</p>
+<p class="vh-arabic__sound">Bismillahi wallahu akbar</p>
+<p class="vh-arabic__meaning">In the name of Allah. Allah is the Greatest.</p>
+</div>
+<details class="vh-note">
+<summary>Other schools differ here
+<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg>
+</summary>
+<p>Shafi'i: skin contact with a non-mahram of the other sex breaks wudu. Hanafi: it does not. Maliki and Hanbali: only if there is desire.</p>
+</details>
+<div class="vh-panel__actions">
+<button type="button" class="vh-button vh-button--quiet">Back</button>
+<button type="button" class="vh-button">Next</button>
+</div>
+</div>
+</article>
+</section>
+
+<section>
+<h2>Notice</h2>
+<p class="vh-notice">
+<svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5"></path><path d="M12 7.5v.5"></path></svg>
+A qualified person has not yet reviewed this content.
+</p>
+<p class="vh-notice">
+<svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5"></path><path d="M12 7.5v.5"></path></svg>
+The layout on the day may differ. Follow your mutawwif and the signs.
+</p>
+</section>
+
+<section>
+<h2>Answer option: rest, chosen, right, wrong</h2>
+<p class="vh-question">Which side is the Kaabah on while you walk?</p>
+<div class="stack">
+<button type="button" class="vh-option" aria-pressed="false"><span class="vh-option__mark" aria-hidden="true"></span>On your right</button>
+<button type="button" class="vh-option" aria-pressed="true"><span class="vh-option__mark" aria-hidden="true"></span>On your left</button>
+<button type="button" class="vh-option vh-option--right" aria-pressed="true"><span class="vh-option__mark" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span>On your left</button>
+<button type="button" class="vh-option vh-option--wrong" aria-pressed="true"><span class="vh-option__mark" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12"></path><path d="M18 6L6 18"></path></svg></span>On your right</button>
+</div>
+<p class="vh-result">Yes. The Kaabah stays on your left.</p>
+<p class="vh-result vh-result--wrong">Not quite. The Kaabah stays on your left.</p>
+</section>
+
+<section>
+<h2>Scene states: the place loads, the phone cannot draw 3D</h2>
+<div class="vh-card vh-cloth">
+<p class="vh-question">Loading the Kaabah</p>
+<div class="vh-beads vh-beads--cloth" aria-hidden="true">
+<span class="vh-bead vh-bead--done"></span>
+<span class="vh-bead vh-bead--done"></span>
+<span class="vh-bead"></span>
+<span class="vh-bead"></span>
+<span class="vh-bead"></span>
+<span class="vh-bead"></span>
+<span class="vh-bead"></span>
+</div>
+<p class="vh-muted">This can take a moment on mobile data.</p>
+</div>
+<div class="vh-card vh-cloth">
+<p class="vh-question">This phone cannot show the 3D place</p>
+<p class="vh-text">You can still read each step, with a picture of where to stand.</p>
+<button type="button" class="vh-button">Read the steps</button>
+</div>
+</section>
+
+</main>
+</body>
+</html>

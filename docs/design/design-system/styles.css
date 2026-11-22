@@ -1,0 +1,427 @@
+@import url("tokens/fonts.css");
+@import url("tokens/tokens-color.css");
+@import url("tokens/tokens-type.css");
+@import url("tokens/tokens-space.css");
+@import url("tokens/tokens-motion.css");
+
+body {
+  margin: 0;
+  color: var(--vh-ink);
+  font: var(--vh-text-body);
+}
+
+:focus-visible {
+  outline: var(--vh-ring) solid var(--vh-focus);
+  outline-offset: var(--vh-ring);
+}
+
+/* Materials */
+
+.vh-marble {
+  background-color: var(--vh-marble);
+  background-image: var(--vh-marble-image);
+  background-size: var(--vh-tile) var(--vh-tile);
+}
+
+.vh-cloth {
+  background-color: var(--vh-cloth);
+  background-image: var(--vh-cloth-image);
+  color: var(--vh-ink);
+}
+
+.vh-kiswah {
+  --vh-focus: var(--vh-on-kiswah);
+  background-color: var(--vh-kiswah);
+  background-image: var(--vh-kiswah-image);
+  color: var(--vh-on-kiswah);
+}
+
+/* Button */
+
+.vh-button {
+  min-height: var(--vh-control);
+  margin: 0 0 var(--vh-lip);
+  padding: 0 var(--vh-space-6);
+  border: var(--vh-stroke) solid var(--vh-gold-line);
+  border-radius: var(--vh-radius-control);
+  background: var(--vh-gold);
+  color: var(--vh-on-gold);
+  font: var(--vh-text-button);
+  box-shadow: 0 var(--vh-lip) 0 var(--vh-gold-edge);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--vh-space-2);
+  cursor: pointer;
+  transition: transform var(--vh-dur-press) var(--vh-ease-out);
+}
+
+.vh-button--quiet {
+  border-color: var(--vh-edge);
+  background-color: var(--vh-cloth);
+  background-image: var(--vh-cloth-image);
+  color: var(--vh-ink);
+  box-shadow: 0 var(--vh-lip) 0 var(--vh-edge);
+}
+
+.vh-button:active {
+  transform: translateY(var(--vh-lip));
+  box-shadow: none;
+}
+
+.vh-button[disabled],
+.vh-button[aria-disabled="true"] {
+  opacity: 0.45;
+  box-shadow: none;
+  cursor: default;
+  transform: none;
+}
+
+/* Step panel */
+
+.vh-panel {
+  border: var(--vh-stroke) solid var(--vh-kiswah-edge);
+  border-radius: var(--vh-radius-panel);
+  box-shadow: 0 var(--vh-lip) 0 var(--vh-kiswah-edge);
+  overflow: hidden;
+}
+
+.vh-panel__head {
+  padding: var(--vh-space-4) var(--vh-space-6);
+  border-bottom: var(--vh-band) solid var(--vh-gold);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--vh-space-6);
+}
+
+.vh-panel__progress {
+  flex: 1;
+  display: grid;
+  gap: var(--vh-space-2);
+}
+
+.vh-panel__where {
+  font: var(--vh-text-label);
+  display: flex;
+  align-items: center;
+  gap: var(--vh-space-2);
+}
+
+.vh-panel__body {
+  padding: var(--vh-space-6);
+  display: grid;
+  gap: var(--vh-space-6);
+}
+
+.vh-panel__actions {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--vh-space-3);
+}
+
+.vh-title {
+  margin: 0;
+  font: var(--vh-text-title);
+}
+
+.vh-text {
+  margin: 0;
+}
+
+/* Kaabah mark */
+
+.vh-mark-kaabah {
+  width: var(--vh-bead-now);
+  height: var(--vh-bead-now);
+  flex: none;
+}
+
+.vh-mark-kaabah rect {
+  fill: var(--vh-kiswah);
+  stroke: var(--vh-gold);
+  stroke-width: 1.5;
+}
+
+.vh-mark-kaabah .vh-mark-kaabah__band {
+  fill: var(--vh-gold);
+  stroke: none;
+}
+
+/* Progress beads */
+
+.vh-beads {
+  position: relative;
+  height: var(--vh-bead-now);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.vh-beads::before {
+  content: "";
+  position: absolute;
+  inset: calc(50% - 1px) 0 auto;
+  height: var(--vh-stroke);
+  background: var(--vh-gold);
+}
+
+.vh-bead {
+  position: relative;
+  box-sizing: border-box;
+  width: var(--vh-bead);
+  height: var(--vh-bead);
+  border: var(--vh-stroke) solid var(--vh-gold);
+  border-radius: var(--vh-radius-round);
+  background: var(--vh-kiswah);
+}
+
+.vh-bead--done {
+  border-color: var(--vh-gold-edge);
+  background: var(--vh-gold);
+}
+
+.vh-bead--now {
+  width: var(--vh-bead-now);
+  height: var(--vh-bead-now);
+  border-width: var(--vh-ring);
+  background: var(--vh-on-kiswah);
+}
+
+.vh-beads--cloth::before {
+  background: var(--vh-gold-edge);
+}
+
+.vh-beads--cloth .vh-bead {
+  border-color: var(--vh-gold-edge);
+  background: var(--vh-cloth);
+}
+
+.vh-beads--cloth .vh-bead--done {
+  background: var(--vh-gold);
+}
+
+/* Language switch, on the kiswah */
+
+.vh-switch {
+  padding: var(--vh-stroke);
+  border: var(--vh-stroke) solid var(--vh-gold);
+  border-radius: var(--vh-radius-control);
+  display: inline-flex;
+}
+
+.vh-switch button {
+  min-width: var(--vh-control);
+  height: var(--vh-switch);
+  border: 0;
+  border-radius: var(--vh-radius-inner);
+  background: transparent;
+  color: var(--vh-on-kiswah);
+  font: var(--vh-text-label);
+  cursor: pointer;
+}
+
+.vh-switch button[aria-pressed="true"] {
+  background: var(--vh-gold);
+  color: var(--vh-on-gold);
+}
+
+/* Arabic block */
+
+.vh-arabic {
+  padding: var(--vh-space-4) var(--vh-space-6);
+  border-top: var(--vh-band) solid var(--vh-gold);
+  border-radius: var(--vh-radius-control);
+  display: grid;
+  gap: var(--vh-space-1);
+}
+
+.vh-arabic__text {
+  margin: 0;
+  font: var(--vh-text-arabic);
+}
+
+.vh-arabic__sound {
+  margin: 0;
+  font: var(--vh-text-label);
+}
+
+.vh-arabic__meaning {
+  margin: 0;
+  font: var(--vh-text-caption);
+  color: var(--vh-on-kiswah-muted);
+}
+
+/* Note: a ruling that opens on tap */
+
+.vh-note {
+  border: var(--vh-stroke) dashed var(--vh-edge);
+  border-radius: var(--vh-radius-control);
+  background: var(--vh-sunken);
+  color: var(--vh-ink);
+}
+
+.vh-note summary {
+  min-height: var(--vh-control);
+  padding: 0 var(--vh-space-4);
+  border-radius: var(--vh-radius-control);
+  font: var(--vh-text-label);
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--vh-space-3);
+  cursor: pointer;
+}
+
+.vh-note summary::-webkit-details-marker {
+  display: none;
+}
+
+.vh-note summary svg {
+  flex: none;
+  transition: transform var(--vh-dur-press) var(--vh-ease-out);
+}
+
+.vh-note[open] summary svg {
+  transform: rotate(180deg);
+}
+
+.vh-note p {
+  margin: 0;
+  padding: 0 var(--vh-space-4) var(--vh-space-4);
+  font: var(--vh-text-caption);
+}
+
+/* Notice */
+
+.vh-notice {
+  margin: 0;
+  padding: var(--vh-space-3) var(--vh-space-4);
+  border: var(--vh-stroke) solid var(--vh-edge);
+  border-radius: var(--vh-radius-control);
+  background: var(--vh-sunken);
+  color: var(--vh-ink);
+  font: var(--vh-text-caption);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--vh-space-3);
+}
+
+.vh-notice svg {
+  flex: none;
+}
+
+/* Answer option and result */
+
+.vh-question {
+  margin: 0;
+  font: var(--vh-text-question);
+}
+
+.vh-option {
+  width: 100%;
+  min-height: var(--vh-option);
+  margin: 0 0 var(--vh-lip);
+  padding: 0 var(--vh-space-4);
+  border: var(--vh-stroke) solid var(--vh-edge);
+  border-radius: var(--vh-radius-control);
+  background-color: var(--vh-cloth);
+  background-image: var(--vh-cloth-image);
+  color: var(--vh-ink);
+  font: var(--vh-text-body);
+  text-align: left;
+  box-shadow: 0 var(--vh-lip) 0 var(--vh-edge);
+  display: flex;
+  align-items: center;
+  gap: var(--vh-space-3);
+  cursor: pointer;
+}
+
+.vh-option__mark {
+  box-sizing: border-box;
+  width: var(--vh-mark);
+  height: var(--vh-mark);
+  border: var(--vh-stroke) solid currentColor;
+  border-radius: var(--vh-radius-round);
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vh-option[aria-pressed="true"] {
+  border-color: var(--vh-kiswah-edge);
+  background-color: var(--vh-kiswah);
+  background-image: var(--vh-kiswah-image);
+  color: var(--vh-on-kiswah);
+  font-weight: var(--vh-weight-strong);
+  box-shadow: 0 var(--vh-lip) 0 var(--vh-kiswah-edge);
+}
+
+.vh-option[aria-pressed="true"] .vh-option__mark {
+  background: var(--vh-gold);
+}
+
+.vh-option.vh-option--right {
+  border-color: var(--vh-gold-line);
+  background-color: var(--vh-cloth);
+  background-image: var(--vh-cloth-image);
+  color: var(--vh-ink);
+  box-shadow: 0 var(--vh-lip) 0 var(--vh-gold-line);
+}
+
+.vh-option.vh-option--right .vh-option__mark {
+  border-color: var(--vh-gold-line);
+  background: var(--vh-gold);
+  color: var(--vh-on-gold);
+}
+
+.vh-option.vh-option--wrong {
+  border-color: var(--vh-mistake);
+  background-color: var(--vh-mistake-tint);
+  background-image: none;
+  color: var(--vh-ink);
+  box-shadow: 0 var(--vh-lip) 0 var(--vh-mistake);
+}
+
+.vh-option.vh-option--wrong .vh-option__mark {
+  border: 0;
+  background: transparent;
+  color: var(--vh-mistake);
+}
+
+.vh-result {
+  margin: 0;
+  font: var(--vh-text-button);
+}
+
+.vh-result--wrong {
+  color: var(--vh-mistake);
+}
+
+/* Scene states: the place loads, or the device cannot draw 3D */
+
+.vh-card {
+  padding: var(--vh-space-6);
+  border: var(--vh-stroke) solid var(--vh-edge);
+  border-radius: var(--vh-radius-panel);
+  box-shadow: 0 var(--vh-lip) 0 var(--vh-edge);
+  display: grid;
+  gap: var(--vh-space-3);
+  justify-items: start;
+}
+
+.vh-card .vh-beads {
+  width: 100%;
+  max-width: calc(var(--vh-tile) * 3);
+}
+
+.vh-muted {
+  margin: 0;
+  font: var(--vh-text-caption);
+  color: var(--vh-ink-muted);
+}

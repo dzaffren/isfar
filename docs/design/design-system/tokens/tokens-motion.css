@@ -1,0 +1,15 @@
+/* Tier 2. Animate transform and opacity only. */
+:root {
+  --vh-dur-press: 160ms;
+  --vh-dur-step: 320ms;
+  --vh-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --vh-move: 12px;
+}
+
+/* Movement stops. A step change becomes a short cross-fade. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --vh-move: 0px;
+    --vh-dur-step: var(--vh-dur-press);
+  }
+}

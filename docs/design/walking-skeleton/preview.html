@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Isfar</title>
+<link rel="stylesheet" href="../design-system/styles.css">
+<style>
+  html, body { height: 100%; }
+  [hidden] { display: none !important; }
+
+  /* The screen. Layout only: each colour, size and radius comes from the design system. */
+  .app { min-height: 100%; display: grid; grid-template-rows: auto 1fr; }
+  .app__main { display: grid; align-content: start; gap: var(--vh-space-4); padding-bottom: var(--vh-space-6); }
+  .app__side { display: grid; grid-auto-rows: max-content; align-content: start; gap: var(--vh-space-3); padding: 0 var(--vh-space-4); }
+
+  .scene__frame { height: calc(var(--vh-tile) * 4); overflow: hidden; border-bottom: var(--vh-stroke) solid var(--vh-edge); display: grid; }
+  .scene__load { align-self: center; margin: 0 var(--vh-space-4); max-width: calc(var(--vh-tile) * 4); }
+  .scene__view { display: block; width: 100%; height: 100%; }
+
+  .scene__sky { fill: var(--vh-cloth); }
+  .scene__rim { fill: var(--vh-sunken); stroke: var(--vh-edge); stroke-width: 1; }
+  .scene__floor { fill: var(--vh-marble); }
+  .scene__joint { stroke: var(--vh-joint); stroke-width: 2; fill: none; }
+  .scene__shade { fill: var(--vh-kiswah-edge); opacity: 0.12; }
+  .scene__face { fill: var(--vh-kiswah); }
+  .scene__face--far { fill: var(--vh-kiswah-edge); }
+  .scene__band { fill: var(--vh-gold); }
+  .scene__door { fill: var(--vh-gold); stroke: var(--vh-gold-edge); stroke-width: 1.5; }
+  .scene__foot { fill: var(--vh-sunken); stroke: var(--vh-edge); stroke-width: 1; }
+
+  /* A projector or a laptop, and a projector with the browser zoomed in. */
+  @media (orientation: landscape) and (min-width: 800px) {
+    .app { height: 100%; }
+    .app__main { grid-template-columns: 1fr min(calc(var(--vh-tile) * 6), 50%); gap: 0; padding-bottom: 0; align-content: stretch; min-height: 0; }
+    .app__side { padding: var(--vh-space-6); overflow: auto; }
+    .scene { border-right: var(--vh-stroke) solid var(--vh-edge); }
+    .scene__frame { height: 100%; border-bottom: 0; }
+    .scene__load { justify-self: center; width: 100%; margin: 0; }
+  }
+
+  /* The preview page around the screens. Not part of the product. */
+  .gallery { max-width: calc(var(--vh-tile) * 25); margin: 0 auto; padding: var(--vh-space-8) var(--vh-space-6) var(--vh-space-12); display: grid; gap: var(--vh-space-8); }
+  .gallery h1 { margin: 0; font: var(--vh-text-title); }
+  .gallery h2 { margin: 0; font: var(--vh-text-question); }
+  .gallery header, .gallery section { display: grid; gap: var(--vh-space-4); }
+  .gallery__row { display: flex; flex-wrap: wrap; align-items: flex-start; gap: var(--vh-space-6); }
+  .gallery figure { margin: 0; display: grid; gap: var(--vh-space-2); }
+  .gallery figcaption { font: var(--vh-text-caption); color: var(--vh-ink-muted); }
+  .gallery a { color: var(--vh-ink); font: var(--vh-text-label); }
+  .frame { border: var(--vh-stroke) solid var(--vh-edge); border-radius: var(--vh-radius-inner); overflow: hidden; }
+  .frame iframe { display: block; border: 0; transform-origin: 0 0; }
+</style>
+</head>
+<body class="vh-marble">
+
+<div class="app" data-app>
+  <header class="vh-panel__head vh-kiswah">
+    <div class="vh-panel__where">
+      <svg class="vh-mark-kaabah" aria-hidden="true" viewBox="0 0 28 28"><rect x="3.75" y="4.75" width="20.5" height="19.5" rx="3"></rect><rect class="vh-mark-kaabah__band" x="4" y="9" width="20" height="3.5"></rect></svg>
+      Isfar
+    </div>
+    <div class="vh-switch" role="group" data-switch aria-label="Bahasa">
+      <button type="button" data-lang="ms" aria-pressed="true">BM</button>
+      <button type="button" data-lang="en" aria-pressed="false">EN</button>
+    </div>
+  </header>
+
+  <main class="app__main">
+    <section class="scene" data-scene data-state="shown">
+      <div class="scene__frame vh-marble">
+        <svg class="scene__view" data-view role="img" aria-label="Kaabah di atas mataf, dari satu sudut pandang" viewBox="0 0 400 320" preserveAspectRatio="xMidYMid slice">
+          <rect class="scene__sky" x="-400" y="-200" width="1200" height="325"></rect>
+          <rect class="scene__floor" x="-400" y="125" width="1200" height="425"></rect>
+          <rect class="scene__rim" x="-400" y="115" width="1200" height="10"></rect>
+          <path class="scene__joint" d="M-400 133H800 M-400 145H800 M-400 163H800 M-400 189H800 M-400 227H800 M-400 283H800"></path>
+          <path class="scene__joint" d="M200 125L-572 330 M200 125L-379 330 M200 125L-186 330 M200 125L7 330 M200 125L200 330 M200 125L393 330 M200 125L586 330 M200 125L779 330 M200 125L972 330"></path>
+          <polygon class="scene__shade" points="215,210 310,189 366,198 264,223"></polygon>
+          <polygon class="scene__face" points="95,67 215,45 215,210 95,187"></polygon>
+          <polygon class="scene__face scene__face--far" points="215,45 310,65 310,189 215,210"></polygon>
+          <polygon class="scene__band" points="95,91 215,78 215,94.5 95,103"></polygon>
+          <polygon class="scene__band" points="215,78 310,89.8 310,102.2 215,94.5"></polygon>
+          <polygon class="scene__door" points="109.4,133.3 133.4,133.9 133.4,178.2 109.4,174.7"></polygon>
+          <polygon class="scene__foot" points="95,182.2 215,203.4 215,210 95,187"></polygon>
+          <polygon class="scene__foot" points="215,203.4 310,184 310,189 215,210"></polygon>
+        </svg>
+        <div class="vh-card vh-cloth scene__load" data-load role="status" hidden>
+          <p class="vh-question" data-t="loadTitle">Memuatkan Kaabah</p>
+          <div class="vh-beads vh-beads--cloth" aria-hidden="true">
+            <span class="vh-bead vh-bead--done"></span>
+            <span class="vh-bead vh-bead--done"></span>
+            <span class="vh-bead"></span>
+            <span class="vh-bead"></span>
+            <span class="vh-bead"></span>
+            <span class="vh-bead"></span>
+            <span class="vh-bead"></span>
+          </div>
+          <p class="vh-muted" data-t="loadHint">Ini mungkin mengambil sedikit masa dengan data mudah alih.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="app__side">
+      <div class="vh-card vh-cloth" data-card aria-live="polite" hidden>
+          <p class="vh-text" data-t="no3d" data-show="unsupported">Peranti ini tidak dapat memaparkan tempat 3D.</p>
+          <p class="vh-text" data-t="failed" data-show="failed">Tempat 3D tidak dapat dimuatkan.</p>
+          <button type="button" class="vh-button" data-retry data-t="retry" data-show="failed">Cuba lagi</button>
+        </div>
+      <article class="vh-panel vh-cloth">
+        <div class="vh-panel__body">
+          <h1 class="vh-title" data-t="title">Kaabah</h1>
+          <p class="vh-text" data-t="text">Inilah Kaabah, di tengah-tengah Masjidil Haram. Lantai marmar yang lapang di sekelilingnya dipanggil mataf.</p>
+        </div>
+      </article>
+      <p class="vh-notice">
+        <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5"></path><path d="M12 7.5v.5"></path></svg>
+        <span data-t="review">Kandungan ini belum disemak oleh orang yang bertauliah.</span>
+      </p>
+      <p class="vh-notice">
+        <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5"></path><path d="M12 7.5v.5"></path></svg>
+        <span data-t="layout">Susun atur pada hari sebenar mungkin berbeza. Ikut mutawwif anda dan papan tanda.</span>
+      </p>
+    </div>
+  </main>
+</div>
+
+<div class="gallery" data-gallery hidden>
+  <header>
+    <h1>Walking skeleton, pause 2 preview</h1>
+    <p class="vh-text">Each frame is the live screen. Tap BM or EN, and tap "Try again". The drawing stands in for the 3D place and for the still picture, which show the same view. While the 3D place loads, the scene holds the loading card on marble. The preview does not store the language.</p>
+  </header>
+  <section>
+    <h2>Phone, 360 by 800</h2>
+    <div class="gallery__row" data-row="phone"></div>
+  </section>
+  <section>
+    <h2>Projector and laptop, shown at half size</h2>
+    <div class="gallery__row" data-row="wide"></div>
+  </section>
+  <section>
+    <h2>Projector at 1920 by 1080, with the browser zoomed to 200%</h2>
+    <p class="vh-text">The body text is 18px, which is small from the back of a classroom. The ustaz zooms the browser, and the wide layout holds.</p>
+    <div class="gallery__row" data-row="zoom"></div>
+  </section>
+</div>
+
+<script>
+  const TEXT = {
+    ms: {
+      switchLabel: "Bahasa",
+      scene: "Kaabah di atas mataf, dari satu sudut pandang",
+      title: "Kaabah",
+      text: "Inilah Kaabah, di tengah-tengah Masjidil Haram. Lantai marmar yang lapang di sekelilingnya dipanggil mataf.",
+      review: "Kandungan ini belum disemak oleh orang yang bertauliah.",
+      layout: "Susun atur pada hari sebenar mungkin berbeza. Ikut mutawwif anda dan papan tanda.",
+      loadTitle: "Memuatkan Kaabah",
+      loadHint: "Ini mungkin mengambil sedikit masa dengan data mudah alih.",
+      no3d: "Peranti ini tidak dapat memaparkan tempat 3D.",
+      failed: "Tempat 3D tidak dapat dimuatkan.",
+      retry: "Cuba lagi"
+    },
+    en: {
+      switchLabel: "Language",
+      scene: "The Kaabah on the mataf, from one fixed view",
+      title: "The Kaabah",
+      text: "This is the Kaabah, in the centre of Masjidil Haram. The open marble floor around it is the mataf.",
+      review: "A qualified person has not yet reviewed this content.",
+      layout: "The layout on the day may differ. Follow your mutawwif and the signs.",
+      loadTitle: "Loading the Kaabah",
+      loadHint: "This can take a moment on mobile data.",
+      no3d: "This device cannot show the 3D place.",
+      failed: "The 3D place did not load.",
+      retry: "Try again"
+    }
+  };
+
+  const query = new URLSearchParams(location.search);
+  const one = (name) => document.querySelector("[data-" + name + "]");
+
+  function runScreen() {
+    const root = document.documentElement;
+    const device = (navigator.language || "").toLowerCase().startsWith("en") ? "en" : "ms";
+    let lang = query.get("lang") === "en" || query.get("lang") === "ms" ? query.get("lang") : device;
+    let state = query.get("state") || "loading";
+    const settles = !query.get("state");
+    const theme = query.get("theme");
+    if (theme === "light" || theme === "dark") root.dataset.theme = theme;
+
+    function paint() {
+      root.lang = lang;
+      document.querySelectorAll("[data-t]").forEach((el) => { el.textContent = TEXT[lang][el.dataset.t]; });
+      one("switch").setAttribute("aria-label", TEXT[lang].switchLabel);
+      one("view").setAttribute("aria-label", TEXT[lang].scene);
+      document.querySelectorAll("[data-lang]").forEach((el) => { el.setAttribute("aria-pressed", String(el.dataset.lang === lang)); });
+      one("scene").dataset.state = state;
+      one("scene").setAttribute("aria-busy", String(state === "loading"));
+      one("card").hidden = state === "shown" || state === "loading";
+      one("view").toggleAttribute("hidden", state === "loading");
+      one("load").hidden = state !== "loading";
+      document.querySelectorAll("[data-show]").forEach((el) => { el.hidden = el.dataset.show !== state; });
+    }
+
+    function load() {
+      state = "loading";
+      paint();
+      setTimeout(() => { state = "shown"; paint(); }, 900);
+    }
+
+    document.querySelectorAll("[data-lang]").forEach((el) => {
+      el.addEventListener("click", () => { lang = el.dataset.lang; paint(); });
+    });
+    one("retry").addEventListener("click", load);
+    if (settles) load(); else paint();
+  }
+
+  function runGallery() {
+    one("app").hidden = true;
+    one("gallery").hidden = false;
+    const frames = [
+      ["phone", 360, 800, 1, "en", "light", "shown", "English, light. The 3D place shows."],
+      ["phone", 360, 800, 1, "ms", "dark", "shown", "Malay, dark. The 3D place shows."],
+      ["phone", 360, 800, 1, "ms", "light", "loading", "Malay. The 3D place loads."],
+      ["phone", 360, 800, 1, "ms", "light", "unsupported", "Malay. The device cannot draw 3D."],
+      ["phone", 360, 800, 1, "en", "light", "failed", "English. The download failed."],
+      ["wide", 1280, 720, 0.5, "en", "light", "shown", "1280 by 720. English, light."],
+      ["wide", 1920, 1080, 0.5, "ms", "dark", "shown", "1920 by 1080. Malay, dark."],
+      ["zoom", 960, 540, 1, "en", "light", "shown", "English, light. Real size."],
+      ["zoom", 960, 540, 1, "ms", "light", "failed", "Malay. The download failed."]
+    ];
+    for (const [row, width, height, scale, lang, theme, state, caption] of frames) {
+      const src = location.pathname + "?screen=1&lang=" + lang + "&theme=" + theme + "&state=" + state;
+      const figure = document.createElement("figure");
+      const frame = document.createElement("div");
+      frame.className = "frame";
+      frame.style.width = width * scale + "px";
+      frame.style.height = height * scale + "px";
+      const iframe = document.createElement("iframe");
+      iframe.src = src;
+      iframe.title = caption;
+      iframe.width = width;
+      iframe.height = height;
+      iframe.style.transform = "scale(" + scale + ")";
+      frame.append(iframe);
+      const text = document.createElement("figcaption");
+      text.textContent = caption + " ";
+      const link = document.createElement("a");
+      link.href = src;
+      link.target = "_blank";
+      link.rel = "noopener";
+      link.textContent = "Open";
+      text.append(link);
+      figure.append(frame, text);
+      document.querySelector('[data-row="' + row + '"]').append(figure);
+    }
+  }
+
+  if (query.has("screen")) runScreen(); else runGallery();
+</script>
+</body>
+</html>

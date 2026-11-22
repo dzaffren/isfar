@@ -1,0 +1,34 @@
+/* 18px body for older eyes and a projector. 16px is the floor. Two Latin weights, one Arabic. */
+:root {
+  --vh-font-sans: "Nunito", system-ui, sans-serif;
+  --vh-font-arabic: "Amiri", serif;
+  --vh-weight-body: 500;
+  --vh-weight-strong: 800;
+
+  --vh-size-caption: 16px;
+  --vh-size-body: 18px;
+  --vh-size-question: 20px;
+  --vh-size-arabic: 30px;
+  --vh-size-title: 32px;
+
+  --vh-line-caption: 24px;
+  --vh-line-body: 28px;
+  --vh-line-title: 38px;
+  --vh-line-arabic: 54px;
+
+  --vh-text-caption: var(--vh-weight-body) var(--vh-size-caption) / var(--vh-line-caption) var(--vh-font-sans);
+  --vh-text-label: var(--vh-weight-strong) var(--vh-size-caption) / var(--vh-line-caption) var(--vh-font-sans);
+  --vh-text-body: var(--vh-weight-body) var(--vh-size-body) / var(--vh-line-body) var(--vh-font-sans);
+  --vh-text-button: var(--vh-weight-strong) var(--vh-size-body) / var(--vh-line-caption) var(--vh-font-sans);
+  --vh-text-question: var(--vh-weight-strong) var(--vh-size-question) / var(--vh-line-body) var(--vh-font-sans);
+  --vh-text-title: var(--vh-weight-strong) var(--vh-size-title) / var(--vh-line-title) var(--vh-font-sans);
+  --vh-text-arabic: 400 var(--vh-size-arabic) / var(--vh-line-arabic) var(--vh-font-arabic);
+}
+
+/* The projector and the laptop. */
+@media (min-width: 1024px) {
+  :root {
+    --vh-size-title: 40px;
+    --vh-line-title: 46px;
+  }
+}

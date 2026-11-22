@@ -1,0 +1,56 @@
+<!-- @dsCard group="Foundations" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spacing, sizes and corners</title>
+<link rel="stylesheet" href="../styles.css">
+<style>
+  .guide { max-width: calc(var(--vh-tile) * 8); margin: 0 auto; padding: var(--vh-space-6) var(--vh-space-4) var(--vh-space-12); display: grid; gap: var(--vh-space-8); }
+  .guide h2 { margin: 0 0 var(--vh-space-3); font: var(--vh-text-label); color: var(--vh-ink-muted); }
+  .rows { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--vh-space-3); font: var(--vh-text-caption); }
+  .rows li { display: flex; align-items: center; gap: var(--vh-space-4); }
+  .bar { flex: none; height: var(--vh-space-4); background: var(--vh-gold); }
+  .box { flex: none; width: var(--vh-control); height: var(--vh-control); border: var(--vh-stroke) solid var(--vh-edge); background: var(--vh-cloth); }
+</style>
+</head>
+<body class="vh-marble">
+<main class="guide">
+
+<section>
+<h2>Space: an 8px scale, with 4px and 12px for tight groups</h2>
+<ul class="rows">
+<li><span class="bar" style="width: var(--vh-space-1)"></span>space-1 · 4px · between the lines of one block</li>
+<li><span class="bar" style="width: var(--vh-space-2)"></span>space-2 · 8px · an icon and its label</li>
+<li><span class="bar" style="width: var(--vh-space-3)"></span>space-3 · 12px · a title and its text</li>
+<li><span class="bar" style="width: var(--vh-space-4)"></span>space-4 · 16px · padding in a control, the page gutter on a phone</li>
+<li><span class="bar" style="width: var(--vh-space-6)"></span>space-6 · 24px · padding in a panel, between the parts of a panel</li>
+<li><span class="bar" style="width: var(--vh-space-8)"></span>space-8 · 32px · between panels</li>
+<li><span class="bar" style="width: var(--vh-space-12)"></span>space-12 · 48px · the end of a page</li>
+</ul>
+</section>
+
+<section>
+<h2>Sizes</h2>
+<ul class="rows">
+<li>target · 48px · the smallest area a finger must hit</li>
+<li>control · 52px · the height of a button</li>
+<li>option · 56px · the height of an answer option</li>
+<li>lip · 5px · the thick edge under a control. A press moves the control down by the lip.</li>
+</ul>
+</section>
+
+<section>
+<h2>Corners</h2>
+<ul class="rows">
+<li><span class="box" style="border-radius: var(--vh-radius-inner)"></span>radius-inner · 12px · a part inside a control</li>
+<li><span class="box" style="border-radius: var(--vh-radius-control)"></span>radius-control · 16px · buttons, options, notes</li>
+<li><span class="box" style="border-radius: var(--vh-radius-panel)"></span>radius-panel · 24px · panels and cards</li>
+<li><span class="box" style="border-radius: var(--vh-radius-round)"></span>radius-round · beads and marks</li>
+</ul>
+</section>
+
+</main>
+</body>
+</html>

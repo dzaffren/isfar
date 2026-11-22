@@ -1,0 +1,60 @@
+<!-- @dsCard group="Foundations" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Colours</title>
+<link rel="stylesheet" href="../styles.css">
+<style>
+  .guide { max-width: calc(var(--vh-tile) * 8); margin: 0 auto; padding: var(--vh-space-6) var(--vh-space-4) var(--vh-space-12); display: grid; gap: var(--vh-space-8); }
+  .guide h2 { margin: 0 0 var(--vh-space-3); font: var(--vh-text-label); color: var(--vh-ink-muted); }
+  .swatches { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--vh-space-3); }
+  .swatches li { display: flex; align-items: center; gap: var(--vh-space-4); font: var(--vh-text-caption); }
+  .swatches b { font: var(--vh-text-label); }
+  .chip { flex: none; width: var(--vh-control); height: var(--vh-control); border: var(--vh-stroke) solid var(--vh-edge); border-radius: var(--vh-radius-inner); }
+</style>
+</head>
+<body class="vh-marble">
+<main class="guide">
+
+<section>
+<h2>Ground and surfaces</h2>
+<ul class="swatches">
+<li><span class="chip" style="background: var(--vh-marble)"></span><span><b>marble</b> The ground behind each panel, with tile joints.</span></li>
+<li><span class="chip" style="background: var(--vh-cloth)"></span><span><b>cloth</b> Panels, quiet buttons and answer options.</span></li>
+<li><span class="chip" style="background: var(--vh-sunken)"></span><span><b>sunken</b> Notes and notices.</span></li>
+<li><span class="chip" style="background: var(--vh-edge)"></span><span><b>edge</b> The outline and the lip of each cloth control. It reaches 3:1 on marble and cloth.</span></li>
+</ul>
+</section>
+
+<section>
+<h2>Text</h2>
+<ul class="swatches">
+<li><span class="chip" style="background: var(--vh-ink)"></span><span><b>ink</b> Text on marble, cloth and sunken.</span></li>
+<li><span class="chip" style="background: var(--vh-ink-muted)"></span><span><b>ink-muted</b> Captions and labels.</span></li>
+</ul>
+</section>
+
+<section>
+<h2>Kiswah and gold</h2>
+<ul class="swatches">
+<li><span class="chip" style="background: var(--vh-kiswah)"></span><span><b>kiswah</b> The panel header, the recitation block, a chosen answer. Nothing else is dark.</span></li>
+<li><span class="chip" style="background: var(--vh-on-kiswah)"></span><span><b>on-kiswah</b> Text on the kiswah. on-kiswah-muted is for the meaning line.</span></li>
+<li><span class="chip" style="background: var(--vh-gold)"></span><span><b>gold</b> Act here: the main button, the current bead, the switch that is on. One flat colour, never a gradient.</span></li>
+<li><span class="chip" style="background: var(--vh-gold-edge)"></span><span><b>gold-edge</b> The lip under a gold button. gold-line is the outline of a gold control and of a right answer.</span></li>
+<li><span class="chip" style="background: var(--vh-on-gold)"></span><span><b>on-gold</b> Text on gold.</span></li>
+</ul>
+</section>
+
+<section>
+<h2>Mistake</h2>
+<ul class="swatches">
+<li><span class="chip" style="background: var(--vh-mistake)"></span><span><b>mistake</b> A wrong answer: its outline, its cross and its words. Always with an icon and plain words.</span></li>
+<li><span class="chip" style="background: var(--vh-mistake-tint)"></span><span><b>mistake-tint</b> The fill of a wrong answer.</span></li>
+</ul>
+</section>
+
+</main>
+</body>
+</html>

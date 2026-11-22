@@ -1,0 +1,28 @@
+/* 8px scale, with 4px and 12px for tight groups. */
+:root {
+  --vh-space-1: 4px;
+  --vh-space-2: 8px;
+  --vh-space-3: 12px;
+  --vh-space-4: 16px;
+  --vh-space-6: 24px;
+  --vh-space-8: 32px;
+  --vh-space-12: 48px;
+
+  --vh-target: 48px;
+  --vh-control: 52px;
+  --vh-option: 56px;
+  --vh-switch: 44px;
+  --vh-mark: 24px;
+  --vh-bead: 20px;
+  --vh-bead-now: 28px;
+  --vh-lip: 5px;
+  --vh-stroke: 2px;
+  --vh-ring: 3px;
+  --vh-band: 6px;
+  --vh-tile: 80px;
+
+  --vh-radius-inner: 12px;
+  --vh-radius-control: 16px;
+  --vh-radius-panel: 24px;
+  --vh-radius-round: 999px;
+}
