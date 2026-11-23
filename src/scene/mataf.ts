@@ -1,20 +1,25 @@
+import plan from "./plan.json" with { type: "json" };
+
 // The plan of the tawaf place, in metres. x and y lie on the floor, and the centre of the Kaabah is 0,0.
 // Seen from above, the walk goes counter-clockwise: Hajar Aswad, the door, Hijr Ismail, Rukun Yamani.
-// tools/kaabah.py uses the same axes, so the door wall is the wall at x = -5.5.
+// The sizes live in plan.json, which tools/mataf.py also reads (D43). The door wall is the wall at x = -5.5.
 export type Point = readonly [number, number];
 
-export const KAABAH = { width: 11, depth: 12.5, height: 13, bandLow: 9.2, bandHigh: 10.4 };
-export const HAJAR_ASWAD: Point = [-5.5, 6.25];
-export const RUKUN_YAMANI: Point = [5.5, 6.25];
-export const DOOR: Point = [-5.5, 3.05];
+const point = ([x, y]: number[]): Point => [x, y];
+
+export const PLAN = plan;
+export const KAABAH = plan.kaabah;
+export const HAJAR_ASWAD = point(plan.hajarAswad.at);
+export const RUKUN_YAMANI = point(plan.rukunYamani);
+export const DOOR = point(plan.door.at);
 // A low wall, half an ellipse, on the wall at y = -6.25.
-export const HIJR = { centre: [0, -6.25] as Point, across: 5.5, out: 8.5, height: 1.3 };
-export const MAQAM: Point = [-18.5, 2.5];
+export const HIJR = { ...plan.hijr, centre: point(plan.hijr.centre) };
+export const MAQAM = point(plan.maqam.at);
 // The ring of arcades around the mataf.
-export const RING = 32;
+export const RING = plan.ring.radius;
 
 // The path of one circuit: an ellipse that clears the Kaabah and Hijr Ismail.
-const PATH = { centre: [0, -2.5] as Point, across: 14, along: 15.5 };
+const PATH = plan.path;
 
 export function onPath(degrees: number): Point {
   const angle = (degrees * Math.PI) / 180;
