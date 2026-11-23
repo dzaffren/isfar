@@ -19,6 +19,7 @@ People who prepare to go for hajj or umrah use it.
 ## Features
 
 - A person opens the deployed site and sees one 3D place, with one step of text in Malay or English.
+- The site leads a person through tawaf in 15 steps, in a 3D mataf, from the Kaabah and its parts to the end of circuit 7.
 
 ## Docs
 

@@ -3,3 +3,4 @@
 - Stop any local preview server before an e2e run, or Playwright tests the old build. ([stop-preview-before-e2e](stop-preview-before-e2e.md))
 - Import JSON with `with { type: "json" }` when a browser test reads the module. ([json-import-attribute](json-import-attribute.md))
 - Prove the 3D half of the browser test in Firefox on the dev machine. ([local-chromium-loses-3d](local-chromium-loses-3d.md))
+- Break the code a browser test guards, and watch the test fail. ([break-the-guarded-code](break-the-guarded-code.md))
