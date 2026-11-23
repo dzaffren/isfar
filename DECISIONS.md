@@ -376,3 +376,79 @@ Rejected: "Bismillahi wallahu akbar" (the form in the design system's sample; th
 chose the form without "wa").
 Source: specs/tawaf-walk.md
 Status: active
+
+## D39 · 2026-11-23 · The tawaf-walk slice proves its own frame rate, at /ship
+
+Why: the dev machine has no graphics chip, so nothing there can measure a frame rate.
+The user runs the speed test against the live site on a computer with a graphics chip.
+A fail sends the slice back to /build.
+Rejected: /poc first (it needs the same computer, and the slice is the same test with
+code that we keep), Accept the load time only (the frame rate stays unmeasured).
+Source: specs/tawaf-walk.md
+Status: active
+
+## D40 · 2026-11-23 · The 3D place draws only when something changes
+
+Why: the person reads each step for a while, and a phone stays cool when the place
+does not draw 60 times a second. The place draws during a camera move, after a resize
+and on load. The console reports the frames of each move.
+Rejected: Draw always, as the skeleton does (an old phone works and warms the whole
+time that the person reads).
+Source: specs/tawaf-walk.md
+Status: active
+
+## D41 · 2026-11-23 · The speed-test fix merges to main before tawaf-walk builds
+
+Why: each PR holds one thing. The user merges fix/speed-renderer-probe, and /build
+rebases feat/tawaf-walk on main.
+Rejected: Carry the fix commit in the tawaf-walk branch (one PR with two things in it).
+Source: specs/tawaf-walk.md
+Status: active
+
+## D42 · 2026-11-23 · The walk ships with no feature flag
+
+Why: the site is hidden from search engines and has a few testers. A rollback is one
+click in the Cloudflare dashboard, or a git revert and a push.
+Rejected: A flag in the address (more code, and a second path to test).
+Source: specs/tawaf-walk.md
+Status: active
+
+## D43 · 2026-11-23 · One plan file feeds the Blender script, the map and the camera
+
+Why: src/scene/plan.json holds the sizes of the place. The model, the top-view map and
+the camera views all read it, so the marker stands where the model shows the spot.
+Rejected: The numbers in tools/mataf.py and in src/scene/mataf.ts (the two drift apart,
+and no test sees it).
+Source: specs/tawaf-walk.md
+Status: active
+
+## D44 · 2026-11-23 · The names are HTML over the canvas, moved by place.ts
+
+Why: HTML text is sharp at phone size, and it uses the fonts and tokens that the page
+already has. place.ts sets the position of each name on each drawn frame.
+Rejected: Text drawn inside the 3D scene (blurry at phone size, and the font must load
+into WebGL), React state for each frame (the whole tree renders on each frame).
+Source: specs/tawaf-walk.md
+Status: active
+
+## D45 · 2026-11-23 · The camera moves on an arc around the Kaabah
+
+Why: the camera keeps its distance from the centre while its angle changes, so it
+never passes through the Kaabah.
+Rejected: A straight line between two views (from Hijr Ismail to Rukun Yamani, the
+line passes through the Kaabah).
+Source: specs/tawaf-walk.md
+Status: active
+
+## D46 · 2026-11-23 · The game feel is a pilgrim who walks on Next, and the self-check
+
+Why: the user asked for a gamified walk. A small figure that walks the path when the
+person presses Next stays led (D2) and works with a clicker (D31). tawaf-check is the
+game loop. tawaf-walk keeps the gold marker of D28, and a /shape pass after it plans
+the figure, the softer look and the man-or-woman choice.
+Rejected: Points, streaks and badges (the design brief bans them, and a score on an act
+of worship makes it feel cheap), A character that the person steers by hand (hard for
+an older person on a phone, no use with a clicker, and D2 rejected a free walk),
+Nintendo's own textures and patterns (they are Nintendo's art).
+Source: specs/tawaf-walk.md
+Status: active
