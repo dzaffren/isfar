@@ -582,3 +582,21 @@ Why: each question fades in over 320 ms, and the camera flies to the next spot i
 Rejected: Tier 1 (the camera cuts between the spots of the questions).
 Source: specs/tawaf-check.md
 Status: active
+
+## D62 · 2026-11-24 · An off Next button keeps the keyboard focus
+
+Why: in the check, "Seterusnya" is off until a pick. With `disabled`, the browser drops
+the focus to the page after each question. With `aria-disabled`, the focus stays and the
+click does nothing.
+Rejected: The `disabled` attribute (a keyboard person loses the place on each
+question), Hide the button until a pick (the bar changes its layout).
+Source: specs/tawaf-check.md
+Status: active
+
+## D63 · 2026-11-24 · The check ships with no feature flag
+
+Why: the site is hidden from search engines and has a few testers, as for the walk
+(D42). A rollback is one click in the Cloudflare dashboard, or a git revert and a push.
+Rejected: A flag in the address (more code, and a second path to test).
+Source: specs/tawaf-check.md
+Status: active
