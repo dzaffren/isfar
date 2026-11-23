@@ -1,6 +1,6 @@
 # Tawaf check
 
-**Version:** v1 · **Status:** Draft · **Type:** Feature · **Project type:** Web UI
+**Version:** v1 · **Status:** Refined · **Type:** Feature · **Project type:** Web UI
 
 **Shape doc:** docs/specs/virtual-hajj/shape.md
 **Depends on:** `tawaf-walk`
@@ -263,6 +263,173 @@ This is a draft in the Shafi'i school (D55). The user corrects it here. The righ
 | Right, wrong | Betul. Belum tepat. | Yes. Not quite. |
 | Result | 6 daripada 7 betul. Ulang kaji langkah ini: Langkah 6 · Rukun Yamani. Anda tahu tempat dan amalan setiap langkah. | 6 of 7 right. Go over these steps: Step 6 · Rukun Yamani. You know the place and the act of each step. |
 
+## Technical plan
+
+### Approach
+
+`App.tsx` reads `#semak` from the address and shows the check in place of the walk. The question number and the picks live in React state only, so a reload starts again (D53).
+`Scene.tsx` stays mounted between the walk and the check. It gets the walk step of each question, so the camera flies as in the walk, and a new `names` flag hides the names until the answer.
+No new file downloads, and the model does not change.
+
+Relies on: D13, D20, D30, D31, D40, D42, D44, D45, D47 to D61, D62, D63
+
+```mermaid
+flowchart TB
+    HASH[("Address: #semak or #tawaf-15")]
+    APP["App.tsx: walk or check, at, picks, keys"]
+    STEP["lib/step.ts: readStep, isCheck"]
+    LOGIC["lib/check.ts: score, missedSteps"]
+    TEXT["content/check.ts: 7 questions"]
+    SIDE["CheckSide: StepPanel, CheckQuestion or CheckResult, StepActions"]
+    SCENE["scene/Scene.tsx: step, names flag"]
+    PLACE["scene/place.ts: goTo, setNames"]
+    MAP["MatafMap: showNames"]
+    HASH -- "hashchange" --> APP
+    APP -- "hash text" --> STEP
+    APP -- "picks" --> LOGIC
+    APP -- "question of at" --> TEXT
+    APP -- "question, pick, score, missed steps" --> SIDE
+    SIDE -- "Keluar or a missed step sets location.hash" --> HASH
+    APP -- "walk step of the question, names after the answer" --> SCENE
+    SCENE -- "goTo(step), setNames(on)" --> PLACE
+    SCENE -- "no 3D: step, showNames" --> MAP
+```
+
+The address picks the walk or the check, `App.tsx` holds the picks, and the scene shows the walk step of each question.
+
+```mermaid
+sequenceDiagram
+    participant U as Person
+    participant A as App.tsx
+    participant Q as CheckQuestion
+    participant S as Scene.tsx
+    participant P as place.ts
+    U->>A: Page Down on step 15
+    A->>A: location.hash = "#semak", hashchange, at = 1, picks all empty
+    A->>S: step 3, names off
+    S->>P: goTo(3), setNames(false)
+    P-->>U: camera flies to the start, no names
+    U->>Q: taps "Sejajar dengan penjuru Hajar Aswad"
+    Q->>A: onPick(1)
+    A-->>U: tick on the answer, "Betul." and the line why, Seterusnya on
+    Q->>Q: scrolls the line why into view
+    A->>S: names on
+    S->>P: setNames(true), one frame
+    P-->>U: "Hajar Aswad" and "Lampu hijau" show
+    U->>A: Page Down
+    A->>A: at = 2
+```
+
+A tap locks the pick in `App.tsx`, and the scene shows the names. Page Down goes on only after a pick.
+
+No data crosses a trust boundary. The address is the only input. `isCheck` accepts only the exact text `#semak`, and the picks never leave the page.
+
+### Changes
+
+| File | What changes | Why |
+| --- | --- | --- |
+| `src/lib/step.ts:1-12` | Adds `CHECK_HASH = "#semak"` and `isCheck(hash)`. `readStep` stays as it is. | Scenarios 1 and 3, D51 |
+| `src/lib/check.ts` (new) | `score(picks, questions)` counts the right picks. `missedSteps(picks, questions)` gives the walk step of each missed question once, in walk order. | Scenario 1, D50 |
+| `src/App.tsx:24-38` | Holds `check` (from `isCheck(location.hash)`), `at` (1 to 7, or "result") and `picks`. The `hashchange` listener sets `check`, and a move into the check resets `at` and `picks`. | Scenarios 1 and 3, D53 |
+| `src/App.tsx:41-53` | Keys: on step 15, the Right arrow key and Page Down set `#semak`. In the check, they go to the next question only after a pick, and they do nothing on the result. The Left arrow key and Page Up do nothing in the check. | Scenario 3, D52, D58 |
+| `src/App.tsx:61-90` | In the check, the side column renders `CheckSide`, and `Scene` gets the question's walk step (15 on the result) and `names={picked}`. On step 15, "Mula semakan" takes the Next place, and "Mula semula" moves into the panel as a quiet button. | Scenarios 1 and 4, D57, D58 |
+| `src/components/CheckSide.tsx` (new) | The panel and the bar of the check, from the preview's `Screen` in `src/preview/tawaf-check.tsx:86-140`: header and beads, `CheckQuestion` or `CheckResult`, and `StepActions` with "Keluar" and "Seterusnya" or "Cuba semula". After Seterusnya, focus goes to the first answer of the new question. | Scenarios 1 to 3, D56, D59 |
+| `src/components/CheckQuestion.tsx` | After a pick, scrolls the line why to the centre of its scroll box, at once under reduced motion. | Scenario 1, the gap from the named reference |
+| `src/components/StepActions.tsx:44` | `off` sets `aria-disabled="true"` and drops the click, in place of `disabled`. Focus stays on the button. | Scenario 3, D62 |
+| `src/scene/place.ts:35`, `:164-170`, `:277` | A `namesOn` flag joins the test for a visible name. `setNames(on)` sets it and asks for one frame. `Place` gains `setNames`. | Scenario 1, D57, D40 |
+| `src/scene/Scene.tsx:10`, `:53`, `:69`, `:76` | Takes `names` (true by default). Calls `setNames` in its own effect and after the load. Passes `showNames` to `MatafMap`. | Scenarios 1 and 4, D57 |
+| `src/content/text.ts` | Keeps the check words of pause 2. | Scenario 1 |
+| `e2e/helpers.ts` (new), `e2e/walk.spec.ts:1-105` | The shared parts move to one file: `SIZES`, `title`, `scene`, `names`, `expectNotices`, `expectBeads`, `expectCamera`, the WebGL-off script and `lightAt`. | Two browser test files need them |
+| `e2e/walk.spec.ts:150-158` | Step 15 shows "Mula semakan" in the bar, and the quiet "Mula semula" still restarts the walk. | D58 |
+| `e2e/check.spec.ts` (new) | Scenarios 1 to 4, and the rules below, at four sizes. | Scenarios 1 to 4 |
+| `src/lib/step.test.ts`, `src/lib/check.test.ts` (new), `src/content/check.test.ts` (new) | Unit tests, listed in the test plan. | Scenarios 1 to 3 |
+| `preview/`, `src/preview/` (deleted) | The preview goes when `e2e/check.spec.ts` passes. | Nothing ships them |
+| `CHANGELOG.md` | One "Added" line for the check. | The repo's rule |
+
+Reusing: `StepPanel`, `Beads`, `StepActions`, `MessageCard`, `Notice`, `MatafMap` and `Scene` as they are, apart from the changes above. `readStep` and `stepHash` in `src/lib/step.ts`, the `hashchange` listener and the key listener in `src/App.tsx:34-53`, the draw on change of `request()` in `src/scene/place.ts:205`, and the WebGL-off script, `expectCamera` and the model-load count of `e2e/walk.spec.ts`.
+Each component of pause 2 stays: `AnswerOption`, `CheckQuestion`, `CheckResult`, `src/content/check.ts`.
+
+### Earn-it
+
+| Added | Triggered by |
+| --- | --- |
+| `src/lib/check.ts` | Scenario 1: the count and the missed steps need a unit test, apart from React |
+| `CheckSide.tsx` | Scenarios 1 to 3: the check panel and bar would add about 60 lines to `App.tsx`. The walk panel stays in `App.tsx`. |
+| `setNames` on the place | D57: the names hide in 3D, and the camera does not move on a pick |
+| `aria-disabled` on Next | D62: a disabled button drops the keyboard focus to the page |
+| Focus to the first answer | Scenario 3 and the access floor: after Seterusnya, the next control is the answer |
+| `e2e/helpers.ts` | Two browser test files use the same eight helpers |
+| Three unit test files | The test plan |
+
+Cut: a router, a state library, a store for the picks (D53), the question number in the address (D53), a console line for the result (the site keeps no log of the answers), a feature flag (D63).
+
+### Non-functionals
+
+|                      |     |
+| -------------------- | --- |
+| **Load**             | A few visits a day: the user and a few testers. The site is static files on Cloudflare's network. |
+| **Breaks first**     | Nothing at 10 times the visits: the site has no server. The check adds about 6 KB of script and no new download, so the 500 KB ceiling of D16 does not move. |
+| **Security surface** | Anyone can open the site. Its inputs are the device language, one stored value and the address. `isCheck` matches only `#semak`. The picks are numbers in memory, and React escapes the text. No new secret, and the site stores nothing new. |
+| **Proof it works**   | CI runs `e2e/check.spec.ts` against the build before the deploy. The smoke step prints `smoke: https://isfar-57q.pages.dev ok`. No number comes from real visitors (shape O5). |
+| **Rollout**          | No flag (D63). The check ships when the PR merges. Rollback: "Rollback to this deployment" in the Cloudflare dashboard, or `git revert` and a push. |
+
+### Test plan
+
+| Scenario | Test | Command |
+| -------- | ---- | ------- |
+| 1. Aminah finishes the walk and checks what she learned | `e2e/check.spec.ts`, at four sizes: step 15 to the result, names hidden then shown, "Langkah 6 · Rukun Yamani" opens `#tawaf-6`. `src/lib/check.test.ts`: the count, a missed question 1 and 2 give one step 3, none missed gives an empty list. | `pnpm e2e --project=firefox` here, `pnpm e2e --project=chromium` in CI. `pnpm test` |
+| 2. Aminah picks a wrong answer | `e2e/check.spec.ts`: the cross and "Belum tepat." on her pick, the tick on the right answer, `aria-disabled` on each answer | `pnpm e2e --project=firefox` |
+| 3. Ustaz Hafiz runs the check on a projector | `e2e/check.spec.ts` at 1920x1080: Page Down before and after a pick, BM with one model download, reload to question 1, Back to the page before. `src/lib/step.test.ts`: `#semak`, `#semak-4`, `#SEMAK`, `#tawaf-15`. | `pnpm e2e --project=firefox`, `pnpm test` |
+| 4. The check works with no 3D | `e2e/check.spec.ts` with the WebGL-off script: the map, the marker of question 2, all seven questions to the result | `pnpm e2e --project=firefox` |
+| Rule: seven questions, three answers, one right, in fixed order | `src/content/check.test.ts`: in each language, the same steps and the same right answer, and no two questions in a row with the right answer in the same place | `pnpm test` |
+| Rule: each question and line why is 40 words or fewer | `src/content/check.test.ts` | `pnpm test` |
+| Rule: the line why is not under the bar after a pick | `e2e/check.spec.ts` at 360x800 and 960x540: after a pick on question 2, the bottom of the line is above the top of the bar | `pnpm e2e --project=firefox` |
+| Rule: the camera cuts under reduced motion | `e2e/check.spec.ts`, with reduced motion set in Playwright | `pnpm e2e --project=firefox` |
+| Rule: the walk still restarts from step 15 | `e2e/walk.spec.ts` | `pnpm e2e --project=firefox` |
+
+**E2E:** `e2e/check.spec.ts` walks scenarios 1 to 4. The Playwright setup exists, and CI on `main` is green with it.
+
+The other commands: `pnpm typecheck`, `pnpm build && pnpm size`. Stop any `vite preview` server on port 4173 before `pnpm e2e` (a lesson of the skeleton). The dev server on port 5199 does not get in the way.
+
+### Chunks
+
+Single chunk. `App.tsx`, `Scene.tsx` and `place.ts` share the `names` contract, and the one browser test needs all three.
+
+Order inside the chunk:
+
+1. `step.ts`, `check.ts` and the three unit test files.
+2. `StepActions` with `aria-disabled`. `CheckSide`, then `App.tsx` with the address, the keys and step 15. The check works on the map.
+3. `names` in `Scene.tsx` and `setNames` in `place.ts`.
+4. `e2e/helpers.ts`, then `e2e/check.spec.ts` in full, then the step 15 lines of `e2e/walk.spec.ts`. Delete the preview.
+
+### Risks
+
+| Risk | Mitigation |
+| ---- | ---------- |
+| A name stays on screen after `setNames(false)`, because the place draws only on a change (D40). | `setNames` asks for one frame. The browser test checks that no name shows on question 1 and on question 3 after a move. |
+| Page Down on step 15 now opens the check, and an ustaz presses it by mistake. | "Keluar" and the browser's Back button go to step 15 at once. Tawaf-walk's O26 kept the clicker from a restart, which loses the place. The check loses nothing. |
+| A reload during the check loses the picks. | Accepted in D53. Seven questions take about 2 minutes. |
+| The question text has a mistake in a ruling. | The "not yet reviewed" notice stays, and the site stays hidden from search engines (D14). A qualified person reviews it before a public launch (shape O1). |
+| The scroll after a pick moves a page that the person reads with a screen magnifier. | The scroll goes to the centre once, only after a tap, and it is instant under reduced motion. |
+
+### Decisions to record
+
+```
+## D62 · 2026-11-24 · An off Next button keeps the keyboard focus
+
+Why: in the check, "Seterusnya" is off until a pick. With `disabled`, the browser drops the focus to the page after each question. With `aria-disabled`, the focus stays and the click does nothing.
+Rejected: The `disabled` attribute (a keyboard person loses the place on each question), Hide the button until a pick (the bar changes its layout).
+Source: specs/tawaf-check.md
+Status: active
+
+## D63 · 2026-11-24 · The check ships with no feature flag
+
+Why: the site is hidden from search engines and has a few testers, as for the walk (D42). A rollback is one click in the Cloudflare dashboard, or a git revert and a push.
+Rejected: A flag in the address (more code, and a second path to test).
+Source: specs/tawaf-check.md
+Status: active
+```
+
 ## Decisions
 
 Recorded as D47 to D55 at pause 1, and D56 to D61 at pause 2.
@@ -287,6 +454,7 @@ Recorded as D47 to D55 at pause 1, and D56 to D61 at pause 2.
 | O14 | The answer option and the button have no padding above and below the text. A two-line answer, such as question 2, touches the edge. | flag | spec p2 | user | Resolved | Added to the design system: `.vh-button` and `.vh-option` get a `--vh-space-3` padding above and below, and their min-height drops by the same amount. A one-line control keeps its height. "Keep each answer to one line" was rejected. 2026-11-24 |
 | O15 | Which motion tier does the check use? | question | spec p2 | user | Resolved | Tier 2, as in the walk. Tier 1 was rejected. 2026-11-24 |
 | O16 | Is the draft text of the check right? | question | spec p2 | user | Resolved | Right as drafted. The "not yet reviewed" notice stays, and a qualified person reviews the text before a public launch (shape O1). 2026-11-24 |
+| O17 | Does the check ship behind a feature flag? | question | spec p3 | user | Resolved | No flag, as for the walk (D42). The rollback is the Cloudflare dashboard, or a `git revert`. "A flag in the address" was rejected. 2026-11-24 |
 
 _Never delete this section or its rows. See references/ledger.md._
 
