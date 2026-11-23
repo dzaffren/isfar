@@ -229,7 +229,7 @@ The new React parts wrap system classes only: `AnswerOption.tsx` wraps `vh-optio
 
 **Added to the design system:** a `--vh-space-3` padding above and below the text of `.vh-button` and `.vh-option`, in `docs/design/design-system/styles.css`. The min-height of each drops by the same amount, so a one-line control keeps its height (O14).
 
-**Access:** The beads carry "Soalan 3 daripada 7" as text. Each answer is a button with `aria-pressed`, and it carries `aria-disabled` after the answer. The line why is a polite live region that is on the page before the answer, so a screen reader reads it when it fills. The tick and the cross are hidden from a screen reader, and the line says "Betul." or "Belum tepat." in words. Each control is 52 px high or more.
+**Access:** The beads carry "Soalan 3 daripada 7" as text. Each answer is a button with `aria-pressed`, and it carries `aria-disabled` after the answer. The line why is a polite live region that is on the page before the answer, so a screen reader reads it when it fills. The tick and the cross are hidden from a screen reader, and the line says "Betul." or "Belum tepat." in words. Before the pick, the text of the scene names no place. After a move between the walk and the check, question 1 focuses its first answer, and the walk focuses its gold button. Each control is 52 px high or more.
 
 **Preview:** `http://localhost:5199/preview/tawaf-check.html`, after `pnpm dev --port 5199`. It lists 18 frames, and each frame is a working check screen from the real components. The frames show the top-view map, so the page does not open 18 3D views. The link "Open question 1 with the real 3D place" shows the real place. Open it in Firefox on this machine. The names still show in 3D there, because `place.ts` hides them only at /build.
 
@@ -260,6 +260,7 @@ This is a draft in the Shafi'i school (D55). The user corrects it here. The righ
 | Step 15 button, leave, try again | Mula semakan, Keluar, Cuba semula | Start the check, Leave, Try again |
 | Header | Semakan · Soalan 3 daripada 7. Semakan · Selesai. | Check · Question 3 of 7. Check · Done. |
 | Beads, for a screen reader | Soalan 3 daripada 7 | Question 3 of 7 |
+| The scene before the pick, for a screen reader | Penanda emas di mataf. Nama tempat muncul selepas anda menjawab. | A gold marker in the mataf. The name of the place shows after you answer. |
 | Right, wrong | Betul. Belum tepat. | Yes. Not quite. |
 | Result | 6 daripada 7 betul. Ulang kaji langkah ini: Langkah 6 · Rukun Yamani. Anda tahu tempat dan amalan setiap langkah. | 6 of 7 right. Go over these steps: Step 6 · Rukun Yamani. You know the place and the act of each step. |
 
@@ -420,6 +421,13 @@ Recorded as D62, D63.
 
 Recorded as D47 to D55 at pause 1, and D56 to D61 at pause 2.
 
+## Review
+
+2026-11-24 · 3 raw findings, 2 survived, 2 fixed.
+
+- correctness · `src/App.tsx:91` · the scene text names no place before the pick, so a screen reader does not hear the answer · `cd85fb2`
+- correctness · `src/App.tsx:108` · after a move between the walk and the check, the new screen takes the focus · `e8a262a`
+
 ## Open items
 
 | ID  | What | Type | Raised at | Owner | Status | Answer |
@@ -442,6 +450,7 @@ Recorded as D47 to D55 at pause 1, and D56 to D61 at pause 2.
 | O16 | Is the draft text of the check right? | question | spec p2 | user | Resolved | Right as drafted. The "not yet reviewed" notice stays, and a qualified person reviews the text before a public launch (shape O1). 2026-11-24 |
 | O17 | Does the check ship behind a feature flag? | question | spec p3 | user | Resolved | No flag, as for the walk (D42). The rollback is the Cloudflare dashboard, or a `git revert`. "A flag in the address" was rejected. 2026-11-24 |
 | O18 | Scenario 4 said "When she answers question 1 and taps Seterusnya, Then the marker on the map moves to the spot of question 2". Questions 1 and 2 both show step 3, so the marker does not move. | flag | build | user | Decided alone | Chose: the scenario answers questions 1 and 2, and the marker moves to the spot of question 3. Other: give question 2 a spot of its own. Undo: change the step of question 2 in `src/content/check.ts`, and put back the old scenario 4. 2026-11-24 |
+| O19 | The scene text for a screen reader named the place of questions 1 and 4, which holds the right answer. Pause 2 did not name a text for the scene in the check. | flag | review | user | Decided alone | Chose: before the pick, the scene reads "Penanda emas di mataf. Nama tempat muncul selepas anda menjawab." Other: keep the walk step's text, and give a screen reader the answer. Undo: `git revert cd85fb2`. 2026-11-24 |
 
 _Never delete this section or its rows. See references/ledger.md._
 
