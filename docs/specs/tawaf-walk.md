@@ -519,6 +519,16 @@ Order inside the chunk:
 
 Recorded as D22 to D31 at pause 1, D32 to D38 at pause 2, and D39 to D46 at /build.
 
+## Review
+
+2026-11-23 · 12 raw findings, 4 survived, 4 fixed, 1 lead needs validation.
+
+- correctness · `e2e/walk.spec.ts:341` · the resize test waits for the canvas to shrink below its old width · `99ba6d6`
+- correctness · `e2e/speed.spec.ts:56` · the speed test divides the gaps between frames, not the frames, by the time · `43645c0`
+- correctness · `src/scene/views.ts:26` · the step 2 camera stands closer and higher, so the arcade roof no longer hides the marker · `05b0ac0`
+- correctness · `src/app.css:36` · the side column gets the scroll padding, so the Back and Next bar no longer hides a focused control at 960x540 · `cf6fc07`
+- needs validation · `src/components/StepPanel.tsx:22` · whether VoiceOver, NVDA and TalkBack announce a polite live region that is inserted with its content already present · with VoiceOver or NVDA on, open `#tawaf-1`, focus "Seterusnya", press Enter, and listen for the step 2 title
+
 ## Open items
 
 | ID  | What | Type | Raised at | Owner | Status | Answer |
