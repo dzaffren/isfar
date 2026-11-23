@@ -531,3 +531,54 @@ and the "not yet reviewed" notice stays.
 Rejected: The user writes each question (pause 2 waits for the text).
 Source: specs/tawaf-check.md
 Status: active
+
+## D56 · 2026-11-24 · In the check, the seven beads count the questions
+
+Why: seven beads and seven questions. A done bead is an answered question, and the
+current bead is this question. The beads show progress, not right or wrong.
+Rejected: A label only (the person loses the progress that always shows).
+Source: specs/tawaf-check.md
+Status: active
+
+## D57 · 2026-11-24 · The names of the parts hide until the answer
+
+Why: a name such as "Hajar Aswad" on question 1 gives the answer away. After the tap,
+the name shows with the line why, so the person joins the name to the spot.
+Rejected: No names in the check (the person does not see the name on the spot), Names
+always, as in the walk (they give answers away).
+Source: specs/tawaf-check.md
+Status: active
+
+## D58 · 2026-11-24 · On step 15, "Mula semakan" takes the gold place, and "Mula semula" moves into the panel
+
+Why: one gold act on each screen (D3). The Right arrow key and Page Down on step 15
+then open the check, so an ustaz goes on with the clicker.
+Rejected: A gold button in the panel beside a gold "Mula semula" in the bar (two acts
+in gold on one screen).
+Source: specs/tawaf-check.md
+Status: active
+
+## D59 · 2026-11-24 · "Keluar" leaves the check for step 15
+
+Why: a short label fits beside "Seterusnya" at 360 px. The answers are dropped (D53).
+Rejected: No left button (only the browser's Back button leaves the check), "Kembali"
+to the last question (one more state to build and test).
+Source: specs/tawaf-check.md
+Status: active
+
+## D60 · 2026-11-24 · The button and the answer option have padding above and below their text
+
+Why: a two-line answer or label touched the edge. The min-height drops by the same
+padding, so a one-line control keeps its height of 52 px or 56 px.
+Rejected: Keep each answer to one line at 360 px (Malay answers such as "Apabila anda
+sampai semula sejajar dengan Hajar Aswad" do not fit).
+Source: specs/tawaf-check.md
+Status: active
+
+## D61 · 2026-11-24 · The check uses motion tier 2, as the walk does
+
+Why: each question fades in over 320 ms, and the camera flies to the next spot in about
+1 second, so the person keeps the walk order. Under reduced motion, the camera cuts.
+Rejected: Tier 1 (the camera cuts between the spots of the questions).
+Source: specs/tawaf-check.md
+Status: active
