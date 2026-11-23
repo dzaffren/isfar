@@ -6,6 +6,11 @@ on:
 permissions:
   contents: read
 
+# A newer push to a branch cancels its older run, test and deploy together, so an older build never goes live after a newer one.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -40,9 +45,6 @@ jobs:
     permissions:
       contents: read
       deployments: write
-    concurrency:
-      group: deploy-${{ github.ref }}
-      cancel-in-progress: true
     steps:
       - uses: actions/download-artifact@v8
         with:
