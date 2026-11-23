@@ -1,6 +1,6 @@
 # Tawaf walk
 
-**Version:** v1 · **Status:** Draft · **Type:** Feature · **Project type:** Web UI
+**Version:** v1 · **Status:** Refined · **Type:** Feature · **Project type:** Web UI
 
 **Shape doc:** docs/specs/virtual-hajj/shape.md
 **Depends on:** `walking-skeleton`
@@ -210,14 +210,14 @@ New words on the controls: "Seterusnya" and "Next", "Kembali" and "Back", "Mula 
 | --- | --- |
 | The two rakaat behind Maqam Ibrahim, and the zamzam | `full-umrah` |
 | A choice of man or woman, with the text for that person | `pilgrim-choice`, a new slice after `full-umrah` (O4) |
-| A pilgrim figure in the 3D place | No slice. Rejected on 2026-11-23 (O9). `pilgrim-choice` can ask again. |
+| A pilgrim figure that walks the path on Next, and a softer look for the place | A /shape pass after this slice (O25, D46) |
 | The niat in Arabic, and a doa for each circuit | No slice. Rejected on 2026-11-23 (O6). |
 | Sound for the recitations | No slice. Not in the shape. |
 | The self-check | `tawaf-check` |
 | Sa'i | `sai-walk` |
 | A tap on a bead to jump to a circuit, and a list of steps | No slice. A link opens a step. |
 | A swipe to change the step | No slice. Not in the shape. |
-| A drag to look around | No slice. D2 leads the person. |
+| A drag to look around | No slice yet. The /shape pass of O25 can ask again. |
 | Minarets and the upper floors in the model | No slice. Rejected on 2026-11-23 (O8). |
 | A drawn picture for each step, for a device with no 3D | No slice. Rejected on 2026-11-23 (O10). |
 | The other kinds of tawaf: qudum, ifadah, wada' and sunat | The hajj shape (shape O7) |
@@ -357,11 +357,247 @@ This is a draft in the Shafi'i school (D24). The user corrects it here.
 | Names of the parts | Hajar Aswad, Pintu Kaabah, Hijr Ismail, Rukun Yamani, Maqam Ibrahim, Lampu hijau | Hajar Aswad, The door, Hijr Ismail, Rukun Yamani, Maqam Ibrahim, Green light |
 | Map, for a screen reader | Peta mataf dari atas | Map of the mataf from above |
 
-## Decisions
+## Technical plan
+
+### Approach
+
+`App.tsx` reads the step from the address, and it gives the step to the step panel and to `Scene.tsx`.
+`Scene.tsx` hands the step to `place.ts`, which moves the camera on an arc to the view of that step. The place draws only while something changes.
+The model is a new `mataf.glb`. A Blender script builds it from the same plan file that the map and the camera read.
+
+Relies on: D2, D5, D8, D11, D13, D16, D18, D19, D20, D22, D26, D27, D28, D29, D30, D31, D32, D34, D36, D37, D39, D40, D41, D42, D43, D44, D45, D46
+
+```mermaid
+flowchart TB
+    HASH[("Address: #tawaf-6")]
+    APP["App.tsx: step, language, keys"]
+    STEP["lib/step.ts: readStep, stepHash"]
+    TEXT["content/tawaf.ts: 15 steps"]
+    PANEL["StepPanel, StepActions, Beads, ArabicBlock, Note"]
+    SCENE["scene/Scene.tsx: four states, names, map"]
+    PLACE["scene/place.ts: three.js, lazy file"]
+    VIEWS["scene/views.ts and mataf.ts"]
+    PLAN[("scene/plan.json")]
+    GLB[("/models/mataf.glb")]
+    HASH -- "hashchange" --> APP
+    APP -- "hash text" --> STEP
+    APP -- "step number" --> TEXT
+    APP -- "words, beads, Next and Back" --> PANEL
+    PANEL -- "sets location.hash" --> HASH
+    APP -- "step number" --> SCENE
+    SCENE -- "goTo(step)" --> PLACE
+    PLACE -- "camera of the step, arc between two" --> VIEWS
+    VIEWS -- "sizes and spots" --> PLAN
+    PLACE -- "GET, then draws" --> GLB
+    PLAN -- "tools/mataf.py, in Blender" --> GLB
+```
+
+The address holds the step, `App.tsx` turns it into words and a step number, and `place.ts` draws the model at the camera of that step.
+
+```mermaid
+sequenceDiagram
+    participant U as Person
+    participant A as App.tsx
+    participant H as Address
+    participant S as Scene.tsx
+    participant P as place.ts
+    U->>A: taps Seterusnya on step 6
+    A->>H: location.hash = "#tawaf-7"
+    H-->>A: hashchange
+    A->>A: readStep("#tawaf-7", 15) gives 7
+    A-->>U: step 7 text fades in, beads stay on circuit 1
+    A->>S: step 7
+    S->>P: goTo(7)
+    P->>P: arc from view 6 to view 7, 900 ms (0 ms under reduced motion)
+    loop each frame of the move
+        P-->>U: draws the place, moves each name
+    end
+    P->>S: data-camera="7"
+    P-->>U: console: [isfar] camera at step 7: 54 frames in 900 ms
+```
+
+A tap changes the address, the address changes the step, and the camera flies while the text is already on screen.
+
+No data crosses a trust boundary. The address is the only input, and `readStep` accepts only `#tawaf-1` to `#tawaf-15`.
+
+### Changes
+
+| File | What changes | Why |
+| --- | --- | --- |
+| `src/lib/step.ts` (new) | `readStep(hash, total)` gives the step of `#tawaf-6`, and 1 for each other text. `stepHash(step)` gives the address part. | Scenario 2, D30 |
+| `src/App.tsx:11-38` | Holds the step: reads `location.hash` at the start, and listens to `hashchange`. Next, Back and "Mula semula" set `location.hash`. A `keydown` listener does the same for the arrow keys and Page Up and Page Down. The layout comes from `Walk()` in `src/preview/tawaf-walk.tsx`. | Scenarios 1 and 2, D31 |
+| `src/scene/Scene.tsx:8`, `:20-56` | Takes `step`. Calls `goTo(step)` in its own effect, so a step change and a language change do not load the place again. `MatafMap` takes the place of `StillPicture` at line 51. Holds one `scene__name` element for each part, which `place.ts` moves. Sets `data-camera` and `data-moving`. | Scenarios 1, 2 and 4, D29, D44 |
+| `src/scene/place.ts:22-28` | The colour map gains the new mesh names: `hijr`, `maqam`, `stone`, `arcade`, `arch`, `guide`, `lamp`. | Scenario 1, D27, D35 |
+| `src/scene/place.ts:31-64` | Loads `/models/mataf.glb`. `showPlace` takes the first step and the name elements, and it returns `{ stop, goTo }`. The camera starts at the view of the first step, with no move. Adds the marker, its pole and the path line with arrows as three.js meshes. | Scenarios 1 and 2, D28 |
+| `src/scene/place.ts:80-98` | Draws on change: during a camera move, after a resize, and on the first frame. On each drawn frame it puts each name at the screen point of its part. It logs one line for each move. | D40, D44, scenario 5 |
+| `src/scene/views.ts` (new) | `viewOf(step)` moves here from `camera()` in `src/preview/Standin.tsx:25`. `between(from, to, t)` gives the camera on an arc around the Kaabah. `namePlace(part, view)` holds the offsets of `WIDE_PUSH`. | Scenario 1, D45 |
+| `src/scene/plan.json` (new), `src/scene/mataf.ts:6-20` | The sizes of the Kaabah, Hijr Ismail, Maqam Ibrahim, the ring and the path move to `plan.json`. `mataf.ts` imports it. `tsconfig.json` gains `resolveJsonModule`. | D43 |
+| `tools/mataf.py` (new), `tools/kaabah.py` (deleted) | A Blender script that reads `plan.json`. It builds the Kaabah as before, the Hajar Aswad stone, the wall of Hijr Ismail, Maqam Ibrahim, a floor disc, 40 arcade walls with arches and a roof, the guide line and the lamp. Each mesh has a name, and the file has no materials. | D19, D26, D27 |
+| `public/models/mataf.glb` (new), `kaabah.glb` (deleted) | The exported model, committed. | D19 |
+| `package.json:19` | `model` runs `blender -b -P tools/mataf.py`. | D19 |
+| `src/content/text.ts:7-9`, `:39-41` | The skeleton's `scene`, `title` and `text` go. The loading title stays "Memuatkan Kaabah". | Scenario 1 |
+| `src/components/StillPicture.tsx` (deleted), `src/app.css:25-34` | The map takes its place. Its fill rules go with it. | D29 |
+| `src/app.css:50`, `:76-78` | The `:has(.walk__actions)` guards go, because each page is now the walk. | D36 |
+| `preview/`, `src/preview/` (deleted) | The stand-in drawing and the preview page go when the real place passes the browser test. | Nothing ships them |
+| `e2e/walk.spec.ts` (new), `e2e/skeleton.spec.ts` (deleted) | Scenarios 1 to 4. It keeps four cases of the skeleton with the new words: a lost 3D context during the download, the stored language, an Indonesian device, and one model download across a language switch. | Scenarios 1 to 4 |
+| `e2e/speed.spec.ts:36-50` | After the place shows, it presses the Right arrow key 14 times, one press each 2 seconds. It reads the console line of each move and fails under 30 frames a second. | Scenario 5 |
+| `src/lib/step.test.ts`, `src/content/tawaf.test.ts`, `src/scene/views.test.ts` (new) | Unit tests, listed in the test plan. | Scenarios 1 to 3, D45 |
+| `CHANGELOG.md` | One "Added" line for the walk. | The repo's rule |
+
+Reusing: `pickLanguage` and `storeLanguage` in `src/lib/language.ts:9-28`, the `token()` colour reader in `src/scene/place.ts:18`, the lost-context path in `src/scene/place.ts:36` and `:77`, `canDraw3D` in `src/scene/Scene.tsx:10`, `kaabahIsDrawn` and the WebGL-off script in `e2e/skeleton.spec.ts:38` and `:69`, and `scripts/check-size.mjs`, which already counts each file in `dist/models`.
+Each component of pause 2 stays as it is: `Beads`, `ArabicBlock`, `Note`, `StepActions`, `MatafMap`, `StepPanel`.
+
+### Earn-it
+
+| Added | Triggered by |
+| --- | --- |
+| `src/lib/step.ts` | Scenario 2: five address cases need a unit test |
+| `src/scene/views.ts` | Scenario 1 and D45: the arc needs a unit test, and three.js cannot load in Vitest without a canvas |
+| `src/scene/plan.json` | D43: the Blender script and the TypeScript code must read the same numbers |
+| `goTo` on the place | Scenario 2: a step change must not load the place again |
+| Draw on change | D40 |
+| `data-camera` and `data-moving` | Scenarios 1, 2 and 4: the browser test must know where the camera is |
+| Names as HTML elements | D34, D44 |
+| The marker and path line as three.js meshes | D28: they move or hide by step, and the model file is still |
+| Three unit test files | The test plan |
+
+Cut: a router, a state library, an animation library, three.js `OrbitControls`, text inside the 3D scene, a feature flag, a second model file, a draw loop that never stops.
+
+### Non-functionals
+
+|                      |     |
+| -------------------- | --- |
+| **Load**             | A few visits a day: the user and a few testers. The site is static files on Cloudflare's network. |
+| **Breaks first**     | Nothing at 10 times the visits: the site has no server. The nearest limit is the 500 KB ceiling of D16. The skeleton uses 150 KB, and I expect the new model to add under 60 KB. `pnpm size` fails the build over the ceiling. |
+| **Security surface** | Anyone can open the site. Its inputs are the device language, one stored value and the address. `readStep` accepts only `#tawaf-1` to `#tawaf-15`, and the page never writes the address into its HTML. React escapes the step text. No new secret, and the site stores nothing new. |
+| **Proof it works**   | The smoke step prints `smoke: https://isfar-57q.pages.dev ok`. The browser console prints `[isfar] place shown in 2140 ms`, and `[isfar] camera at step 7: 54 frames in 900 ms` after each move. No number comes from real visitors (shape O5). |
+| **Rollout**          | No flag (D42). The walk takes the place of the one-step page when the PR merges. Rollback: "Rollback to this deployment" on the earlier deployment in the Cloudflare dashboard, or `git revert` and a push. |
+
+### Test plan
+
+| Scenario | Test | Command |
+| -------- | ---- | ------- |
+| 1. Aminah walks tawaf from the first step to the last | `e2e/walk.spec.ts`, at four sizes. `src/content/tawaf.test.ts`: 15 steps in each language, the beads of steps 1, 3, 4, 8, 9, 14 and 15. | `pnpm e2e --project=firefox` here, `pnpm e2e --project=chromium` in CI. `pnpm test` |
+| 2. Ustaz Hafiz opens a step by its link | `e2e/walk.spec.ts`. `src/lib/step.test.ts`: `#tawaf-6`, `#tawaf-15`, `#tawaf-0`, `#tawaf-99`, `#abc` and an empty address. | `pnpm e2e --project=firefox`, `pnpm test` |
+| 3. A recitation and a note | `e2e/walk.spec.ts`. `src/content/tawaf.test.ts`: recitations on steps 3 and 7, notes on steps 2, 5 and 13, in each language. | `pnpm e2e --project=firefox`, `pnpm test` |
+| 4. The walk works with no 3D | `e2e/walk.spec.ts`: 3D off, then a failed download of `mataf.glb` | `pnpm e2e --project=firefox` |
+| 5. The fuller place runs at old-phone speed | `e2e/speed.spec.ts`, run by the user after the deploy, on a computer with a graphics chip | `SPEED_URL=https://isfar-57q.pages.dev pnpm e2e:speed` |
+| Rule: each step text is 40 words or fewer | `src/content/tawaf.test.ts` | `pnpm test` |
+| Rule: the camera cuts under reduced motion | `e2e/walk.spec.ts`, with reduced motion set in Playwright | `pnpm e2e --project=firefox` |
+| Rule: the camera never passes through the Kaabah | `src/scene/views.test.ts`: on each move between two neighbour steps, the camera stays 9 m or more from the centre | `pnpm test` |
+| Rule: the 3D download stays under 500 KB | `scripts/check-size.mjs` | `pnpm build && pnpm size` |
+
+**E2E:** `e2e/walk.spec.ts` walks scenarios 1 to 4. The Playwright setup exists, and CI on `main` is green with it.
+
+The other commands: `pnpm typecheck`, `pnpm model`. Stop any `vite preview` server before `pnpm e2e` (a lesson of the skeleton).
+
+### Chunks
+
+Single chunk. `Scene.tsx` and `place.ts` share one contract, and the one browser test needs both.
+
+Order inside the chunk:
+
+1. The user merges `fix/speed-renderer-probe`. Rebase `feat/tawaf-walk` on `main` (D41).
+2. `step.ts` and the two content tests. Then `App.tsx` with the address, the keys and the layout. `Scene.tsx` shows the map for each step. Scenarios 2, 3 and the no-3D half of 4 pass.
+3. `plan.json`, `views.ts` and its test.
+4. `tools/mataf.py` and `mataf.glb`. Then `place.ts`: the new model, the marker, the path line, `goTo`, the names, and draw on change.
+5. `e2e/walk.spec.ts` in full, then `e2e/speed.spec.ts`. Delete the preview.
+
+### Risks
+
+| Risk | Mitigation |
+| ---- | ---------- |
+| The fuller place does not hold 30 frames a second at phone speed. Nothing on the dev machine can measure it. | Scenario 5 at /ship, on a computer with a graphics chip (O21). The first cuts, in order: no antialias on a phone, a pixel ratio of 1.5, fewer arcade walls. |
+| A real old phone is still untested. | Accepted in the skeleton (O9 there). Draw on change lowers the work between steps. |
+| Draw on change leaves a blank or old frame after a resize, a theme change or a restored tab. | The place draws on each resize and when the page becomes visible. The browser test resizes once and checks the pixel. |
+| The names overlap on a view that the preview did not show. | Fixed offsets for the wide view, from the preview. The browser test checks that the five names of step 1 do not overlap at four sizes. |
+| The model and the code read different numbers. | One `plan.json` (D43). |
+| The step text has a mistake in a ruling. | The "not yet reviewed" notice stays on each step, and the site stays hidden from search engines (D14). A qualified person reviews it before a public launch (shape O1). |
+| `fix/speed-renderer-probe` is not merged when /build starts. | /build stops at step 1 and says so. |
 
 ### Decisions to record
 
 Recorded as D22 to D31 at pause 1, and D32 to D38 at pause 2.
+
+Running `/build` approves these.
+
+```markdown
+## D39 · 2026-11-23 · The tawaf-walk slice proves its own frame rate, at /ship
+
+Why: the dev machine has no graphics chip, so nothing there can measure a frame rate.
+The user runs the speed test against the live site on a computer with a graphics chip.
+A fail sends the slice back to /build.
+Rejected: /poc first (it needs the same computer, and the slice is the same test with
+code that we keep), Accept the load time only (the frame rate stays unmeasured).
+Source: specs/tawaf-walk.md
+Status: active
+
+## D40 · 2026-11-23 · The 3D place draws only when something changes
+
+Why: the person reads each step for a while, and a phone stays cool when the place
+does not draw 60 times a second. The place draws during a camera move, after a resize
+and on load. The console reports the frames of each move.
+Rejected: Draw always, as the skeleton does (an old phone works and warms the whole
+time that the person reads).
+Source: specs/tawaf-walk.md
+Status: active
+
+## D41 · 2026-11-23 · The speed-test fix merges to main before tawaf-walk builds
+
+Why: each PR holds one thing. The user merges fix/speed-renderer-probe, and /build
+rebases feat/tawaf-walk on main.
+Rejected: Carry the fix commit in the tawaf-walk branch (one PR with two things in it).
+Source: specs/tawaf-walk.md
+Status: active
+
+## D42 · 2026-11-23 · The walk ships with no feature flag
+
+Why: the site is hidden from search engines and has a few testers. A rollback is one
+click in the Cloudflare dashboard, or a git revert and a push.
+Rejected: A flag in the address (more code, and a second path to test).
+Source: specs/tawaf-walk.md
+Status: active
+
+## D43 · 2026-11-23 · One plan file feeds the Blender script, the map and the camera
+
+Why: src/scene/plan.json holds the sizes of the place. The model, the top-view map and
+the camera views all read it, so the marker stands where the model shows the spot.
+Rejected: The numbers in tools/mataf.py and in src/scene/mataf.ts (the two drift apart,
+and no test sees it).
+Source: specs/tawaf-walk.md
+Status: active
+
+## D44 · 2026-11-23 · The names are HTML over the canvas, moved by place.ts
+
+Why: HTML text is sharp at phone size, and it uses the fonts and tokens that the page
+already has. place.ts sets the position of each name on each drawn frame.
+Rejected: Text drawn inside the 3D scene (blurry at phone size, and the font must load
+into WebGL), React state for each frame (the whole tree renders on each frame).
+Source: specs/tawaf-walk.md
+Status: active
+
+## D45 · 2026-11-23 · The camera moves on an arc around the Kaabah
+
+Why: the camera keeps its distance from the centre while its angle changes, so it
+never passes through the Kaabah.
+Rejected: A straight line between two views (from Hijr Ismail to Rukun Yamani, the
+line passes through the Kaabah).
+Source: specs/tawaf-walk.md
+Status: active
+
+## D46 · 2026-11-23 · The game feel is a pilgrim who walks on Next, and the self-check
+
+Why: the user asked for a gamified walk. A small figure that walks the path when the
+person presses Next stays led (D2) and works with a clicker (D31). tawaf-check is the
+game loop. tawaf-walk keeps the gold marker of D28, and a /shape pass after it plans
+the figure, the softer look and the man-or-woman choice.
+Rejected: Points, streaks and badges (the design brief bans them, and a score on an act
+of worship makes it feel cheap), A character that the person steers by hand (hard for
+an older person on a phone, no use with a clicker, and D2 rejected a free walk),
+Nintendo's own textures and patterns (they are Nintendo's art).
+Source: specs/tawaf-walk.md
+Status: active
+```
 
 ## Open items
 
@@ -387,6 +623,11 @@ Recorded as D22 to D31 at pause 1, and D32 to D38 at pause 2.
 | O18 | On a 360x800 phone, the step text starts under the actions bar. The skeleton kept the place at 320 px (its O28). | flag | spec p2 | user | Resolved | In the walk, the place is 240 px high on a phone. "Keep 320 px" was rejected. 2026-11-23 |
 | O19 | With no 3D, the skeleton's message card sits above the step text, on each of 15 steps. | flag | spec p2 | user | Resolved | The no-3D card sits under the step panel. The failed-download card stays above it. 2026-11-23 |
 | O20 | D25 names the first recitation "Bismillahi, Allahu Akbar". The design system's sample says "Bismillahi wallahu akbar". | question | spec p2 | user | Resolved | "Bismillahi, Allahu Akbar", without "wa". 2026-11-23 |
+| O21 | The fuller 3D place holds 30 frames a second at phone speed. The dev machine has no graphics chip, so nothing here can measure it. | unproven | spec p3 | user | Accepted risk | The slice proves it: the user runs scenario 5 against the live site at /ship, on a computer with a graphics chip. A fail sends the slice back to /build. `/poc` first was rejected. 2026-11-23 |
+| O22 | The skeleton draws the place about 60 times a second, also when nothing moves. | flag | spec p3 | user | Resolved | The place draws only on a change. "Draw always" was rejected. 2026-11-23 |
+| O23 | Scenario 5 needs the fix on `fix/speed-renderer-probe`, which is not on `main`. | question | spec p3 | user | Resolved | The user merges the fix first, and /build rebases on `main`. "Carry it in this branch" was rejected. 2026-11-23 |
+| O24 | Does the walk ship behind a feature flag? | question | spec p3 | user | Resolved | No flag. The rollback is the Cloudflare dashboard, or a `git revert`. 2026-11-23 |
+| O25 | The user asked for an interactive, gamified walk with Animal Crossing textures. | question | spec p3 | user | Resolved | This slice does not change. A /shape pass after it plans a pilgrim figure that walks on Next, with a softer look. Points, a hand-steered character and Nintendo's own art were rejected. 2026-11-23 |
 
 _Never delete this section or its rows. See references/ledger.md._
 
@@ -435,3 +676,16 @@ _Never delete this section or its rows. See references/ledger.md._
 - **Graphics chip** — the part of a computer that draws 3D fast. The dev machine has none.
 - **Fast 4G** — a network profile in Chrome that limits the speed to about 9 Mbps.
 - **D22, D14** — numbered entries in `DECISIONS.md`, the record of each choice.
+- **three.js** — a library that draws 3D in the browser.
+- **`.glb`** — one file that holds a 3D model.
+- **Blender** — a free program that makes 3D models. A script can drive it.
+- **Lazy file** — code that the browser fetches only when the page asks for it.
+- **JSON** — a plain text format for data, which Blender and the site both read.
+- **Arc** — a curved path. The camera keeps its distance from the Kaabah on it.
+- **Feature flag** — a switch that hides new code until someone turns it on.
+- **PR** — a pull request: a set of commits that waits for a merge on GitHub.
+- **Rebase** — to move a branch so that it starts from the newest `main`.
+- **Smoke step** — one quick check in CI that the live site answers.
+- **Unit test** — a test of one small piece of code, with no browser.
+- **Vitest, Playwright** — the unit test runner, and the tool that drives browsers for the browser tests.
+- **Antialias, pixel ratio** — two settings of the 3D drawing. Each one trades sharpness for speed.

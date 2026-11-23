@@ -79,6 +79,7 @@ Each slice ships its text in Malay and English.
 | O12 | How do we know it worked? | question | shape | user | Resolved | After the walk, a first-timer can say where each step happens and what to do there, without notes. 2026-11-21 |
 | O13 | Does the person choose a man or a woman? | question | spec tawaf-walk p1 | user | Resolved | Yes, in the new slice `pilgrim-choice`, after `full-umrah`. Until then one walk serves both, and the text says "for men". 2026-11-23 |
 | O14 | O1 says the user writes the content from course notes. Who drafts it? | question | spec tawaf-walk p1 | user | Resolved | Claude drafts the step text, and the user corrects it against the course notes. The review of O1 stays. 2026-11-23 |
+| O15 | The user asked for a gamified walk: interactive, with the feel of Animal Crossing. | question | spec tawaf-walk p3 | user | Resolved | A /shape pass after `tawaf-walk` plans a pilgrim figure that walks on Next, a softer look, and where `pilgrim-choice` fits. Points, a hand-steered character and Nintendo's own art were rejected (D46). 2026-11-23 |
 
 ## Glossary
 
