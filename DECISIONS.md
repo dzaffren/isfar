@@ -311,3 +311,68 @@ Down keys go to the next step, and the Left arrow and Page Up keys go back.
 Rejected: Buttons only (the ustaz stays at the laptop).
 Source: specs/tawaf-walk.md
 Status: active
+
+## D32 · 2026-11-23 · The walk uses motion tier 2: the step text fades in, and the camera flies between spots
+
+Why: the camera flies to the next spot in about 1 second, so the person keeps the sense
+of the walk between two spots. The step text fades in over 320 ms. Under reduced motion
+the camera cuts, and the text fades in 160 ms.
+Rejected: Tier 1 (the camera cuts on each step, and the person loses the sense of the
+walk between two spots).
+Source: specs/tawaf-walk.md
+Status: active
+
+## D33 · 2026-11-23 · The progress label says the step count, and the beads say the circuit
+
+Why: "Tawaf · Langkah 9 daripada 15" tells how far the walk is, and the seven beads
+tell the circuit. Each says a different thing.
+Rejected: A label that says the circuit (it repeats the beads, and the person does not
+see how many steps remain).
+Source: specs/tawaf-walk.md
+Status: active
+
+## D34 · 2026-11-23 · The names of the parts show in the place, as scene content
+
+Why: each name shows beside its part, in the 3D place and on the map, so the person
+matches the name to the shape. The names use the system's label type and colours, and
+they are not a new primitive.
+Rejected: A new "scene label" primitive through /design-system first (pause 2 waits for
+it), No names in the place (the person must match each name to a shape alone).
+Source: specs/tawaf-walk.md
+Status: active
+
+## D35 · 2026-11-23 · One green token, --vh-lamp, for the green light of the start
+
+Why: the green light is green on the day, and the design system had no green. The
+token belongs to the place, and no interface part uses it.
+Rejected: A gold light with the name beside it (the light is not green), A full
+/design-system pass for one colour (pause 2 waits for it).
+Source: specs/tawaf-walk.md
+Status: active
+
+## D36 · 2026-11-23 · On a phone, the 3D place is 240 px high in the walk
+
+Why: at 320 px, two lines of step text show on a 360x800 phone, and the person
+scrolls on each of 15 steps. At 240 px, about five lines show.
+Rejected: Keep 320 px, as in the skeleton (two lines of text show without a scroll).
+Source: specs/tawaf-walk.md
+Status: active
+
+## D37 · 2026-11-23 · With no 3D, the message card sits under the step panel
+
+Why: the message is the same on each of 15 steps, so the step text comes first. The
+failed-download card keeps its place above the step, because it has the "Cuba lagi"
+button.
+Rejected: Above the step, as in the skeleton (the message pushes the step text down on
+each step).
+Source: specs/tawaf-walk.md
+Status: active
+
+## D38 · 2026-11-23 · The first recitation reads "Bismillahi, Allahu Akbar"
+
+Why: the user chose this form for step 3 and step 8. A qualified person still reviews
+the content before a public launch (shape O1).
+Rejected: "Bismillahi wallahu akbar" (the form in the design system's sample; the user
+chose the form without "wa").
+Source: specs/tawaf-walk.md
+Status: active

@@ -122,8 +122,8 @@ Scenario: A step shows a recitation and a note on the other schools
   Given she is on step 2, "Sebelum bermula", in Malay
   Then a closed note "Mazhab lain berbeza di sini" shows under the step text
   When she taps the note
-  Then the note opens and says how the Hanafi school differs on wuduk
-  And step 5, where no school differs, shows no note
+  Then the note opens and shows "Syafi'i, Maliki dan Hanbali: wuduk ialah syarat sah tawaf. Hanafi: wuduk wajib tetapi bukan syarat. Tawaf tanpa wuduk sah, dan dam dikenakan."
+  And step 4, where no school differs, shows no note
 
 Scenario: The walk still works when the 3D place cannot show
   Given 3D drawing is off in the browser on Aminah's phone
@@ -164,16 +164,16 @@ Rules that hold for each scenario:
 
 ### Steps in this slice
 
-I draft the words of each step, and the user corrects them at pause 2 (O5).
-A step gets a note only where another school differs, and pause 2 names those steps.
+The words of each step are in "Text of the steps", under Interface. The user corrects the draft there (O5).
+A step gets a note only where another school differs. Steps 2, 5 and 13 have one.
 
 | # | Address | Title, Malay | Title, English | The marker stands | The step also has |
 | --- | --- | --- | --- | --- | --- |
 | 1 | `#tawaf-1` | Kaabah dan bahagiannya | The Kaabah and its parts | Nowhere. The view is wide. | The names of the parts |
-| 2 | `#tawaf-2` | Sebelum bermula | Before you start | At the edge of the mataf | Wuduk, aurat, idtiba' for men. A note. |
+| 2 | `#tawaf-2` | Sebelum bermula | Before you start | At the edge of the mataf | Wuduk, aurat, idtiba' for men. A note on wuduk. |
 | 3 | `#tawaf-3` | Tempat mula | The start | On the guide line, at the Hajar Aswad corner | Niat and istilam. The recitation "Bismillahi, Allahu Akbar". The green light. |
 | 4 | `#tawaf-4` | Kaabah di sebelah kiri | The Kaabah on your left | Past the door, near Maqam Ibrahim | The path line. Raml for men. |
-| 5 | `#tawaf-5` | Hijr Ismail | Hijr Ismail | Outside the wall of Hijr Ismail | The path goes around the wall. |
+| 5 | `#tawaf-5` | Hijr Ismail | Hijr Ismail | Outside the wall of Hijr Ismail | The path goes around the wall. A note on a circuit through it. |
 | 6 | `#tawaf-6` | Rukun Yamani | Rukun Yamani | At Rukun Yamani | What to do at this corner |
 | 7 | `#tawaf-7` | Antara dua penjuru | Between the two corners | Between Rukun Yamani and the Hajar Aswad corner | The recitation "Rabbana atina" |
 | 8 | `#tawaf-8` | Satu pusingan selesai | One circuit is done | On the guide line again | Istilam again. Bead 1. |
@@ -181,7 +181,7 @@ A step gets a note only where another school differs, and pause 2 names those st
 | 10 | `#tawaf-10` | Pusingan 3 | Circuit 3 | On the guide line | The last circuit with raml |
 | 11 | `#tawaf-11` | Pusingan 4 | Circuit 4 | On the guide line | A usual walk from here |
 | 12 | `#tawaf-12` | Pusingan 5 | Circuit 5 | On the guide line | What to do when the count is lost |
-| 13 | `#tawaf-13` | Pusingan 6 | Circuit 6 | On the guide line | What to do when wuduk breaks |
+| 13 | `#tawaf-13` | Pusingan 6 | Circuit 6 | On the guide line | What to do when wuduk breaks. A note on what breaks it. |
 | 14 | `#tawaf-14` | Pusingan 7 | Circuit 7 | On the guide line | Where the last circuit ends |
 | 15 | `#tawaf-15` | Tawaf selesai | Tawaf is complete | Nowhere. The view is wide. | "Mula semula" |
 
@@ -225,11 +225,143 @@ New words on the controls: "Seterusnya" and "Next", "Kembali" and "Back", "Mula 
 | The site listed in search engines | `full-umrah` (D14) |
 | A test on a real 5-year-old Android | No slice. Accepted risk in the skeleton (O9 there). |
 
+## Interface
+
+One screen, built only from the kiswah and marble design system in `docs/design/design-system/`.
+
+```mermaid
+flowchart TB
+    B["Top bar: Kaabah mark, Isfar, BM and EN"] -- "language of each text" --> P["Step panel: step count, seven beads, title, text, Arabic block, note"]
+    A["Actions bar: Kembali, Seterusnya or Mula semula"] -- "step number" --> P
+    A -- "step number" --> S["Scene: 3D place with camera, marker, path line and names"]
+    S -- "no 3D, or a failed download" --> M["Top-view map with marker and names"]
+    M -- "failed download: Cuba lagi reloads on the same step" --> S
+    P -- "a tap on the note" --> N["The note opens: how the other schools differ"]
+```
+
+The actions bar sets the step, the step panel shows its words, and the scene shows its place in 3D or on the map.
+
+**Layout**
+
+| Screen | Order |
+| --- | --- |
+| Upright phone | Top bar, scene (240 px high, O18), step panel, message card for no 3D, two notices. The actions bar stays at the bottom edge of the screen. The page scrolls under it. |
+| Landscape, 800 px wide or more | Top bar across the top. The scene fills the left side. The step panel, message card and notices stack in a column on the right, 480 px wide at most. The actions bar stays at the bottom of that column. |
+
+On a 360x800 phone, about five lines of step text show without a scroll. A long step and a recitation still scroll.
+The failed-download card sits above the step panel, because it has the "Cuba lagi" button. The no-3D card sits under the step panel (O19).
+
+**The step panel**
+
+| Part | What it shows |
+| --- | --- |
+| Header, on kiswah | "Tawaf · Langkah 9 daripada 15", and the seven beads. The label is the step count, and the beads are the circuits (O15). |
+| Title and text | The words of the step. They fade in on a step change. |
+| Arabic block | Steps 3 and 7 only. Arabic, then the sound in Latin letters, then the meaning. |
+| Note | Steps 2, 5 and 13 only. "Mazhab lain berbeza di sini", closed until a tap. |
+
+**States of the scene**
+
+| State | The scene shows | With the step panel |
+| --- | --- | --- |
+| Loading | The loading card of the skeleton | Nothing more |
+| Shown | The 3D place: the camera at the spot, the gold marker, the path line from step 4 to step 14, and the names of the parts in focus | Nothing more |
+| Unsupported | The top-view map, with the marker and the same names | The no-3D message card, under the step panel |
+| Failed | The same map | The failed-download card with "Cuba lagi", above the step panel |
+
+The names of the parts are scene content. They use the system's label type, cloth and edge colours, and they are not a new primitive (O16).
+Step 1 shows five names. Step 3 shows "Hajar Aswad" and "Lampu hijau". Each later step shows the part in focus.
+
+**Motion tier:** 2 (O14).
+
+| Move | Time | Under reduced motion |
+| --- | --- | --- |
+| A button presses down | 160 ms | The same |
+| The step text fades in and rises 12 px | 320 ms | It fades in 160 ms and does not rise |
+| The camera flies to the spot of the new step | About 1 second, with an ease-out curve | The camera cuts |
+| The note's arrow turns | 160 ms | The same |
+
+A new step during a camera move sends the camera to the newest spot at once.
+
+**3D budget**
+
+| Part | Budget |
+| --- | --- |
+| Download | 500 KB compressed at most, for three.js plus the model (D16). The skeleton uses 150 KB. |
+| Frame rate | 30 frames a second or more, also during a camera move, on a desktop Chrome with the CPU slowed 4 times |
+| On a phone | The same scene. It is built for the phone first. |
+| Reduced motion | The camera cuts. Nothing else in the scene moves. |
+| Lazy load | The text shows first. The 3D code and the model load after it. |
+
+**Components used:** Step panel with its header, Progress beads, Kaabah mark, Language switch, Button and quiet Button, Arabic block, Note, Notice, Scene card (loading and message), and the marble, cloth and kiswah materials.
+
+**Added to the design system:** one colour token, `--vh-lamp`, for the green light of the start. No interface part uses it (O17).
+
+**Not used yet:** Answer option and result. `tawaf-check` uses them.
+
+**Access:** The scene carries a text description of each step's view. The beads carry the circuit as text. The step panel tells a screen reader about a new step. Each control is 52 px high. The arrow keys and Page Up and Page Down move the walk. Each Arabic line carries `lang="ar"` and reads right to left.
+
+**Preview:** `http://localhost:5199/preview/tawaf-walk.html`, after `pnpm dev --port 5199`. It lists 17 frames, and each frame is a working walk screen from the real components.
+A drawing stands in for the 3D place, from the camera of each step. The camera cuts in the preview and does not fly.
+
+**Built in this pause, for /build to keep:** `src/content/tawaf.ts`, `src/scene/mataf.ts` (the plan of the place and the spot of each step), `src/components/Beads.tsx`, `ArabicBlock.tsx`, `Note.tsx`, `StepActions.tsx`, `MatafMap.tsx`, the new props of `StepPanel.tsx`, and the walk rules in `src/app.css`.
+**For the preview only:** `preview/tawaf-walk.html` and `src/preview/`. No build ships them.
+
+**Checks:** The static drift check passes on 15 files. The rendered drift check passes on 8 pages, in light and dark. `pnpm typecheck`, `pnpm test` and `pnpm e2e --project=firefox` pass. The `design-taste-frontend` inspector is not installed, so it did not run.
+
+### Text of the steps
+
+This is a draft in the Shafi'i school (D24). The user corrects it here.
+
+| # | Malay | English |
+| --- | --- | --- |
+| 1 | **Kaabah dan bahagiannya.** Tawaf ialah tujuh pusingan mengelilingi Kaabah. Kenali lima tempat ini dahulu: Hajar Aswad, pintu Kaabah, Hijr Ismail, Rukun Yamani dan Maqam Ibrahim. | **The Kaabah and its parts.** Tawaf is seven circuits around the Kaabah. First learn these five places: Hajar Aswad, the door of the Kaabah, Hijr Ismail, Rukun Yamani and Maqam Ibrahim. |
+| 2 | **Sebelum bermula.** Pastikan anda berwuduk dan menutup aurat. Lelaki dalam ihram memakai kain secara idtiba': bahu kanan terbuka, dan hujung kain di atas bahu kiri. | **Before you start.** Make sure that you have wuduk and that your aurat is covered. A man in ihram wears the cloth in idtiba': the right shoulder bare, and the end of the cloth over the left shoulder. |
+| 3 | **Tempat mula.** Berdiri sejajar dengan penjuru Hajar Aswad. Lampu hijau di dinding masjid menandakan tempatnya, dan lantai sebenar tiada garisan. Berniat tawaf, hadap Hajar Aswad, angkat tangan ke arahnya dan baca: | **The start.** Stand in line with the Hajar Aswad corner. A green light on the mosque wall marks the place, and the real floor has no line. Make the niat of tawaf, face Hajar Aswad, raise your hand towards it and say: |
+| 4 | **Kaabah di sebelah kiri.** Pusing supaya Kaabah berada di sebelah kiri anda, dan mula berjalan. Anda melalui pintu Kaabah dan Maqam Ibrahim. Lelaki berjalan pantas dengan langkah pendek (raml) dalam tiga pusingan pertama. | **The Kaabah on your left.** Turn so that the Kaabah is on your left, and start to walk. You pass the door of the Kaabah and Maqam Ibrahim. Men walk briskly with short steps (raml) in the first three circuits. |
+| 5 | **Hijr Ismail.** Jalan di luar tembok rendah Hijr Ismail. Kawasan di dalamnya dikira sebahagian daripada Kaabah, jadi pusingan yang melalui dalamnya tidak dikira. | **Hijr Ismail.** Walk outside the low wall of Hijr Ismail. The area inside it counts as part of the Kaabah, so a circuit that goes through it does not count. |
+| 6 | **Rukun Yamani.** Di penjuru ini, sentuh Rukun Yamani dengan tangan kanan jika mudah. Jika sesak, teruskan berjalan. Jangan menolak orang lain untuk sampai kepadanya. | **Rukun Yamani.** At this corner, touch Rukun Yamani with your right hand if it is easy. If it is crowded, keep walking. Do not push other people to reach it. |
+| 7 | **Antara dua penjuru.** Dari Rukun Yamani ke penjuru Hajar Aswad, baca doa ini sambil berjalan: | **Between the two corners.** From Rukun Yamani to the Hajar Aswad corner, say this doa as you walk: |
+| 8 | **Satu pusingan selesai.** Apabila anda sampai semula sejajar dengan Hajar Aswad, satu pusingan selesai. Angkat tangan ke arahnya, baca “Bismillahi, Allahu Akbar”, dan teruskan pusingan kedua. | **One circuit is done.** When you are in line with Hajar Aswad again, one circuit is done. Raise your hand towards it, say “Bismillahi, Allahu Akbar”, and go on to the second circuit. |
+| 9 | **Pusingan 2.** Ikut jalan yang sama: lalu pintu Kaabah, di luar Hijr Ismail, Rukun Yamani, dan kembali ke garisan Hajar Aswad. Lelaki masih berjalan pantas (raml). | **Circuit 2.** Follow the same path: past the door of the Kaabah, outside Hijr Ismail, Rukun Yamani, and back to the line of Hajar Aswad. Men still walk briskly (raml). |
+| 10 | **Pusingan 3.** Ini pusingan terakhir dengan raml bagi lelaki. Wanita berjalan seperti biasa sepanjang tawaf. Anda boleh berzikir atau berdoa dalam apa-apa bahasa. | **Circuit 3.** This is the last circuit with raml for men. Women walk at a usual pace for the whole tawaf. You can make zikir or doa in any language. |
+| 11 | **Pusingan 4.** Mulai pusingan ini, semua orang berjalan seperti biasa. Pastikan Kaabah sentiasa di sebelah kiri anda, dan jangan menghadap atau membelakanginya semasa berjalan. | **Circuit 4.** From this circuit, everyone walks at a usual pace. Keep the Kaabah on your left at all times, and do not face it or turn your back to it as you walk. |
+| 12 | **Pusingan 5.** Jika anda ragu tentang bilangan pusingan, ambil bilangan yang lebih sedikit. Contohnya, jika ragu antara empat dan lima, kira sebagai empat. | **Circuit 5.** If you are not sure of the count, take the lower number. For example, if you are not sure between four and five, count four. |
+| 13 | **Pusingan 6.** Jika wuduk terbatal, keluar, ambil wuduk semula, dan sambung dari tempat anda berhenti. Pusingan yang sudah selesai tetap dikira. | **Circuit 6.** If your wuduk breaks, leave, renew it, and go on from the place where you stopped. The circuits that you finished still count. |
+| 14 | **Pusingan 7.** Pusingan terakhir tamat apabila anda sampai semula sejajar dengan Hajar Aswad. Lalui garisan itu sepenuhnya sebelum berhenti. | **Circuit 7.** The last circuit ends when you are in line with Hajar Aswad again. Pass the line fully before you stop. |
+| 15 | **Tawaf selesai.** Anda telah melengkapkan tujuh pusingan. Selepas ini ialah solat sunat tawaf dua rakaat di belakang Maqam Ibrahim. Bahagian itu akan datang kemudian. | **Tawaf is complete.** You have completed seven circuits. Next come the two rakaat of solat sunat tawaf behind Maqam Ibrahim. That part of the site comes later. |
+
+**Recitations**
+
+| Step | Arabic | Sound | Meaning, Malay | Meaning, English |
+| --- | --- | --- | --- | --- |
+| 3 | بِسْمِ اللهِ، اللهُ أَكْبَرُ | Bismillahi, Allahu Akbar | Dengan nama Allah. Allah Maha Besar. | In the name of Allah. Allah is the Greatest. |
+| 7 | رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ | Rabbana atina fid-dunya hasanah, wa fil-akhirati hasanah, wa qina 'adhaban-nar | Wahai Tuhan kami, berilah kami kebaikan di dunia dan kebaikan di akhirat, dan peliharalah kami daripada azab neraka. | Our Lord, give us good in this world and good in the hereafter, and protect us from the punishment of the Fire. |
+
+**Notes on the other schools**
+
+| Step | Malay | English |
+| --- | --- | --- |
+| 2 | Syafi'i, Maliki dan Hanbali: wuduk ialah syarat sah tawaf. Hanafi: wuduk wajib tetapi bukan syarat. Tawaf tanpa wuduk sah, dan dam dikenakan. | Shafi'i, Maliki and Hanbali: wuduk is a condition of a valid tawaf. Hanafi: wuduk is required but is not a condition. A tawaf without wuduk is valid, and a dam is due. |
+| 5 | Syafi'i, Maliki dan Hanbali: pusingan yang melalui dalam Hijr Ismail tidak sah. Hanafi: berjalan di luarnya wajib. Pusingan itu sah, tetapi perlu diulang atau dam dikenakan. | Shafi'i, Maliki and Hanbali: a circuit that goes through Hijr Ismail is not valid. Hanafi: the walk outside it is required. The circuit is valid, but you repeat it or a dam is due. |
+| 13 | Syafi'i: bersentuhan kulit dengan bukan mahram yang berlainan jantina membatalkan wuduk. Hanafi: tidak batal. Maliki dan Hanbali: batal jika dengan syahwat. | Shafi'i: skin contact with a non-mahram of the other sex breaks wuduk. Hanafi: it does not. Maliki and Hanbali: only if there is desire. |
+
+**Other words**
+
+| Part | Malay | English |
+| --- | --- | --- |
+| Next, Back, Start again | Seterusnya, Kembali, Mula semula | Next, Back, Start again |
+| Note label | Mazhab lain berbeza di sini | Other schools differ here |
+| Step count | Tawaf · Langkah 9 daripada 15 | Tawaf · Step 9 of 15 |
+| Beads, for a screen reader | Pusingan 2 daripada 7. Pusingan belum bermula. Tujuh pusingan selesai. | Circuit 2 of 7. No circuit has started. Seven circuits are done. |
+| Names of the parts | Hajar Aswad, Pintu Kaabah, Hijr Ismail, Rukun Yamani, Maqam Ibrahim, Lampu hijau | Hajar Aswad, The door, Hijr Ismail, Rukun Yamani, Maqam Ibrahim, Green light |
+| Map, for a screen reader | Peta mataf dari atas | Map of the mataf from above |
+
 ## Decisions
 
 ### Decisions to record
 
-Recorded as D22, D23, D24, D25, D26, D27, D28, D29, D30 and D31.
+Recorded as D22 to D31 at pause 1, and D32 to D38 at pause 2.
 
 ## Open items
 
@@ -248,6 +380,13 @@ Recorded as D22, D23, D24, D25, D26, D27, D28, D29, D30 and D31.
 | O11 | D20 says the walk must keep its step across a reload. Where does the step live? | question | spec p1 | user | Resolved | In the address, as `#tawaf-6`. "On the device" was rejected. 2026-11-23 |
 | O12 | Do the keyboard and a presenter clicker move the walk? | question | spec p1 | user | Resolved | Yes. Right arrow and Page Down go on. Left arrow and Page Up go back. 2026-11-23 |
 | O13 | Where does the slice `pilgrim-choice` go in the shape's order? | question | spec p1 | user | Resolved | After `full-umrah`, as slice 5. "After `tawaf-walk`" was rejected. 2026-11-23 |
+| O14 | Which motion tier does the walk use? | question | spec p2 | user | Resolved | Tier 2. The step text fades in over 320 ms, and the camera flies in about 1 second. Tier 1 was rejected. 2026-11-23 |
+| O15 | The beads count the circuits. What does the label beside them say? | question | spec p2 | user | Resolved | The step count: "Tawaf · Langkah 9 daripada 15". A label for the circuit was rejected. 2026-11-23 |
+| O16 | The design system has no label that sits over the 3D place. How do the names of the parts show? | question | spec p2 | user | Resolved | In the place, as scene content in the system's label type and colours. A new primitive first and no names were rejected. 2026-11-23 |
+| O17 | The green light needs a green, and the design system has none. | flag | spec p2 | user | Resolved | One token, `--vh-lamp`, in the colour tokens, for the green light only. A gold light and a full /design-system pass were rejected. 2026-11-23 |
+| O18 | On a 360x800 phone, the step text starts under the actions bar. The skeleton kept the place at 320 px (its O28). | flag | spec p2 | user | Resolved | In the walk, the place is 240 px high on a phone. "Keep 320 px" was rejected. 2026-11-23 |
+| O19 | With no 3D, the skeleton's message card sits above the step text, on each of 15 steps. | flag | spec p2 | user | Resolved | The no-3D card sits under the step panel. The failed-download card stays above it. 2026-11-23 |
+| O20 | D25 names the first recitation "Bismillahi, Allahu Akbar". The design system's sample says "Bismillahi wallahu akbar". | question | spec p2 | user | Resolved | "Bismillahi, Allahu Akbar", without "wa". 2026-11-23 |
 
 _Never delete this section or its rows. See references/ledger.md._
 
@@ -280,6 +419,16 @@ _Never delete this section or its rows. See references/ledger.md._
 - **Address** — the text in the browser's address bar. The part after `#` names the step.
 - **Presenter clicker** — a small remote for slides. It sends the Page Up and Page Down keys.
 - **Reduced motion** — a device setting for people who want less movement on screen.
+- **Motion tier** — zuko's scale for how much the interface moves. Tier 2 allows planned moves between steps.
+- **Design system** — the one set of colours, sizes and parts that each screen reuses.
+- **Token** — a named design value, such as a colour or a size, that each screen reuses.
+- **Primitive** — a basic part of the interface, such as a button.
+- **Drift check** — a script that fails a screen which uses a value from outside the design system.
+- **Stand-in** — the drawing that takes the place of the 3D place in the preview.
+- **Dam** — a penalty for a missed duty of the pilgrimage, most often the sacrifice of an animal.
+- **Mahram** — a close relative whom a person can never marry.
+- **Zikir** — short words that remember Allah, said again and again.
+- **Solat sunat tawaf** — the prayer of two rakaat after tawaf.
 - **e2e** — end-to-end: one test that walks the whole slice as a person would.
 - **Browser test** — a test that opens the real site in a browser and uses it like a person.
 - **CI** — a service that runs the tests on each push.
