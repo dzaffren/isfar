@@ -23,7 +23,7 @@ export function viewOf(step: number): View {
     return { from: [midX + (lampY / length) * 32, midY - (lampX / length) * 32, 21], to: [midX, midY, 1] };
   }
   const away = unit([x, y + 2.5, 0]);
-  if (spot.view === "approach") return { from: [x + away[0] * 16, y + away[1] * 16, 15], to: [x * 0.5, y * 0.5, 0] };
+  if (spot.view === "approach") return { from: [x + away[0] * 12, y + away[1] * 12, 21], to: [x * 0.6, y * 0.6, 0] };
   // A walk: from behind and above the marker, with the Kaabah on the left.
   const ahead: V3 = [-away[1], away[0], 0];
   return {
