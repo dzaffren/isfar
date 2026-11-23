@@ -1,3 +1,5 @@
 - Measure frame rates on a machine with a graphics chip, not on the dev machine. ([no-gpu-on-dev-machine](no-gpu-on-dev-machine.md))
 - Make the first commit of an empty repo on the feature branch. ([first-commit-on-feature-branch](first-commit-on-feature-branch.md))
 - Stop any local preview server before an e2e run, or Playwright tests the old build. ([stop-preview-before-e2e](stop-preview-before-e2e.md))
+- Import JSON with `with { type: "json" }` when a browser test reads the module. ([json-import-attribute](json-import-attribute.md))
+- Prove the 3D half of the browser test in Firefox on the dev machine. ([local-chromium-loses-3d](local-chromium-loses-3d.md))

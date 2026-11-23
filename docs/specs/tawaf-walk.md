@@ -1,6 +1,6 @@
 # Tawaf walk
 
-**Version:** v1 · **Status:** Refined · **Type:** Feature · **Project type:** Web UI
+**Version:** v1 · **Status:** Built · **Type:** Feature · **Project type:** Web UI
 
 **Shape doc:** docs/specs/virtual-hajj/shape.md
 **Depends on:** `walking-skeleton`
@@ -548,6 +548,7 @@ Recorded as D22 to D31 at pause 1, D32 to D38 at pause 2, and D39 to D46 at /bui
 | O23 | Scenario 5 needs the fix on `fix/speed-renderer-probe`, which is not on `main`. | question | spec p3 | user | Resolved | The user merges the fix first, and /build rebases on `main`. "Carry it in this branch" was rejected. 2026-11-23 |
 | O24 | Does the walk ship behind a feature flag? | question | spec p3 | user | Resolved | No flag. The rollback is the Cloudflare dashboard, or a `git revert`. 2026-11-23 |
 | O25 | The user asked for an interactive, gamified walk with Animal Crossing textures. | question | spec p3 | user | Resolved | This slice does not change. A /shape pass after it plans a pilgrim figure that walks on Next, with a softer look. Points, a hand-steered character and Nintendo's own art were rejected. 2026-11-23 |
+| O26 | The rules say that "Seterusnya", the Right arrow key and Page Down do the same thing. Step 15 has no "Seterusnya". | flag | build | user | Decided alone | Chose: on step 15, the Right arrow key and Page Down do nothing, so a clicker cannot restart the walk by mistake. Keys with Alt, Ctrl, Shift or Meta are left to the browser, so Alt+Left goes back one step, not two. Other: the keys do "Mula semula" on step 15. Undo: in `src/App.tsx`, call `goTo(1)` when the step is 15. 2026-11-23 |
 
 _Never delete this section or its rows. See references/ledger.md._
 

@@ -11,3 +11,4 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - See the Kaabah and the mataf in 3D, with the first step in Malay or English.
 - Switch between BM and EN, and the site keeps the choice on the device.
 - Read the step with a still picture when the device cannot show 3D, or try again when the 3D download fails.
+- Walk through tawaf in 15 steps in a 3D mataf, with Next and Back, the arrow keys, a link to each step, and a top-view map when the device cannot show 3D.
