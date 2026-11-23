@@ -32,8 +32,9 @@ body,
   .scene__load { justify-self: center; width: 100%; margin: 0; }
 }
 
-/* The walk: a step fades in, and Back and Next stay at the bottom edge. */
-html { scroll-padding-bottom: calc(var(--vh-control) + var(--vh-space-8)); }
+/* The walk: a step fades in, and Back and Next stay at the bottom edge. The side column scrolls in landscape. */
+html,
+.app__side { scroll-padding-bottom: calc(var(--vh-control) + var(--vh-space-8)); }
 .walk__step { animation: walk-step var(--vh-dur-step) var(--vh-ease-out); }
 @keyframes walk-step { from { opacity: 0; transform: translateY(var(--vh-move)); } }
 .walk__actions { position: sticky; bottom: 0; margin: 0 calc(-1 * var(--vh-space-4)) calc(-1 * var(--vh-space-6)); padding: var(--vh-space-3) var(--vh-space-4); border-top: var(--vh-stroke) solid var(--vh-edge); }

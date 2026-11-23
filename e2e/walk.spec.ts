@@ -330,6 +330,20 @@ test.describe("reduced motion", () => {
   });
 });
 
+test.describe("a projector at 200%", () => {
+  test.use({ viewport: { width: 960, height: 540 }, locale: "ms-MY" });
+
+  test("the Back and Next bar does not cover the note toggle when it takes focus", async ({ page }) => {
+    await page.goto("/#tawaf-2");
+    const toggle = page.locator("summary", { hasText: MS.note });
+    for (let tab = 0; tab < 10 && !(await toggle.evaluate((summary) => summary === document.activeElement)); tab += 1) await page.keyboard.press("Tab");
+    await expect(toggle).toBeFocused();
+    await expect
+      .poll(async () => (await toggle.boundingBox())!.y + (await toggle.boundingBox())!.height, "the toggle ends above the bar")
+      .toBeLessThanOrEqual((await page.locator(".walk__actions").boundingBox())!.y);
+  });
+});
+
 test.describe("a resize", () => {
   test.use({ viewport: { width: 1280, height: 720 }, locale: "ms-MY" });
 
