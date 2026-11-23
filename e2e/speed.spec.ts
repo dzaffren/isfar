@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-// Scenario 5, run by hand against the live site: SPEED_URL=https://isfar.pages.dev pnpm e2e:speed
+// Scenario 5, run by hand against the live site: SPEED_URL=https://isfar-57q.pages.dev pnpm e2e:speed
 // It drives real Chrome with a window, because CI draws 3D in software and its frame rate means nothing.
 test("the place runs at old-phone speed", async ({ page }) => {
   test.skip(!process.env.SPEED_URL, "Set SPEED_URL to the live site.");
@@ -20,6 +20,13 @@ test("the place runs at old-phone speed", async ({ page }) => {
 
   const lines: string[] = [];
   page.on("console", (message) => lines.push(message.text()));
+  // Read the renderer before the site makes its own contexts; a later probe can get no context at all.
+  await page.addInitScript(() => {
+    const gl = document.createElement("canvas").getContext("webgl2");
+    const info = gl?.getExtension("WEBGL_debug_renderer_info");
+    (window as unknown as { renderer: string }).renderer = info ? String(gl!.getParameter(info.UNMASKED_RENDERER_WEBGL)) : "unknown";
+    gl?.getExtension("WEBGL_lose_context")?.loseContext();
+  });
   await page.goto("/");
 
   const scene = page.locator("[data-scene]");
@@ -33,11 +40,9 @@ test("the place runs at old-phone speed", async ({ page }) => {
 
   await expect.poll(() => lines.find((line) => line.includes("frames a second")), { timeout: 20_000 }).toBeTruthy();
   // A software renderer draws on the CPU, so its frame rate says nothing about a phone's graphics chip.
-  const renderer = await page.evaluate(() => {
-    const gl = document.createElement("canvas").getContext("webgl2");
-    const info = gl?.getExtension("WEBGL_debug_renderer_info");
-    return info ? String(gl!.getParameter(info.UNMASKED_RENDERER_WEBGL)) : "unknown";
-  });
+  const renderer = await page.evaluate(() => (window as unknown as { renderer: string }).renderer);
+  console.log(`renderer: ${renderer}`);
+  expect(renderer, "the renderer must be known").not.toBe("unknown");
   expect(renderer, "run on a machine with a graphics chip").not.toMatch(/swiftshader|llvmpipe|software/i);
 
   const rate = Number(/(\d+) frames a second/.exec(lines.find((line) => line.includes("frames a second"))!)![1]);
