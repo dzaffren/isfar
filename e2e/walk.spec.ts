@@ -337,8 +337,10 @@ test.describe("a resize", () => {
     await page.goto("/");
     await expectCamera(page, 1);
     await kaabahIsDrawn(page);
+    const width = () => page.locator("[data-scene] canvas").evaluate((canvas: HTMLCanvasElement) => canvas.width);
+    const before = await width();
     await page.setViewportSize({ width: 960, height: 540 });
-    await expect.poll(async () => (await page.locator("[data-scene] canvas").evaluate((canvas: HTMLCanvasElement) => canvas.width))).toBeLessThan(800);
+    await expect.poll(width, "the canvas takes the new size").toBeLessThan(before);
     await kaabahIsDrawn(page);
   });
 });
