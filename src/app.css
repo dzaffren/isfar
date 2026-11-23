@@ -41,6 +41,7 @@ html { scroll-padding-bottom: calc(var(--vh-control) + var(--vh-space-8)); }
 /* The names of the parts, over the 3D place and over the map. */
 .scene__frame { position: relative; container-type: size; }
 .scene__name { position: absolute; transform: translate(-50%, -50%); padding: var(--vh-space-1) var(--vh-space-2); border: var(--vh-stroke) solid var(--vh-edge); border-radius: var(--vh-radius-inner); background: var(--vh-cloth); color: var(--vh-ink); font: var(--vh-text-label); white-space: nowrap; }
+.scene__names { position: absolute; inset: 0; pointer-events: none; }
 .scene__lead { stroke: var(--vh-edge); stroke-width: 2; }
 
 /* The top-view map, for a device with no 3D. It is a square that fits the scene. */

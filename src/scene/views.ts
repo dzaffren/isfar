@@ -12,7 +12,7 @@ const unit = (a: V3): V3 => {
 // The camera of a step: wide over the whole place, or towards the spot of the marker.
 export function viewOf(step: number): View {
   const spot = SPOTS[step - 1];
-  if (!spot.at) return { from: [-21, 30, 52], to: [-5, 2, 0] };
+  if (!spot.at) return { from: [-21, 30, 52], to: [-1, 0, 5] };
   const [x, y] = spot.at;
   if (spot.view === "start") {
     // From the side of the guide line: the corner on the left, the green light on the right.
