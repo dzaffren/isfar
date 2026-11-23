@@ -66,3 +66,10 @@ html { scroll-padding-bottom: calc(var(--vh-control) + var(--vh-space-8)); }
   .app__side > * { flex: none; }
   .walk__actions { margin: auto calc(-1 * var(--vh-space-6)) calc(-1 * var(--vh-space-6)); padding: var(--vh-space-3) var(--vh-space-6); }
 }
+
+/* The tawaf check: three answers, the line why, and the missed steps. */
+.check__answers { display: grid; gap: var(--vh-space-3); }
+.check__why { color: var(--vh-ink); font: var(--vh-text-body); }
+.check__missed { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--vh-space-3); }
+.check__missed .vh-button { width: 100%; justify-content: flex-start; text-align: left; }
+.check__again { justify-self: start; }

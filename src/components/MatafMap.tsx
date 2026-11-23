@@ -34,11 +34,13 @@ function arrow(degrees: number): string {
   return `translate(${x} ${y}) rotate(${turn})`;
 }
 
-type Props = { step: number; words: Words; label: string };
+type Props = { step: number; words: Words; label: string; showNames?: boolean };
 
 // The top view of the mataf, for a device that cannot show the 3D place. The marker stands at the spot of the step.
-export function MatafMap({ step, words, label }: Props) {
+export function MatafMap({ step, words, label, showNames = true }: Props) {
   const spot = SPOTS[step - 1];
+  // The check hides the names until the person answers, because a name can give the answer away.
+  const names = showNames ? spot.names : [];
   const path = Array.from({ length: 73 }, (_, index) => flip(onPath(index * 5)).join(",")).join(" ");
   const [lineX, lineY] = flip(GREEN_LIGHT);
   const [cornerX, cornerY] = flip(HAJAR_ASWAD);
@@ -67,14 +69,14 @@ export function MatafMap({ step, words, label }: Props) {
         <rect className="map__door" x={DOOR[0] - 0.5} y={-DOOR[1] - 0.95} width="1" height="1.9" />
         <circle className="map__stone" cx={cornerX} cy={cornerY} r="0.9" />
         <rect className="map__door" x={MAQAM[0] - 0.9} y={-MAQAM[1] - 0.9} width="1.8" height="1.8" />
-        {spot.names.map((part) => {
+        {names.map((part) => {
           const [fromX, fromY] = flip(PARTS[part]);
           const [toX, toY] = flip(NAME_AT[part]);
           return <line key={part} className="map__lead" x1={fromX} y1={fromY} x2={toX} y2={toY} />;
         })}
         {spot.at && <circle className="map__marker" data-marker cx={spot.at[0]} cy={-spot.at[1]} r="1.7" />}
       </svg>
-      {spot.names.map((part) => (
+      {names.map((part) => (
         <span key={part} className="scene__name" style={percent(NAME_AT[part])}>
           {words[PART_WORD[part]]}
         </span>
