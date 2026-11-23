@@ -214,3 +214,100 @@ Rejected: Google Fonts (each visit makes a request to Google, which sees the vis
 address).
 Source: specs/walking-skeleton.md
 Status: active
+
+## D22 · 2026-11-23 · The tawaf walk is 15 steps: three before, circuit 1 in full, one for each later circuit, one to close
+
+Why: the person sees each place of the circuit once, and then counts to seven. The
+seven beads count the circuits. The walk ends at the end of circuit 7, as the shape
+says, and the two rakaat and the zamzam go to full-umrah.
+Rejected: One circuit and then "do six more" (the person does not count to seven),
+Each circuit in full (about 30 steps, and the same places show seven times), Start at
+the Hajar Aswad corner with no step before it (the walk assumes that the person is
+ready), End after the two rakaat or after the zamzam (more steps, and more of the
+mosque to model).
+Source: specs/tawaf-walk.md
+Status: active
+
+## D23 · 2026-11-23 · One walk for men and women; a later slice lets the person choose
+
+Why: an ustaz teaches a mixed class from one screen, so the step text says "for men"
+where a step is for men only. The slice pilgrim-choice comes after full-umrah, and it
+then covers each rite at once.
+Rejected: Ask "man or woman" at the start of this slice (one more screen before the
+place, and the same question comes back for sa'i, ihram and tahallul), pilgrim-choice
+straight after tawaf-walk (it covers tawaf only, and each later slice adds to it).
+Source: specs/tawaf-walk.md
+Status: active
+
+## D24 · 2026-11-23 · Claude drafts the step text, and the user corrects it
+
+Why: a draft in the Shafi'i school gives the user something to correct against the
+course notes at pause 2. The "not yet reviewed" notice stays on each step, and a
+qualified person still reviews the content before a public launch (shape O1).
+Rejected: The user's course notes first (the spec waits for the notes), The user
+writes each step (pause 2 waits for the text).
+Source: specs/tawaf-walk.md
+Status: active
+
+## D25 · 2026-11-23 · The tawaf walk shows two short recitations
+
+Why: "Bismillahi, Allahu Akbar" at the Hajar Aswad corner and "Rabbana atina" between
+Rukun Yamani and the Hajar Aswad corner fit the step panel on a phone.
+Rejected: The niat in Arabic as a third recitation (the user chose two), A doa for each
+circuit (seven long doa, and the step panel gets long on a phone).
+Source: specs/tawaf-walk.md
+Status: active
+
+## D26 · 2026-11-23 · The start shows the green light and a guide line on the floor
+
+Why: the real mataf has no floor line today, and green lights on the mosque wall mark
+the start. The 3D place shows the light as on the day. The guide line makes the start
+clear from above, and the step text says that the real floor has no line.
+Rejected: The green light only (the line of the start is hard to see from above), A
+floor line only (the person looks for a line that is not there).
+Source: specs/tawaf-walk.md
+Status: active
+
+## D27 · 2026-11-23 · The tawaf place is the Kaabah, the mataf and a simple ring of arcades
+
+Why: tawaf uses the Hajar Aswad corner, the door, Hijr Ismail, Rukun Yamani and Maqam
+Ibrahim. The ring of arcades holds the green light and closes the view.
+Rejected: The mataf only (the green light has no wall), Minarets and the upper floors
+(more to model and a larger download, and tawaf does not use them).
+Source: specs/tawaf-walk.md
+Status: active
+
+## D28 · 2026-11-23 · A gold marker and a path line show where to stand and walk
+
+Why: the camera looks from behind and above, so the person sees the spot and where it
+is in the mataf. Gold means "act here" in the design system (D3).
+Rejected: A pilgrim figure (more model work, and it needs a man or a woman), A view
+through the pilgrim's eyes (it does not show where the spot is in the mataf).
+Source: specs/tawaf-walk.md
+Status: active
+
+## D29 · 2026-11-23 · With no 3D, each step shows one top-view map with a marker
+
+Why: the map is the still picture of D13. One drawing serves 15 steps, and the marker
+moves to the spot of each step, so the person still learns where.
+Rejected: A drawn picture for each step (about 14 drawings to make and to keep right),
+The skeleton's one Kaabah picture on each step (it does not show where the step
+happens).
+Source: specs/tawaf-walk.md
+Status: active
+
+## D30 · 2026-11-23 · The step lives in the address, as #tawaf-6
+
+Why: a reload keeps the step, which D20 asks for. The Back button of the browser goes
+one step back, and an ustaz can share a link to one step.
+Rejected: The step stored on the device (no link opens a given step).
+Source: specs/tawaf-walk.md
+Status: active
+
+## D31 · 2026-11-23 · Arrow keys and a presenter clicker move the walk
+
+Why: an ustaz with a clicker teaches away from the laptop. The Right arrow and Page
+Down keys go to the next step, and the Left arrow and Page Up keys go back.
+Rejected: Buttons only (the ustaz stays at the laptop).
+Source: specs/tawaf-walk.md
+Status: active

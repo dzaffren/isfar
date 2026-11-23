@@ -33,6 +33,7 @@ flowchart LR
     S1 -->|a finished walk to ask about| S2[2 tawaf-check]
     S1 -->|the guided walk, reused| S3[3 sai-walk]
     S3 -->|tawaf and sa'i to join| S4[4 full-umrah]
+    S4 -->|each rite, to tailor| S5[5 pilgrim-choice]
 ```
 
 Slice 0 proves the rails, slice 1 is the first thing worth using, and slices 2 and 3 each work without the other.
@@ -44,13 +45,14 @@ Slice 0 proves the rails, slice 1 is the first thing worth using, and slices 2 a
 | 2 | tawaf-check | After the tawaf walk, the person answers where each step happens and what to do there. The result shows on screen and is not kept. | It measures "they can explain it back" before we build two more rites. |
 | 3 | sai-walk | The site leads the person through sa'i in 3D, between Safa and Marwah. | Sa'i is the next rite in the real order. It reuses the guided walk from slice 1. |
 | 4 | full-umrah | The walk starts with ihram at the miqat and ends with tahallul. A person walks one whole umrah, first step to last. | The first and last steps are the least about a place. They join the two walks into one journey. |
+| 5 | pilgrim-choice | The person chooses a man or a woman at the start. Each step then shows the text for that person. | The steps differ for men and women in each rite. After full-umrah, one slice covers them all at once. |
 
 Each slice must look right at phone size and at projector size.
 Each slice ships its text in Malay and English.
 
 ## Not doing
 
-- **Hajj.** Mina, Arafah, Muzdalifah and the jamarat get their own shape after umrah ships (O7). Umrah alone is five slices.
+- **Hajj.** Mina, Arafah, Muzdalifah and the jamarat get their own shape after umrah ships (O7). Umrah alone is six slices.
 - **Free walk in 3D.** The person must find the place of each step alone, and a free walk does not show the order.
 - **360-degree photos.** The person stands at fixed spots, with no path between the steps.
 - **Map and pictures.** It has no look-around.
@@ -75,6 +77,8 @@ Each slice ships its text in Malay and English.
 | O10 | What does the person do to see a place? | question | shape | user | Resolved | The site leads them step by step through a 3D place. 2026-11-21 |
 | O11 | Which language does the first version use? | question | shape | user | Resolved | Malay and English, from day one. 2026-11-21 |
 | O12 | How do we know it worked? | question | shape | user | Resolved | After the walk, a first-timer can say where each step happens and what to do there, without notes. 2026-11-21 |
+| O13 | Does the person choose a man or a woman? | question | spec tawaf-walk p1 | user | Resolved | Yes, in the new slice `pilgrim-choice`, after `full-umrah`. Until then one walk serves both, and the text says "for men". 2026-11-23 |
+| O14 | O1 says the user writes the content from course notes. Who drafts it? | question | spec tawaf-walk p1 | user | Resolved | Claude drafts the step text, and the user corrects it against the course notes. The review of O1 stays. 2026-11-23 |
 
 ## Glossary
 
