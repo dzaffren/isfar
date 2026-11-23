@@ -452,3 +452,82 @@ an older person on a phone, no use with a clicker, and D2 rejected a free walk),
 Nintendo's own textures and patterns (they are Nintendo's art).
 Source: specs/tawaf-walk.md
 Status: active
+
+## D47 · 2026-11-24 · A check question shows the spot in the place, with three text answers
+
+Why: the gold marker at a spot tests "where" and "what to do there" (shape O12). It
+reuses the camera views of the walk, and the map serves a device with no 3D.
+Rejected: Text only (it does not test where), A tap on a spot on the map (hard on a
+phone, and a new kind of control).
+Source: specs/tawaf-check.md
+Status: active
+
+## D48 · 2026-11-24 · The tawaf check has seven questions
+
+Why: seven cover the start, its actions, the Kaabah on the left, Hijr Ismail, Rukun
+Yamani, the doa and the end of circuit 7, in about 2 minutes.
+Rejected: Five (drops the doa and the end), One for each of the 15 steps (circuits 2
+to 7 repeat one question).
+Source: specs/tawaf-check.md
+Status: active
+
+## D49 · 2026-11-24 · Right or wrong shows after each answer, with one line why
+
+Why: the person learns at the question, and the answer option of the design system
+already has the right and wrong states.
+Rejected: Only at the end (it feels like a test, and the person learns less on the
+way).
+Source: specs/tawaf-check.md
+Status: active
+
+## D50 · 2026-11-24 · The result shows a plain count and the missed questions, and keeps nothing
+
+Why: "6 daripada 7 betul" is a fact for the person. Each missed question links to its
+step, so the person goes back to it. No stars or badges (D46).
+Rejected: The missed list only (the person does not see how far they are), A done
+message only (it shows nothing to go back to).
+Source: specs/tawaf-check.md
+Status: active
+
+## D51 · 2026-11-24 · The check opens from step 15 and from the address #semak
+
+Why: the person goes on from the end of the walk, and an ustaz opens the check from a
+link.
+Rejected: Step 15 only (no link opens the check), A button on each step (the person
+checks before they finish the walk).
+Source: specs/tawaf-check.md
+Status: active
+
+## D52 · 2026-11-24 · The check goes on only after an answer
+
+Why: Next, the Right arrow key and Page Down wait for an answer. The ustaz taps the
+answer that the class calls out, then clicks on.
+Rejected: A skip that counts as missed (a clicker press skips a question by mistake).
+Source: specs/tawaf-check.md
+Status: active
+
+## D53 · 2026-11-24 · A reload starts the check again at question 1
+
+Why: the answers live only in the open page (shape O5). Seven questions take about 2
+minutes, and "Cuba lagi" (D20) reloads too.
+Rejected: The question in the address, as #semak-4 (the result then counts part of the
+check), The answers stored on the device (the site keeps nothing).
+Source: specs/tawaf-check.md
+Status: active
+
+## D54 · 2026-11-24 · The questions and the answers have a fixed order
+
+Why: a class sees the same screen as the ustaz, and the tests stay simple. The right
+answer stands in a different place from question to question.
+Rejected: Answers in a new order on each try (the class and the ustaz see different
+screens), Both in a new order (the walk order is lost).
+Source: specs/tawaf-check.md
+Status: active
+
+## D55 · 2026-11-24 · Claude drafts the check text, and the user corrects it
+
+Why: the same as D24 for the step text. The draft comes from the step text at pause 2,
+and the "not yet reviewed" notice stays.
+Rejected: The user writes each question (pause 2 waits for the text).
+Source: specs/tawaf-check.md
+Status: active
