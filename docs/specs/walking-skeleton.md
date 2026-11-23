@@ -30,7 +30,7 @@ The user chose each line on 2026-11-21.
 | 3D layer | three.js directly, with no React wrapper |
 | 3D model | One `.glb` file, exported by a Blender script in the repo |
 | Fonts | Font files inside the site. No request to Google. |
-| Names | GitHub repo `dzaffren/isfar`. Cloudflare project `isfar`, so the address is `isfar.pages.dev` if that name is free. |
+| Names | GitHub repo `dzaffren/isfar`. Cloudflare project `isfar`, so the address is `isfar.pages.dev` if that name is free. It was not: the address is `isfar-57q.pages.dev` (O44). |
 
 ## Slice test
 
@@ -310,7 +310,7 @@ flowchart TB
         TEST -- "only when green" --> DEPLOY
         DEPLOY -- "deployment address" --> SMOKE
     end
-    DEPLOY -- "main: built files" --> PROD["isfar.pages.dev"]
+    DEPLOY -- "main: built files" --> PROD["isfar-57q.pages.dev"]
     DEPLOY -- "other branch: built files" --> PREV["branch preview address"]
 ```
 
@@ -375,7 +375,7 @@ Cut: a router, a state library, a translation library, React Three Fiber, a lint
 | **Load**             | A few visits a day: the user and a few testers. The site is static files on Cloudflare's network. |
 | **Breaks first**     | I found no limit that 10 times the visits meets: the Cloudflare Pages limits page lists no bandwidth limit. The nearest limit is 25 MiB for one file, and the model is a few KB. |
 | **Security surface** | Anyone can open the site. It takes no input: it reads the device language and one stored value, and it accepts only `ms` or `en`. The secrets are `CLOUDFLARE_API_TOKEN` (Pages edit only) and `CLOUDFLARE_ACCOUNT_ID`, held as GitHub Actions secrets. The site stores the language code in the visitor's browser, and nothing on a server. |
-| **Proof it works**   | The smoke step prints `smoke: https://isfar.pages.dev ok` after it finds `<title>Isfar</title>` in the live page. The browser console prints `[isfar] place shown in 2140 ms` and `[isfar] 58 frames a second over 10 s`. No number comes from real visitors, because the site collects nothing (shape O5). |
+| **Proof it works**   | The smoke step prints `smoke: https://isfar-57q.pages.dev ok` after it finds `<title>Isfar</title>` in the live page. The browser console prints `[isfar] place shown in 2140 ms` and `[isfar] 58 frames a second over 10 s`. No number comes from real visitors, because the site collects nothing (shape O5). |
 | **Rollout**          | No flag: nothing exists to protect, and search engines do not list the site. Rollback: "Rollback to this deployment" on the earlier deployment in the Cloudflare dashboard, or `git revert` and a push. |
 
 ### Test plan
@@ -386,7 +386,7 @@ Cut: a router, a state library, a translation library, React Three Fiber, a lint
 | 2. A person switches language and the site remembers it | `e2e/skeleton.spec.ts`, and `src/lib/language.test.ts` | `pnpm e2e --project=firefox`, `pnpm test` |
 | 3. The device cannot draw 3D | `e2e/skeleton.spec.ts` | `pnpm e2e --project=firefox` |
 | 4. The download of the 3D place fails | `e2e/skeleton.spec.ts` | `pnpm e2e --project=firefox` |
-| 5. The place runs at old-phone speed | `e2e/speed.spec.ts`, run by hand after the deploy | `SPEED_URL=https://isfar.pages.dev pnpm e2e:speed` |
+| 5. The place runs at old-phone speed | `e2e/speed.spec.ts`, run by hand after the deploy | `SPEED_URL=https://isfar-57q.pages.dev pnpm e2e:speed` |
 | Rule: the 3D download stays under 500 KB | `scripts/check-size.mjs` | `pnpm build && pnpm size` |
 | Rule: a red run never deploys | `needs: test` on the deploy job in `ci.yml` | A push to GitHub |
 
@@ -485,6 +485,7 @@ Recorded as D4, D5, D6, D7, D8, D9, D10, D11, D12, D13, D14, D15, D16, D17, D18,
 | O41 | O37 said scripted Chrome on the dev machine may not draw 3D. | flag | build | user | Decided alone | Chose: no change. Scripted Chrome draws 3D here, but only in software (O40). Headless Chromium here still loses the WebGL context, so the Chromium project runs in CI only. Other: run the Chromium project here with launch flags. Undo: none needed. 2026-11-23 |
 | O42 | The loading card said the beads light "about half a second apart". | flag | build | user | Decided alone | Chose: 320 ms apart, the `--vh-dur-step` token, so no new token. Other: a new 500 ms token through /design-system. Undo: add the token and use it in `.vh-beads--busy` in `styles.css`. 2026-11-23 |
 | O43 | The review found three new runtime packages (react, react-dom, three) with no check on known advisories. | flag | review | user | Decided alone | Chose: the test job runs `pnpm audit --prod --audit-level high`, so only a high or critical advisory stops the deploy. Other: fail on an advisory of any level, which can block each deploy on a low advisory that has no fix. Undo: remove `--audit-level high` in `.github/workflows/ci.yml`. 2026-11-23 |
+| O44 | The spec said the address is `isfar.pages.dev`. Cloudflare gave the project `isfar` the address `isfar-57q.pages.dev`, because the name was taken on pages.dev. | flag | ship | user | Decided alone | Chose: keep `isfar-57q.pages.dev`, and use it in the spec. Other: a new project with a free name, or a custom domain, which D6 rejected for now. Undo: create a Pages project with a free name, and change `--project-name` in `.github/workflows/ci.yml`. 2026-11-23 |
 
 _Never delete this section or its rows. See references/ledger.md._
 
