@@ -32,6 +32,8 @@ export function App() {
   // The question and the picks live only in the open page, so a reload starts the check again (D53).
   const [at, setAt] = useState<number | "result">(1);
   const [picks, setPicks] = useState<Picks>(NO_PICKS);
+  // A move through the address swaps the side column, so the new screen takes the focus that the old one held.
+  const [moved, setMoved] = useState(false);
   const [scene, setScene] = useState<SceneState>("loading");
   const onScene = useCallback((state: SceneState) => setScene(state), []);
   const words = TEXT[language];
@@ -52,6 +54,7 @@ export function App() {
       setStep(readStep(location.hash, TOTAL));
       const inCheck = isCheck(location.hash);
       setCheck(inCheck);
+      setMoved(true);
       if (inCheck) restart();
     };
     window.addEventListener("hashchange", onHash);
@@ -119,6 +122,7 @@ export function App() {
               onLeave={() => goTo(TOTAL)}
               onAgain={restart}
               onStep={goTo}
+              focusFirst={moved}
             >
               {notices}
             </CheckSide>
@@ -145,6 +149,7 @@ export function App() {
               <StepActions
                 back={step > 1 ? { label: words.back, onAct: () => goTo(step - 1) } : undefined}
                 next={last ? { label: words.checkStart, onAct: () => (location.hash = CHECK_HASH) } : { label: words.next, onAct: () => goTo(step + 1) }}
+                focusNext={moved}
               />
             </>
           )}

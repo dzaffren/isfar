@@ -45,8 +45,10 @@ for (const size of SIZES) {
       await expect(page.locator(".vh-panel").getByRole("button", { name: MS.startAgain })).toBeVisible();
       await expect(scene(page)).toHaveAttribute("data-state", "shown", { timeout: 15_000 });
 
-      await page.getByRole("button", { name: MS.start }).click();
+      await page.getByRole("button", { name: MS.start }).focus();
+      await page.keyboard.press("Enter");
       await expect(page).toHaveURL(/#semak$/);
+      await expect(options(page).first(), "the focus moves into the check").toBeFocused();
       await expect(header(page)).toHaveText("Semakan · Soalan 1 daripada 7");
       await expectBeads(page, 0, 1);
       await expectCamera(page, 3);
@@ -106,9 +108,11 @@ test.describe("a wrong answer", () => {
     await expect(line(page)).toHaveText(`${MS.wrong} Kaabah sentiasa di sebelah kiri anda sepanjang tawaf.`);
     for (const each of await options(page).all()) await expect(each).toHaveAttribute("aria-disabled", "true");
 
-    await page.getByRole("button", { name: MS.leave }).click();
+    await page.getByRole("button", { name: MS.leave }).focus();
+    await page.keyboard.press("Enter");
     await expect(page).toHaveURL(/#tawaf-15$/);
     await expect(title(page)).toHaveText("Tawaf selesai");
+    await expect(page.getByRole("button", { name: MS.start }), "the focus moves to the walk's bar").toBeFocused();
   });
 });
 

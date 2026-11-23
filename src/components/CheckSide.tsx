@@ -20,11 +20,12 @@ type Props = {
   onLeave: () => void;
   onAgain: () => void;
   onStep: (step: number) => void;
+  focusFirst: boolean;
   children: ReactNode;
 };
 
 // The step panel and the bar of the check. The children sit between them: the message card and the notices.
-export function CheckSide({ words, questions, steps, at, picks, onPick, onNext, onLeave, onAgain, onStep, children }: Props) {
+export function CheckSide({ words, questions, steps, at, picks, onPick, onNext, onLeave, onAgain, onStep, focusFirst, children }: Props) {
   const total = questions.length;
   const leave = { label: words.checkLeave, onAct: onLeave };
 
@@ -59,7 +60,7 @@ export function CheckSide({ words, questions, steps, at, picks, onPick, onNext, 
           picked={picks[at - 1]}
           rightWord={words.checkRight}
           wrongWord={words.checkWrong}
-          focusFirst={at > 1}
+          focusFirst={focusFirst || at > 1}
           onPick={onPick}
         />
       </StepPanel>
