@@ -204,6 +204,39 @@ body {
   background: var(--vh-gold);
 }
 
+/* Busy: the beads light in turn, like counting. Under reduced motion they stay unlit. */
+
+.vh-beads--busy .vh-bead::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: var(--vh-radius-round);
+  background: var(--vh-gold);
+  opacity: 0;
+  animation: vh-bead-count calc(var(--vh-dur-step) * 7) var(--vh-ease-out) infinite;
+}
+
+.vh-beads--busy .vh-bead:nth-child(2)::after { animation-delay: calc(var(--vh-dur-step) * 1); }
+.vh-beads--busy .vh-bead:nth-child(3)::after { animation-delay: calc(var(--vh-dur-step) * 2); }
+.vh-beads--busy .vh-bead:nth-child(4)::after { animation-delay: calc(var(--vh-dur-step) * 3); }
+.vh-beads--busy .vh-bead:nth-child(5)::after { animation-delay: calc(var(--vh-dur-step) * 4); }
+.vh-beads--busy .vh-bead:nth-child(6)::after { animation-delay: calc(var(--vh-dur-step) * 5); }
+.vh-beads--busy .vh-bead:nth-child(7)::after { animation-delay: calc(var(--vh-dur-step) * 6); }
+
+@keyframes vh-bead-count {
+  0% { opacity: 0; }
+  5% { opacity: 1; }
+  20% { opacity: 1; }
+  35% { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vh-beads--busy .vh-bead::after {
+    animation: none;
+  }
+}
+
 /* Language switch, on the kiswah */
 
 .vh-switch {

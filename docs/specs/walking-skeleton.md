@@ -1,6 +1,6 @@
 # Walking skeleton
 
-**Version:** v1 · **Status:** Refined · **Type:** Skeleton · **Project type:** Web UI
+**Version:** v1 · **Status:** Shipped · **Type:** Skeleton · **Project type:** Web UI
 
 **Shape doc:** docs/specs/virtual-hajj/shape.md
 **Depends on:** None
@@ -30,7 +30,7 @@ The user chose each line on 2026-11-21.
 | 3D layer | three.js directly, with no React wrapper |
 | 3D model | One `.glb` file, exported by a Blender script in the repo |
 | Fonts | Font files inside the site. No request to Google. |
-| Names | GitHub repo `dzaffren/isfar`. Cloudflare project `isfar`, so the address is `isfar.pages.dev` if that name is free. |
+| Names | GitHub repo `dzaffren/isfar`. Cloudflare project `isfar`, so the address is `isfar.pages.dev` if that name is free. It was not: the address is `isfar-57q.pages.dev` (O44). |
 
 ## Slice test
 
@@ -310,7 +310,7 @@ flowchart TB
         TEST -- "only when green" --> DEPLOY
         DEPLOY -- "deployment address" --> SMOKE
     end
-    DEPLOY -- "main: built files" --> PROD["isfar.pages.dev"]
+    DEPLOY -- "main: built files" --> PROD["isfar-57q.pages.dev"]
     DEPLOY -- "other branch: built files" --> PREV["branch preview address"]
 ```
 
@@ -375,7 +375,7 @@ Cut: a router, a state library, a translation library, React Three Fiber, a lint
 | **Load**             | A few visits a day: the user and a few testers. The site is static files on Cloudflare's network. |
 | **Breaks first**     | I found no limit that 10 times the visits meets: the Cloudflare Pages limits page lists no bandwidth limit. The nearest limit is 25 MiB for one file, and the model is a few KB. |
 | **Security surface** | Anyone can open the site. It takes no input: it reads the device language and one stored value, and it accepts only `ms` or `en`. The secrets are `CLOUDFLARE_API_TOKEN` (Pages edit only) and `CLOUDFLARE_ACCOUNT_ID`, held as GitHub Actions secrets. The site stores the language code in the visitor's browser, and nothing on a server. |
-| **Proof it works**   | The smoke step prints `smoke: https://isfar.pages.dev ok` after it finds `<title>Isfar</title>` in the live page. The browser console prints `[isfar] place shown in 2140 ms` and `[isfar] 58 frames a second over 10 s`. No number comes from real visitors, because the site collects nothing (shape O5). |
+| **Proof it works**   | The smoke step prints `smoke: https://isfar-57q.pages.dev ok` after it finds `<title>Isfar</title>` in the live page. The browser console prints `[isfar] place shown in 2140 ms` and `[isfar] 58 frames a second over 10 s`. No number comes from real visitors, because the site collects nothing (shape O5). |
 | **Rollout**          | No flag: nothing exists to protect, and search engines do not list the site. Rollback: "Rollback to this deployment" on the earlier deployment in the Cloudflare dashboard, or `git revert` and a push. |
 
 ### Test plan
@@ -386,7 +386,7 @@ Cut: a router, a state library, a translation library, React Three Fiber, a lint
 | 2. A person switches language and the site remembers it | `e2e/skeleton.spec.ts`, and `src/lib/language.test.ts` | `pnpm e2e --project=firefox`, `pnpm test` |
 | 3. The device cannot draw 3D | `e2e/skeleton.spec.ts` | `pnpm e2e --project=firefox` |
 | 4. The download of the 3D place fails | `e2e/skeleton.spec.ts` | `pnpm e2e --project=firefox` |
-| 5. The place runs at old-phone speed | `e2e/speed.spec.ts`, run by hand after the deploy | `SPEED_URL=https://isfar.pages.dev pnpm e2e:speed` |
+| 5. The place runs at old-phone speed | `e2e/speed.spec.ts`, run by hand after the deploy | `SPEED_URL=https://isfar-57q.pages.dev pnpm e2e:speed` |
 | Rule: the 3D download stays under 500 KB | `scripts/check-size.mjs` | `pnpm build && pnpm size` |
 | Rule: a red run never deploys | `needs: test` on the deploy job in `ci.yml` | A push to GitHub |
 
@@ -427,191 +427,16 @@ Order inside the chunk:
 
 ### Decisions to record
 
-Pauses 1, 2 and 3 drafted these entries. /build appends them to `DECISIONS.md`.
+Recorded as D4, D5, D6, D7, D8, D9, D10, D11, D12, D13, D14, D15, D16, D17, D18, D19, D20, D21.
 
-```markdown
-## D4 · 2026-11-21 · Vite, React and TypeScript, with three.js for 3D
+## Review
 
-Why: this pairing has the most 3D examples, so the skeleton carries the least unknown.
-The site is static files, and it needs no server framework.
-Rejected: Svelte (a smaller download, but fewer 3D examples to copy from), No UI
-framework (step state gets hard to manage by the self-check slice), Astro (one more
-tool, and the step state still lives in a script).
-Source: specs/walking-skeleton.md
-Status: active
+2026-11-23 · 5 raw findings, 3 survived, 3 fixed, 1 lead needs validation.
 
-## D5 · 2026-11-21 · No database; the step text lives in repo files
-
-Why: the site keeps nothing about the person (shape O5), so the only data is the step
-text in two languages. Files in the repo need no server and no account.
-Rejected: Headless CMS (an account and a second home for the content, for one author
-who uses git), Hosted Postgres (a server path that no umrah slice needs).
-Source: specs/walking-skeleton.md
-Status: active
-
-## D6 · 2026-11-21 · Host on Cloudflare Pages, at its free pages.dev address
-
-Why: each visit downloads a 3D model, and the Cloudflare Pages limits page lists no
-bandwidth limit on the free plan. Each branch gets a preview address. GitHub Actions
-uploads the built files to the project "isfar".
-Rejected: Workers static assets (Cloudflare's main platform now, but a deploy path with
-more unknowns for the skeleton), GitHub Pages (no preview address for a branch, and a soft cap of 100 GB a
-month), Vercel (the hobby tier caps bandwidth and bars commercial use), Netlify (the
-free tier has a usage cap), A custom domain now (a purchase and DNS setup inside the
-skeleton).
-Source: specs/walking-skeleton.md
-Status: active
-
-## D7 · 2026-11-21 · GitHub Actions on a public repo; a red run never deploys
-
-Why: Actions minutes are free for a public repo, and a browser test with 3D uses a few
-minutes for each push. The live address only gets a build whose browser test passed.
-Rejected: A private repo (2,000 free minutes a month), Cloudflare's own build only (it
-cannot run a browser test), Deploy on each push (a broken page can go live).
-Source: specs/walking-skeleton.md
-Status: active
-
-## D8 · 2026-11-21 · Vitest for unit tests, Playwright for browser tests, at four sizes
-
-Why: headless Chromium on the dev machine loses 3D drawing, and headless Firefox draws.
-Playwright drives both, so one test runs in Firefox there and in Chromium in CI. The
-sizes are 360x800, 960x540, 1280x720 and 1920x1080.
-Rejected: Cypress (weaker Firefox support), Playwright only (the self-check slice has
-scoring logic that wants unit tests), Two sizes (an older 1280x720 classroom projector
-goes untested).
-Source: specs/walking-skeleton.md
-Status: active
-
-## D9 · 2026-11-21 · pnpm is the package manager
-
-Why: pnpm 9.15.9 is on the dev machine. It installs faster than npm and keeps a
-stricter dependency tree.
-Rejected: npm (slower installs), Bun (not installed, and one more unknown in the
-skeleton).
-Source: specs/walking-skeleton.md
-Status: active
-
-## D10 · 2026-11-21 · The 3D place is a simple stylised model, made for this project
-
-Why: a chunky Kaabah with its gold band on the marble mataf fits the kiswah and marble
-direction (D3). It has no licence question, and we control its size.
-Rejected: A free model from a model library (a licence check, an accuracy check, and
-likely too heavy for an old phone), A detailed model built or commissioned now (days of
-work or money before the skeleton ships).
-Source: specs/walking-skeleton.md
-Status: active
-
-## D11 · 2026-11-21 · The skeleton proves 3D at phone speed, on a slowed desktop Chrome
-
-Why: no old Android is at hand. The bar is the 3D place within 5 seconds and 30 frames
-a second, with the CPU slowed 4 times and the "Fast 4G" network profile. A script on
-the dev machine drives real Chrome against the live site, because CI draws 3D in
-software. A hand check in DevTools is the fallback. A real old phone stays untested,
-and that is an accepted risk.
-Rejected: /poc first (the skeleton is the same test, with code that we keep), By hand
-only (the check is not repeatable by command), A real old
-Android (none at hand), 10 seconds and 20 frames (rough movement, and later slices draw
-more), 3 seconds and 60 frames (a mid-range phone probably fails it), "Slow 4G" or a CPU
-slowed 6 times (stricter than a mid-range phone on 4G in Malaysia).
-Source: specs/walking-skeleton.md
-Status: active
-
-## D12 · 2026-11-21 · Language: the device language, else Malay; stored on the device
-
-Why: one address serves both languages, and the next visit opens in the person's own
-language. The browser stores the language code only, and the site sends nothing about
-the person to a server (shape O5).
-Rejected: /ms and /en in the address (a second address for each page; the user chose
-one), Not held (a reload loses the choice), Always Malay (a device set to English
-should open in English), A choice screen (one more tap before the place shows).
-Source: specs/walking-skeleton.md
-Status: active
-
-## D13 · 2026-11-21 · When 3D cannot show: the step text, a still picture, a short message
-
-Why: the person still reads the step and still sees the place. A failed download also
-gets a "Try again" button.
-Rejected: Text and message with no picture (the person gets no view of the place), A
-full-page "not supported" message (the person reads no step text).
-Source: specs/walking-skeleton.md
-Status: active
-
-## D14 · 2026-11-21 · The site stays hidden from search engines until full-umrah
-
-Why: the first deploys hold placeholder text that no qualified person has reviewed
-(shape O1). full-umrah is the first slice with one whole umrah.
-Rejected: Public and listed (search engines list the placeholder text), Behind a login
-(the CI test needs a way through the login), tawaf-walk lists it (the review must then
-happen for tawaf alone), A new launch slice (a sixth slice in the shape for one mark).
-Source: specs/walking-skeleton.md
-Status: active
-
-## D15 · 2026-11-21 · The site name is Isfar
-
-Why: "isfar" is the Arabic for dawn growing bright, the moment a person can see the
-place. It shares a root with "safar", travel. One name serves both languages. An
-Arabic reader has not checked the meaning yet.
-Rejected: Virtual Hajj and Haji Maya (the user wanted a name with an image behind it),
-Direct names such as Manasik and Labbaik (the user wanted a likeness, not the name of
-a rite), Langkah, Sabil, Yakin and Asa (earlier drafts that the user passed over).
-Source: specs/walking-skeleton.md
-Status: active
-
-## D16 · 2026-11-21 · The 3D download stays under 500 KB compressed
-
-Why: the ceiling covers three.js plus the model, and it leaves room for the fuller
-model of tawaf-walk. A fixed number shows growth before the 5 second bar breaks.
-Rejected: 300 KB (little room for the fuller model), No ceiling (a slow growth in size
-goes unseen until the 5 second bar breaks).
-Source: specs/walking-skeleton.md
-Status: active
-
-## D17 · 2026-11-21 · A projector reads by browser zoom; the wide layout holds from 800 px
-
-Why: the body text is 18px, which is small from the back of a classroom. At 200% zoom a
-1920x1080 projector is 960x540, and the scene stays beside the step panel. 960x540 is
-a test size.
-Rejected: Larger text in the design system (a laptop user close to the screen gets it
-too), Leave it (the room cannot read the step).
-Source: specs/walking-skeleton.md
-Status: active
-## D18 · 2026-11-23 · three.js directly, with no React wrapper
-
-Why: the skeleton has one fixed view. One component owns a canvas and calls three.js,
-which is the smallest download under the 500 KB ceiling (D16).
-Rejected: React Three Fiber (a library and download size that one fixed view does not
-need yet).
-Source: specs/walking-skeleton.md
-Status: active
-
-## D19 · 2026-11-23 · The model is a .glb file from a Blender script in the repo
-
-Why: the site loads the Kaabah as it will load the fuller mosque, so the skeleton
-proves the model file, its loader and its size. The script makes the file again on any
-machine with Blender, and the file is committed.
-Rejected: Shapes in three.js code (tawaf-walk then meets the model file path for the
-first time), A file modelled by hand (the skeleton waits for it).
-Source: specs/walking-skeleton.md
-Status: active
-
-## D20 · 2026-11-23 · "Try again" reloads the page
-
-Why: a reload works in each browser, and the language is stored, so the person loses
-nothing. tawaf-walk must keep the current step across a reload, or replace this.
-Rejected: Fetch again in place (nobody has proved that each browser fetches a failed
-code file again without a reload), /poc (a spike for a path that the reload avoids).
-Source: specs/walking-skeleton.md
-Status: active
-
-## D21 · 2026-11-23 · The font files ship inside the site
-
-Why: no request goes to Google, so the site sends nothing about the person to a third
-party (shape O5), and a phone on 4G opens one less connection.
-Rejected: Google Fonts (each visit makes a request to Google, which sees the visitor's
-address).
-Source: specs/walking-skeleton.md
-Status: active
-```
+- correctness · `src/scene/place.ts:36` · check the WebGL context after the model download, so a loss during the download gives the failed state · `e0428d8`
+- correctness · `.github/workflows/ci.yml:10` · one concurrency group for the whole run, so a newer push cancels the older run before it can deploy · `b37ff3f`
+- A03 Software Supply Chain Failures · `package.json:22` · `pnpm audit --prod --audit-level high` in the test job · `ad2a81c`
+- needs validation · `.github/workflows/ci.yml:25` · whether headless Chromium on the GitHub ubuntu-latest runner keeps the WebGL context, as this VM with no GPU does not · after the first push at /ship, open the test job log and look for `Received: "failed"` under `e2e/skeleton.spec.ts:64`
 
 ## Open items
 
@@ -655,6 +480,12 @@ Status: active
 | O36 | The repo has no commits, and /build needs one to branch from. | question | spec p3 | user | Resolved | /build renames the branch to `main` and commits the docs there once. The slice goes on `feat/walking-skeleton`. 2026-11-23 |
 | O37 | A scripted desktop Chrome on the dev machine draws 3D with the CPU slowed, so scenario 5 can run as a script. | unproven | spec p3 | user | Accepted risk | /build writes the script. If scripted Chrome cannot draw 3D, the hand check in DevTools replaces it. `/poc` was rejected. 2026-11-23 |
 | O38 | What moves the seven beads in the loading card? | question | spec p3 | user | Resolved | They light one by one in a loop. Under reduced motion they stay still and unlit. No beads and still beads were rejected. 2026-11-23 |
+| O39 | O36 said /build makes one commit on `main` with the existing docs. The zuko hook `block-dangerous.sh` blocks each commit on `main`. | flag | build | user | Decided alone | Chose: the docs commit `55178e7` is the first commit on `feat/walking-skeleton`, and no local `main` exists yet. Other: a docs commit on `main`, then a branch. Undo: at /ship, push `55178e7` as `main` before the PR, so the PR holds only the slice. 2026-11-23 |
+| O40 | Scenario 5 said "a desktop Chrome" proves 30 frames a second. The dev machine is a cloud VM with no graphics chip. Its Chrome draws with SwiftShader, at 18 frames a second with or without the CPU slow-down, so its frame rate says nothing about a phone. | flag | build | user | Decided alone | Chose: `e2e/speed.spec.ts` measures the load time, then fails on a software renderer and names it. The frame-rate half needs a machine with a graphics chip at /ship. The load-time half passed here: 1293 ms against a local build. Other: accept the software frame rate as the proof. Undo: delete the renderer check in `e2e/speed.spec.ts`. 2026-11-23 |
+| O41 | O37 said scripted Chrome on the dev machine may not draw 3D. | flag | build | user | Decided alone | Chose: no change. Scripted Chrome draws 3D here, but only in software (O40). Headless Chromium here still loses the WebGL context, so the Chromium project runs in CI only. Other: run the Chromium project here with launch flags. Undo: none needed. 2026-11-23 |
+| O42 | The loading card said the beads light "about half a second apart". | flag | build | user | Decided alone | Chose: 320 ms apart, the `--vh-dur-step` token, so no new token. Other: a new 500 ms token through /design-system. Undo: add the token and use it in `.vh-beads--busy` in `styles.css`. 2026-11-23 |
+| O43 | The review found three new runtime packages (react, react-dom, three) with no check on known advisories. | flag | review | user | Decided alone | Chose: the test job runs `pnpm audit --prod --audit-level high`, so only a high or critical advisory stops the deploy. Other: fail on an advisory of any level, which can block each deploy on a low advisory that has no fix. Undo: remove `--audit-level high` in `.github/workflows/ci.yml`. 2026-11-23 |
+| O44 | The spec said the address is `isfar.pages.dev`. Cloudflare gave the project `isfar` the address `isfar-57q.pages.dev`, because the name was taken on pages.dev. | flag | ship | user | Decided alone | Chose: keep `isfar-57q.pages.dev`, and use it in the spec. Other: a new project with a free name, or a custom domain, which D6 rejected for now. Undo: create a Pages project with a free name, and change `--project-name` in `.github/workflows/ci.yml`. 2026-11-23 |
 
 _Never delete this section or its rows. See references/ledger.md._
 
@@ -686,6 +517,8 @@ _Never delete this section or its rows. See references/ledger.md._
 - **Smoke step** — one quick check that the live site answers.
 - **Preview address** — a separate address that shows one branch before it merges.
 - **Secret** — a value such as an API token, held by GitHub and hidden from the logs.
+- **SwiftShader** — Chrome's software renderer. It draws 3D on the CPU when there is no graphics chip.
+- **Cloud VM** — a computer that runs inside a data centre, often with no graphics chip.
 - **Fast 4G** — a network profile in Chrome that limits the speed to about 9 Mbps.
 - **Frames a second** — how many times a second the browser draws the 3D place. 30 looks smooth.
 - **Kaabah** — the cube-shaped building that pilgrims walk around.
