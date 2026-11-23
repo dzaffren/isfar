@@ -51,9 +51,10 @@ test("the fuller place runs at old-phone speed", async ({ page }) => {
   }
   await expect(scene).toHaveAttribute("data-camera", "15");
   // A move to the same view, as from step 8 to step 9, cuts in 0 ms and draws one frame.
+  // The first frame of a move is at 0 ms, so N frames span N - 1 gaps.
   const moves = lines.flatMap((line) => {
     const move = /camera at step (\d+): (\d+) frames in (\d+) ms/.exec(line);
-    return move && Number(move[3]) > 0 ? [{ step: move[1], rate: Number(move[2]) / (Number(move[3]) / 1000) }] : [];
+    return move && Number(move[3]) > 0 ? [{ step: move[1], rate: (Number(move[2]) - 1) / (Number(move[3]) / 1000) }] : [];
   });
   expect(moves.length, "the camera flies between the spots").toBeGreaterThan(0);
   for (const { step, rate } of moves) {
