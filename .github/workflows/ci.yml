@@ -61,6 +61,7 @@ jobs:
       - name: smoke
         env:
           URL: ${{ steps.deploy.outputs.pages-deployment-alias-url || steps.deploy.outputs.deployment-url }}
+        # A new deployment can answer 522 for a few seconds before Cloudflare serves it.
         run: |
-          curl -fsS "$URL" | grep -q "<title>Isfar</title>"
+          curl -fsS --retry 10 --retry-delay 6 --retry-all-errors "$URL" | grep -q "<title>Isfar</title>"
           echo "smoke: $URL ok"
