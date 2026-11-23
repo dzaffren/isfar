@@ -1,11 +1,28 @@
-type Props = { title: string; text: string };
+import type { ReactNode } from "react";
 
-export function StepPanel({ title, text }: Props) {
+type Props = {
+  title: string;
+  text: string;
+  progress?: { label: string; beads: ReactNode };
+  step?: number;
+  children?: ReactNode;
+};
+
+export function StepPanel({ title, text, progress, step, children }: Props) {
   return (
     <article className="vh-panel vh-cloth">
-      <div className="vh-panel__body">
+      {progress && (
+        <header className="vh-panel__head vh-kiswah">
+          <div className="vh-panel__progress">
+            <div className="vh-panel__where">{progress.label}</div>
+            {progress.beads}
+          </div>
+        </header>
+      )}
+      <div key={step} className={step === undefined ? "vh-panel__body" : "vh-panel__body walk__step"} aria-live={step === undefined ? undefined : "polite"}>
         <h1 className="vh-title">{title}</h1>
         <p className="vh-text">{text}</p>
+        {children}
       </div>
     </article>
   );

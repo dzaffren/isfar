@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 // Scenario 5, run by hand against the live site: SPEED_URL=https://isfar-57q.pages.dev pnpm e2e:speed
 // It drives real Chrome with a window, because CI draws 3D in software and its frame rate means nothing.
-test("the place runs at old-phone speed", async ({ page }) => {
+test("the fuller place runs at old-phone speed", async ({ page }) => {
   test.skip(!process.env.SPEED_URL, "Set SPEED_URL to the live site.");
   await page.setViewportSize({ width: 360, height: 800 });
 
@@ -38,14 +38,27 @@ test("the place runs at old-phone speed", async ({ page }) => {
   console.log(`place shown in ${Math.round(shownAt)} ms`);
   expect(shownAt).toBeLessThan(5_000);
 
-  await expect.poll(() => lines.find((line) => line.includes("frames a second")), { timeout: 20_000 }).toBeTruthy();
   // A software renderer draws on the CPU, so its frame rate says nothing about a phone's graphics chip.
   const renderer = await page.evaluate(() => (window as unknown as { renderer: string }).renderer);
   console.log(`renderer: ${renderer}`);
   expect(renderer, "the renderer must be known").not.toBe("unknown");
   expect(renderer, "run on a machine with a graphics chip").not.toMatch(/swiftshader|llvmpipe|software/i);
 
-  const rate = Number(/(\d+) frames a second/.exec(lines.find((line) => line.includes("frames a second"))!)![1]);
-  console.log(`${rate} frames a second over 10 s`);
-  expect(rate).toBeGreaterThanOrEqual(30);
+  // Step 1 to step 15, one step each 2 seconds. The place logs the frames of each camera move.
+  for (let step = 2; step <= 15; step += 1) {
+    await page.keyboard.press("ArrowRight");
+    await page.waitForTimeout(2_000);
+  }
+  await expect(scene).toHaveAttribute("data-camera", "15");
+  // A move to the same view, as from step 8 to step 9, cuts in 0 ms and draws one frame.
+  // The first frame of a move is at 0 ms, so N frames span N - 1 gaps.
+  const moves = lines.flatMap((line) => {
+    const move = /camera at step (\d+): (\d+) frames in (\d+) ms/.exec(line);
+    return move && Number(move[3]) > 0 ? [{ step: move[1], rate: (Number(move[2]) - 1) / (Number(move[3]) / 1000) }] : [];
+  });
+  expect(moves.length, "the camera flies between the spots").toBeGreaterThan(0);
+  for (const { step, rate } of moves) {
+    console.log(`move to step ${step}: ${Math.round(rate)} frames a second`);
+    expect(rate, `the move to step ${step}`).toBeGreaterThanOrEqual(30);
+  }
 });

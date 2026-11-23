@@ -20,6 +20,7 @@
   --vh-mistake: #9b2c4a;
   --vh-mistake-tint: #f7e4e9;
   --vh-focus: #2b2622;
+  --vh-lamp: #1f8a4c;
 
   --vh-marble-image: linear-gradient(var(--vh-joint) 2px, transparent 2px),
     linear-gradient(90deg, var(--vh-joint) 2px, transparent 2px);
@@ -45,6 +46,7 @@
     --vh-mistake: #ffb3c4;
     --vh-mistake-tint: #4a2630;
     --vh-focus: #fbf3dc;
+    --vh-lamp: #4fd08a;
   }
 }
 
@@ -63,6 +65,7 @@
   --vh-mistake: #ffb3c4;
   --vh-mistake-tint: #4a2630;
   --vh-focus: #fbf3dc;
+  --vh-lamp: #4fd08a;
 }
 
 [data-theme="light"] {
@@ -80,4 +83,5 @@
   --vh-mistake: #9b2c4a;
   --vh-mistake-tint: #f7e4e9;
   --vh-focus: #2b2622;
+  --vh-lamp: #1f8a4c;
 }
