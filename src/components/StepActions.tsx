@@ -41,7 +41,8 @@ export function StepActions({ back, next, focusNext }: Props) {
         ) : (
           <span />
         )}
-        <button type="button" className="vh-button" onClick={next.onAct} autoFocus={focusNext} disabled={next.off}>
+        {/* An off button keeps the focus, so a keyboard person stays in the bar (D62). */}
+        <button type="button" className="vh-button" onClick={next.off ? undefined : next.onAct} autoFocus={focusNext} aria-disabled={next.off || undefined}>
           {next.label}
         </button>
       </div>
