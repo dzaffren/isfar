@@ -1,6 +1,6 @@
 # Tawaf check
 
-**Version:** v1 · **Status:** Refined · **Type:** Feature · **Project type:** Web UI
+**Version:** v1 · **Status:** Built · **Type:** Feature · **Project type:** Web UI
 
 **Shape doc:** docs/specs/virtual-hajj/shape.md
 **Depends on:** `tawaf-walk`
@@ -117,8 +117,8 @@ Scenario: The check still works when the 3D place cannot show
   When she opens "#semak" in Malay
   Then the top-view map shows, with the marker at the Hajar Aswad corner
   And the message "Peranti ini tidak dapat memaparkan tempat 3D." shows under the question
-  When she answers question 1 and taps "Seterusnya"
-  Then the marker on the map moves to the spot of question 2
+  When she answers questions 1 and 2
+  Then the marker on the map moves to the spot of question 3
   And she can finish all seven questions and see the result
 ```
 
@@ -441,6 +441,7 @@ Recorded as D47 to D55 at pause 1, and D56 to D61 at pause 2.
 | O15 | Which motion tier does the check use? | question | spec p2 | user | Resolved | Tier 2, as in the walk. Tier 1 was rejected. 2026-11-24 |
 | O16 | Is the draft text of the check right? | question | spec p2 | user | Resolved | Right as drafted. The "not yet reviewed" notice stays, and a qualified person reviews the text before a public launch (shape O1). 2026-11-24 |
 | O17 | Does the check ship behind a feature flag? | question | spec p3 | user | Resolved | No flag, as for the walk (D42). The rollback is the Cloudflare dashboard, or a `git revert`. "A flag in the address" was rejected. 2026-11-24 |
+| O18 | Scenario 4 said "When she answers question 1 and taps Seterusnya, Then the marker on the map moves to the spot of question 2". Questions 1 and 2 both show step 3, so the marker does not move. | flag | build | user | Decided alone | Chose: the scenario answers questions 1 and 2, and the marker moves to the spot of question 3. Other: give question 2 a spot of its own. Undo: change the step of question 2 in `src/content/check.ts`, and put back the old scenario 4. 2026-11-24 |
 
 _Never delete this section or its rows. See references/ledger.md._
 

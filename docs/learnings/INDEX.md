@@ -4,3 +4,4 @@
 - Import JSON with `with { type: "json" }` when a browser test reads the module. ([json-import-attribute](json-import-attribute.md))
 - Prove the 3D half of the browser test in Firefox on the dev machine. ([local-chromium-loses-3d](local-chromium-loses-3d.md))
 - Break the code a browser test guards, and watch the test fail. ([break-the-guarded-code](break-the-guarded-code.md))
+- Wait for the page to stop scrolling before a test sets its own scroll. ([settle-scroll-before-setting-it](settle-scroll-before-setting-it.md))
