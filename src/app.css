@@ -13,7 +13,7 @@ body,
 .app__main { display: grid; align-content: start; gap: var(--vh-space-4); padding-bottom: var(--vh-space-6); }
 .app__side { display: grid; grid-auto-rows: max-content; align-content: start; gap: var(--vh-space-3); padding: 0 var(--vh-space-4); }
 
-.scene__frame { height: calc(var(--vh-tile) * 4); overflow: hidden; border-bottom: var(--vh-stroke) solid var(--vh-edge); display: grid; }
+.scene__frame { height: calc(var(--vh-tile) * 3); overflow: hidden; border-bottom: var(--vh-stroke) solid var(--vh-edge); display: grid; }
 .scene__frame > * { grid-area: 1 / 1; }
 .scene__view { display: block; width: 100%; height: 100%; }
 .scene__load { align-self: center; margin: 0 var(--vh-space-4); max-width: calc(var(--vh-tile) * 4); }
@@ -21,17 +21,6 @@ body,
 /* The 3D place fades in when its first frame is drawn. Opacity only, so it stays under reduced motion. */
 .scene__canvas { transition: opacity var(--vh-dur-press) var(--vh-ease-out); }
 [data-state="loading"] .scene__canvas { opacity: 0; }
-
-.scene__sky { fill: var(--vh-cloth); }
-.scene__rim { fill: var(--vh-sunken); stroke: var(--vh-edge); stroke-width: 1; }
-.scene__floor { fill: var(--vh-marble); }
-.scene__joint { stroke: var(--vh-joint); stroke-width: 2; fill: none; }
-.scene__shade { fill: var(--vh-kiswah-edge); opacity: 0.12; }
-.scene__face { fill: var(--vh-kiswah); }
-.scene__face--far { fill: var(--vh-kiswah-edge); }
-.scene__band { fill: var(--vh-gold); }
-.scene__door { fill: var(--vh-gold); stroke: var(--vh-gold-edge); stroke-width: 1.5; }
-.scene__foot { fill: var(--vh-sunken); stroke: var(--vh-edge); stroke-width: 1; }
 
 /* A projector or a laptop, and a 1920x1080 projector zoomed to 200% (D17). */
 @media (orientation: landscape) and (min-width: 800px) {
@@ -47,7 +36,6 @@ body,
 html { scroll-padding-bottom: calc(var(--vh-control) + var(--vh-space-8)); }
 .walk__step { animation: walk-step var(--vh-dur-step) var(--vh-ease-out); }
 @keyframes walk-step { from { opacity: 0; transform: translateY(var(--vh-move)); } }
-.app__main:has(.walk__actions) .scene__frame { height: calc(var(--vh-tile) * 3); }
 .walk__actions { position: sticky; bottom: 0; margin: 0 calc(-1 * var(--vh-space-4)) calc(-1 * var(--vh-space-6)); padding: var(--vh-space-3) var(--vh-space-4); border-top: var(--vh-stroke) solid var(--vh-edge); }
 
 /* The names of the parts, over the 3D place and over the map. */
@@ -73,8 +61,7 @@ html { scroll-padding-bottom: calc(var(--vh-control) + var(--vh-space-8)); }
 .map__marker { fill: var(--vh-gold); stroke: var(--vh-kiswah); stroke-width: 0.6; }
 
 @media (orientation: landscape) and (min-width: 800px) {
-  .app__main:has(.walk__actions) .scene__frame { height: 100%; }
-  .app__side:has(.walk__actions) { display: flex; flex-direction: column; }
-  .app__side:has(.walk__actions) > * { flex: none; }
+  .app__side { display: flex; flex-direction: column; }
+  .app__side > * { flex: none; }
   .walk__actions { margin: auto calc(-1 * var(--vh-space-6)) calc(-1 * var(--vh-space-6)); padding: var(--vh-space-3) var(--vh-space-6); }
 }

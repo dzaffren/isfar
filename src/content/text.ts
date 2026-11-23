@@ -1,12 +1,9 @@
 import type { Language } from "../lib/language";
 
-// Each text on the page, in the two languages. The spec's "Text in this slice" table is the source.
+// Each text on the page outside the steps, in the two languages. The specs' text tables are the source.
 const ms = {
   siteName: "Isfar",
   languageSwitch: "Bahasa",
-  scene: "Kaabah di atas mataf, dari satu sudut pandang",
-  title: "Kaabah",
-  text: "Inilah Kaabah, di tengah-tengah Masjidil Haram. Lantai marmar yang lapang di sekelilingnya dipanggil mataf.",
   noticeReview: "Kandungan ini belum disemak oleh orang yang bertauliah.",
   noticeLayout: "Susun atur pada hari sebenar mungkin berbeza. Ikut mutawwif anda dan papan tanda.",
   loadingTitle: "Memuatkan Kaabah",
@@ -36,9 +33,6 @@ export type Words = Record<keyof typeof ms, string>;
 const en: Words = {
   siteName: "Isfar",
   languageSwitch: "Language",
-  scene: "The Kaabah on the mataf, from one fixed view",
-  title: "The Kaabah",
-  text: "This is the Kaabah, in the centre of Masjidil Haram. The open marble floor around it is the mataf.",
   noticeReview: "A qualified person has not yet reviewed this content.",
   noticeLayout: "The layout on the day may differ. Follow your mutawwif and the signs.",
   loadingTitle: "Loading the Kaabah",

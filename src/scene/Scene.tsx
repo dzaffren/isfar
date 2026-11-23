@@ -1,11 +1,11 @@
 import { useEffect, useRef } from "react";
 import { LoadingCard } from "../components/LoadingCard";
-import { StillPicture } from "../components/StillPicture";
+import { MatafMap } from "../components/MatafMap";
 import type { Words } from "../content/text";
 
 export type SceneState = "loading" | "shown" | "unsupported" | "failed";
 
-type Props = { words: Words; state: SceneState; onState: (state: SceneState) => void };
+type Props = { step: number; words: Words; where: string; state: SceneState; onState: (state: SceneState) => void };
 
 function canDraw3D(): boolean {
   try {
@@ -17,7 +17,7 @@ function canDraw3D(): boolean {
   }
 }
 
-export function Scene({ words, state, onState }: Props) {
+export function Scene({ step, words, where, state, onState }: Props) {
   const canvas = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -48,8 +48,8 @@ export function Scene({ words, state, onState }: Props) {
   return (
     <section className="scene" data-scene data-state={state} aria-busy={state === "loading"}>
       <div className="scene__frame vh-marble">
-        {still && <StillPicture label={words.scene} />}
-        <canvas ref={canvas} className="scene__view scene__canvas" role="img" aria-label={words.scene} hidden={still} />
+        {still && <MatafMap step={step} words={words} label={`${words.map}. ${where}`} />}
+        <canvas ref={canvas} className="scene__view scene__canvas" role="img" aria-label={where} hidden={still} />
         {state === "loading" && <LoadingCard title={words.loadingTitle} hint={words.loadingHint} />}
       </div>
     </section>
