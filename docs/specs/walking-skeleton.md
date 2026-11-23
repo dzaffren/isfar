@@ -429,6 +429,15 @@ Order inside the chunk:
 
 Recorded as D4, D5, D6, D7, D8, D9, D10, D11, D12, D13, D14, D15, D16, D17, D18, D19, D20, D21.
 
+## Review
+
+2026-11-23 · 5 raw findings, 3 survived, 3 fixed, 1 lead needs validation.
+
+- correctness · `src/scene/place.ts:36` · check the WebGL context after the model download, so a loss during the download gives the failed state · `e0428d8`
+- correctness · `.github/workflows/ci.yml:10` · one concurrency group for the whole run, so a newer push cancels the older run before it can deploy · `b37ff3f`
+- A03 Software Supply Chain Failures · `package.json:22` · `pnpm audit --prod --audit-level high` in the test job · `ad2a81c`
+- needs validation · `.github/workflows/ci.yml:25` · whether headless Chromium on the GitHub ubuntu-latest runner keeps the WebGL context, as this VM with no GPU does not · after the first push at /ship, open the test job log and look for `Received: "failed"` under `e2e/skeleton.spec.ts:64`
+
 ## Open items
 
 | ID  | What | Type | Raised at | Owner | Status | Answer |
@@ -475,6 +484,7 @@ Recorded as D4, D5, D6, D7, D8, D9, D10, D11, D12, D13, D14, D15, D16, D17, D18,
 | O40 | Scenario 5 said "a desktop Chrome" proves 30 frames a second. The dev machine is a cloud VM with no graphics chip. Its Chrome draws with SwiftShader, at 18 frames a second with or without the CPU slow-down, so its frame rate says nothing about a phone. | flag | build | user | Decided alone | Chose: `e2e/speed.spec.ts` measures the load time, then fails on a software renderer and names it. The frame-rate half needs a machine with a graphics chip at /ship. The load-time half passed here: 1293 ms against a local build. Other: accept the software frame rate as the proof. Undo: delete the renderer check in `e2e/speed.spec.ts`. 2026-11-23 |
 | O41 | O37 said scripted Chrome on the dev machine may not draw 3D. | flag | build | user | Decided alone | Chose: no change. Scripted Chrome draws 3D here, but only in software (O40). Headless Chromium here still loses the WebGL context, so the Chromium project runs in CI only. Other: run the Chromium project here with launch flags. Undo: none needed. 2026-11-23 |
 | O42 | The loading card said the beads light "about half a second apart". | flag | build | user | Decided alone | Chose: 320 ms apart, the `--vh-dur-step` token, so no new token. Other: a new 500 ms token through /design-system. Undo: add the token and use it in `.vh-beads--busy` in `styles.css`. 2026-11-23 |
+| O43 | The review found three new runtime packages (react, react-dom, three) with no check on known advisories. | flag | review | user | Decided alone | Chose: the test job runs `pnpm audit --prod --audit-level high`, so only a high or critical advisory stops the deploy. Other: fail on an advisory of any level, which can block each deploy on a low advisory that has no fix. Undo: remove `--audit-level high` in `.github/workflows/ci.yml`. 2026-11-23 |
 
 _Never delete this section or its rows. See references/ledger.md._
 
