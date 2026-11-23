@@ -1,0 +1,23 @@
+/* The preview page of a slice. It ships in no build. */
+.preview { padding: var(--vh-space-6) var(--vh-space-4) var(--vh-space-12); display: grid; gap: var(--vh-space-8); }
+.preview__intro { max-width: calc(var(--vh-tile) * 9); display: grid; gap: var(--vh-space-3); }
+.preview__frames { display: flex; flex-wrap: wrap; align-items: flex-start; gap: var(--vh-space-8) var(--vh-space-6); }
+.preview__frame { margin: 0; display: grid; gap: var(--vh-space-2); }
+.preview__frame figcaption { font: var(--vh-text-label); color: var(--vh-ink); }
+.preview__frame iframe { border: var(--vh-stroke) solid var(--vh-edge); border-radius: var(--vh-radius-control); display: block; }
+
+/* The drawing that stands in for the 3D place. */
+.standin { position: relative; overflow: hidden; }
+.scene__guide { fill: var(--vh-edge); }
+.scene__path { fill: none; stroke: var(--vh-gold-edge); stroke-width: 3; stroke-linecap: round; }
+.scene__arrow { fill: var(--vh-gold-edge); }
+.scene__marker { fill: var(--vh-gold); stroke: var(--vh-kiswah); stroke-width: 2; }
+.scene__pole { fill: none; stroke: var(--vh-kiswah); stroke-width: 2; }
+.scene__pin { fill: var(--vh-gold); stroke: var(--vh-kiswah); stroke-width: 2; }
+.scene__arch { fill: var(--vh-edge); opacity: 0.45; }
+.scene__lamp { fill: var(--vh-lamp); stroke: var(--vh-kiswah-edge); stroke-width: 1; }
+.scene__hijr { fill: var(--vh-sunken); stroke: var(--vh-edge); stroke-width: 1; }
+.scene__maqam { fill: var(--vh-gold); stroke: var(--vh-gold-edge); stroke-width: 1; }
+.scene__maqam--far { fill: var(--vh-gold-edge); }
+.scene__face--top { fill: var(--vh-kiswah-edge); }
+.scene__stone { fill: var(--vh-on-kiswah); stroke: var(--vh-gold); stroke-width: 2; }

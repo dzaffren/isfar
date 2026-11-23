@@ -14,6 +14,21 @@ const ms = {
   no3d: "Peranti ini tidak dapat memaparkan tempat 3D.",
   failed: "Tempat 3D tidak dapat dimuatkan.",
   retry: "Cuba lagi",
+  next: "Seterusnya",
+  back: "Kembali",
+  startAgain: "Mula semula",
+  noteLabel: "Mazhab lain berbeza di sini",
+  progress: "Tawaf · Langkah {n} daripada {total}",
+  circuit: "Pusingan {n} daripada 7",
+  noCircuit: "Pusingan belum bermula",
+  allCircuits: "Tujuh pusingan selesai",
+  map: "Peta mataf dari atas",
+  partHajarAswad: "Hajar Aswad",
+  partDoor: "Pintu Kaabah",
+  partHijr: "Hijr Ismail",
+  partYamani: "Rukun Yamani",
+  partMaqam: "Maqam Ibrahim",
+  partGreenLight: "Lampu hijau",
 };
 
 export type Words = Record<keyof typeof ms, string>;
@@ -31,6 +46,21 @@ const en: Words = {
   no3d: "This device cannot show the 3D place.",
   failed: "The 3D place did not load.",
   retry: "Try again",
+  next: "Next",
+  back: "Back",
+  startAgain: "Start again",
+  noteLabel: "Other schools differ here",
+  progress: "Tawaf · Step {n} of {total}",
+  circuit: "Circuit {n} of 7",
+  noCircuit: "No circuit has started",
+  allCircuits: "Seven circuits are done",
+  map: "Map of the mataf from above",
+  partHajarAswad: "Hajar Aswad",
+  partDoor: "The door",
+  partHijr: "Hijr Ismail",
+  partYamani: "Rukun Yamani",
+  partMaqam: "Maqam Ibrahim",
+  partGreenLight: "Green light",
 };
 
 export const TEXT: Record<Language, Words> = { ms, en };
