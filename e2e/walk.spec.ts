@@ -330,19 +330,33 @@ test.describe("reduced motion", () => {
   });
 });
 
-test.describe("a projector at 200%", () => {
-  test.use({ viewport: { width: 960, height: 540 }, locale: "ms-MY" });
+for (const size of [SIZES[1], { width: 360, height: 640 }]) {
+  test.describe(`focus at ${size.width}x${size.height}`, () => {
+    test.use({ viewport: size, locale: "ms-MY" });
 
-  test("the Back and Next bar does not cover the note toggle when it takes focus", async ({ page }) => {
-    await page.goto("/#tawaf-2");
-    const toggle = page.locator("summary", { hasText: MS.note });
-    for (let tab = 0; tab < 10 && !(await toggle.evaluate((summary) => summary === document.activeElement)); tab += 1) await page.keyboard.press("Tab");
-    await expect(toggle).toBeFocused();
-    await expect
-      .poll(async () => (await toggle.boundingBox())!.y + (await toggle.boundingBox())!.height, "the toggle ends above the bar")
-      .toBeLessThanOrEqual((await page.locator(".walk__actions").boundingBox())!.y);
+    test("the Back and Next bar does not cover the note toggle when it takes focus", async ({ page }) => {
+      await page.goto("/#tawaf-2");
+      const toggle = page.locator("summary", { hasText: MS.note });
+      // Scroll so that the toggle starts half under the bar, as it does with the fonts in CI.
+      // The side column scrolls in landscape, and the page in portrait.
+      await toggle.evaluate((summary) => {
+        const side = summary.closest(".app__side")!;
+        const scroller = getComputedStyle(side).overflowY === "auto" ? side : document.scrollingElement!;
+        const bar = side.querySelector(".walk__actions")!.getBoundingClientRect();
+        const box = summary.getBoundingClientRect();
+        scroller.scrollTop += box.top + box.height / 2 - bar.top;
+      });
+      const bar = await page.locator(".walk__actions").boundingBox();
+      const box = await toggle.boundingBox();
+      expect(box!.y < bar!.y && box!.y + box!.height > bar!.y, "the toggle starts half under the bar").toBe(true);
+      await toggle.focus();
+      await expect(toggle).toBeFocused();
+      await expect
+        .poll(async () => (await toggle.boundingBox())!.y + (await toggle.boundingBox())!.height, "the toggle ends above the bar")
+        .toBeLessThanOrEqual((await page.locator(".walk__actions").boundingBox())!.y);
+    });
   });
-});
+}
 
 test.describe("a resize", () => {
   test.use({ viewport: { width: 1280, height: 720 }, locale: "ms-MY" });
