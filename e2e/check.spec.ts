@@ -51,6 +51,8 @@ for (const size of SIZES) {
       await expectBeads(page, 0, 1);
       await expectCamera(page, 3);
       await expect(names(page)).toHaveCount(0);
+      const canvas = page.locator("[data-scene] canvas");
+      await expect(canvas, "a screen reader hears no place name before the pick").not.toHaveAttribute("aria-label", /Hajar Aswad/);
       await expect(title(page)).toHaveText("Di mana anda berdiri untuk memulakan tawaf?");
       await expect(options(page)).toHaveCount(3);
       await expect(next(page)).toHaveAttribute("aria-disabled", "true");
@@ -62,6 +64,7 @@ for (const size of SIZES) {
       await expect(line(page)).toContainText(MS.right);
       await expect(option(page, "Di hadapan pintu Kaabah")).toHaveAttribute("aria-disabled", "true");
       await expect(names(page)).toHaveText(["Hajar Aswad", "Lampu hijau"], { useInnerText: true });
+      await expect(canvas).toHaveAttribute("aria-label", /Hajar Aswad/);
       await expect(next(page)).not.toHaveAttribute("aria-disabled", "true");
 
       await next(page).click();
@@ -157,6 +160,7 @@ test.describe("no 3D", () => {
     await expect(page.locator("[data-still]")).toBeVisible();
     expect(await markerAt(page)).toEqual(SPOTS[2].at!.map((value) => expect.closeTo(value, 1)));
     await expect(page.locator("[data-still] .scene__name")).toHaveCount(0);
+    await expect(page.locator("[data-still]"), "a screen reader hears no place name before the pick").not.toHaveAttribute("aria-label", /Hajar Aswad/);
     const message = page.getByText(MS.no3d, { exact: true });
     await expect(message).toBeVisible();
     expect((await message.boundingBox())!.y, "the message sits under the step panel").toBeGreaterThan((await page.locator(".vh-panel").boundingBox())!.y);

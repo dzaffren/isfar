@@ -38,6 +38,7 @@ const ms = {
   checkStep: "Langkah {n} · {title}",
   checkAgain: "Cuba semula",
   checkLeave: "Keluar",
+  checkWhere: "Penanda emas di mataf. Nama tempat muncul selepas anda menjawab.",
 };
 
 export type Words = Record<keyof typeof ms, string>;
@@ -79,6 +80,7 @@ const en: Words = {
   checkStep: "Step {n} · {title}",
   checkAgain: "Try again",
   checkLeave: "Leave",
+  checkWhere: "A gold marker in the mataf. The name of the place shows after you answer.",
 };
 
 export const TEXT: Record<Language, Words> = { ms, en };

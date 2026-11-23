@@ -88,7 +88,9 @@ export function App() {
   // The camera of a question is the camera of its walk step, and the result shows the wide view of step 15.
   const questions = CHECK[language];
   const sceneStep = !check ? step : at === "result" ? TOTAL : questions[at - 1].step;
-  const where = TAWAF[language][sceneStep - 1].where;
+  // Before the pick, the text for a screen reader names no place, as the names hide on screen (D57).
+  const names = !check || at === "result" || told;
+  const where = names ? TAWAF[language][sceneStep - 1].where : words.checkWhere;
   const notices = (
     <>
       {scene === "unsupported" && <MessageCard message={words.no3d} />}
@@ -102,7 +104,7 @@ export function App() {
     <div className="app">
       <TopBar siteName={words.siteName} switchLabel={words.languageSwitch} language={language} onLanguage={chooseLanguage} />
       <main className="app__main">
-        <Scene step={sceneStep} names={!check || at === "result" || told} words={words} where={where} state={scene} onState={onScene} />
+        <Scene step={sceneStep} names={names} words={words} where={where} state={scene} onState={onScene} />
         <div className="app__side">
           {scene === "failed" && <MessageCard message={words.failed} retry={{ label: words.retry, onRetry: () => location.reload() }} />}
           {check ? (
