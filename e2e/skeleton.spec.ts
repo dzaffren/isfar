@@ -104,6 +104,23 @@ for (const size of SIZES) {
         await expect(page.locator("[data-scene]")).toHaveAttribute("data-state", "shown", { timeout: 15_000 });
         await kaabahIsDrawn(page);
       });
+
+      test("the device drops 3D while the place downloads", async ({ page }) => {
+        await page.route(MODEL, async (route) => {
+          await new Promise((done) => setTimeout(done, 1500));
+          await route.continue();
+        });
+        const asked = page.waitForRequest((request) => request.url().endsWith("/models/kaabah.glb"));
+        await page.goto("/");
+        await asked;
+        await page.locator("[data-scene] canvas").evaluate((canvas: HTMLCanvasElement) => {
+          canvas.getContext("webgl2")!.getExtension("WEBGL_lose_context")!.loseContext();
+        });
+        await expect(page.locator("[data-scene]")).toHaveAttribute("data-state", "failed", { timeout: 15_000 });
+        await expect(page.locator("[data-still]")).toBeVisible();
+        await expect(page.getByText(MS.failed, { exact: true })).toBeVisible();
+        await expect(page.getByRole("button", { name: MS.retry })).toBeVisible();
+      });
     });
 
     test.describe("English device", () => {

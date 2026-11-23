@@ -32,6 +32,8 @@ export async function showPlace(canvas: HTMLCanvasElement, { onShown, onLost }: 
   const renderer = new WebGLRenderer({ canvas, antialias: true });
   try {
     const gltf = await new GLTFLoader().loadAsync("/models/kaabah.glb");
+    // The device can drop 3D while the model downloads, before the listener below exists.
+    if (renderer.getContext().isContextLost()) throw new Error("WebGL context lost while the model downloaded");
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
     const scene = new Scene();
