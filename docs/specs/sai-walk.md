@@ -332,6 +332,16 @@ This is a draft in the Shafi'i school (D24). Its source is `src/content/sai.ts`.
 | Map, for a screen reader | Peta mas'a dari atas | Map of the mas'a from above |
 | Loading | Memuatkan mas'a | Loading the mas'a |
 
+## Review
+
+2026-11-24 · 7 raw findings, 4 survived, 4 fixed, 1 lead needs validation.
+
+- correctness · `src/scene/masa.ts:56` · on steps 6 to 12 the camera looks towards the next hill, so the path line is in view · `6fdf167`
+- correctness · `src/scene/place.ts:115` · the arrows of the walks back towards Safa face up, so they draw · `1823940`
+- correctness · `src/lib/step.ts:7` · a sa'i address with no step number opens tawaf step 1 · `09da176`
+- coverage · `src/scene/masa.ts:31` · a test for `groundAt`, the height of the marker on the hills · `9acbe78`
+- needs validation · `e2e/speed.spec.ts:10` · whether a computer with a graphics chip still holds 30 frames a second in each window when the two speed tests draw at once · on that computer, run `SPEED_URL=https://isfar-57q.pages.dev pnpm e2e:speed`, then the same with `--workers=1`, and compare the "move to step N" rates
+
 ## Open items
 
 | ID  | What | Type | Raised at | Owner | Status | Answer |
