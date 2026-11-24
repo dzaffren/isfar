@@ -24,6 +24,10 @@ describe("readPlace", () => {
     expect(readPlace("")).toEqual({ rite: "tawaf", step: 1 });
     expect(readPlace("#semak")).toEqual({ rite: "tawaf", step: 1 });
     expect(readPlace("#SAI-5")).toEqual({ rite: "tawaf", step: 1 });
+    expect(readPlace("#sai-abc")).toEqual({ rite: "tawaf", step: 1 });
+    expect(readPlace("#sai-")).toEqual({ rite: "tawaf", step: 1 });
+    expect(readPlace("#sai-5/x")).toEqual({ rite: "tawaf", step: 1 });
+    expect(readPlace("#tawaf-abc")).toEqual({ rite: "tawaf", step: 1 });
   });
 
   it("gives step 1 to an address that only looks like a step", () => {
@@ -32,6 +36,7 @@ describe("readPlace", () => {
     expect(readPlace("#tawaf-1e1")).toEqual({ rite: "tawaf", step: 1 });
     expect(readPlace("#tawaf- 6")).toEqual({ rite: "tawaf", step: 1 });
     expect(readPlace("#sai-05")).toEqual({ rite: "sai", step: 1 });
+    expect(readPlace("#sai-6x")).toEqual({ rite: "tawaf", step: 1 });
   });
 });
 
