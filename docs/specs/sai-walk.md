@@ -349,7 +349,7 @@ This is a draft in the Shafi'i school (D24). Its source is `src/content/sai.ts`.
 | O11 | D35 keeps `--vh-lamp` for the green light of the tawaf start only. The sa'i green lights need a green too. | question | spec p2 | user | Resolved | Reuse `--vh-lamp`. D72 supersedes D35: the one green is for the green lights of the place. "A new token" was rejected. 2026-11-24 |
 | O12 | O4 named the second recitation "Rabbighfir warham, wa antal a'azzul akram". The form that the books of manasik usually give, from Ibn Mas'ud, says "innaka antal a'azzul akram". I did not check a source. | question | spec p2 | user | Resolved | "Rabbighfir warham, innaka antal a'azzul akram". "wa antal a'azzul akram" was rejected. The user checks it against the course notes with the rest of the text. 2026-11-24 |
 | O13 | Which motion tier does the sa'i walk use? | question | spec p2 | user | Resolved | Tier 2, as the tawaf walk. "Tier 1" was rejected. 2026-11-24 |
-| O14 | The 3D mas'a holds 30 frames a second at phone speed. The dev machine has no graphics chip, so nothing here can measure it. | unproven | spec p3 | user | Open | The user chose `/poc` first, on a computer with a graphics chip. "Prove it at /ship" was rejected. 2026-11-24 |
+| O14 | The 3D mas'a holds 30 frames a second at phone speed. The dev machine has no graphics chip, so nothing here can measure it. | unproven | spec p3 | user | Accepted risk | The `/poc` spike could not answer it. Its speed test stopped on this computer's software renderer (SwiftShader), and no computer with a graphics chip is at hand. "Add the number to the spike page and read it on a real phone" was rejected. The cuts stay ready, in order: no antialias on a phone, a pixel ratio of 1.5, fewer arches. The first real proof comes when a person opens the site on a phone. 2026-11-24 |
 | O15 | A rite change drops one 3D place and loads the other, with a new 3D context. | flag | spec p3 | user | Resolved | Swap the place: the scene starts again for the new rite, with a short loading card. "Keep both places loaded" was rejected (D77). 2026-11-24 |
 | O16 | Pause 2 put the green lights across the ceiling. A camera at about 12 m cannot see under a roof. | question | spec p3 | user | Resolved | No roof. Each green light is a beam across the top of the walls, with bands down them. "A roof, with the camera inside" was rejected (D79). 2026-11-24 |
 | O17 | Does the sa'i walk ship behind a feature flag? | question | spec p3 | user | Resolved | No flag. The rollback is the Cloudflare dashboard, or a `git revert`. "A flag in the address" was rejected (D80). 2026-11-24 |
@@ -476,7 +476,7 @@ Cut: a router, a state library, a second `Scene` component, one model file for b
 | 2. Ustaz Hafiz opens a sa'i step by its link, and moves between the rites | `e2e/sai.spec.ts`. `src/lib/step.test.ts`: `#sai-5`, `#sai-13`, `#sai-0`, `#sai-99`, `#sai-05`, `#tawaf-6`, `#abc` and an empty address. | `pnpm e2e --project=firefox`, `pnpm test` |
 | 3. A recitation and a note | `e2e/sai.spec.ts`. `src/content/sai.test.ts`: recitations on steps 3 and 5, a note on step 2 only, in each language. | `pnpm e2e --project=firefox`, `pnpm test` |
 | 4. The sa'i walk works with no 3D | `e2e/sai.spec.ts`: 3D off, then a failed download of `masa.glb` | `pnpm e2e --project=firefox` |
-| 5. The mas'a runs at old-phone speed | `e2e/speed.spec.ts`, run by the user after the deploy, on a computer with a graphics chip | `SPEED_URL=https://isfar-57q.pages.dev pnpm e2e:speed` |
+| 5. The mas'a runs at old-phone speed | `e2e/speed.spec.ts`. Not run: no computer with a graphics chip is at hand (O14). The test stays, for when one is. | `SPEED_URL=https://isfar-57q.pages.dev pnpm e2e:speed` |
 | Rule: each step text is 40 words or fewer | `src/content/sai.test.ts` | `pnpm test` |
 | Rule: the camera cuts under reduced motion | `e2e/sai.spec.ts`, with reduced motion set in Playwright | `pnpm e2e --project=firefox` |
 | Rule: the camera stays inside the ends of the hall, above the walls | `src/scene/views.test.ts`: each sa'i view and 10 points on each move between two neighbour steps | `pnpm test` |
@@ -502,7 +502,7 @@ Order inside the chunk:
 
 | Risk | Mitigation |
 | ---- | ---------- |
-| The mas'a does not hold 30 frames a second at phone speed. | O14: `/poc` settles it on a computer with a graphics chip before /build. Scenario 5 checks it again at /ship. |
+| The mas'a does not hold 30 frames a second at phone speed. | Accepted risk (O14). The rough spike model has 44 arches and is 9.7 KB compressed, and the built mas'a stays at that size or smaller. A slow report from a phone triggers the cuts, in order: no antialias on a phone, a pixel ratio of 1.5, fewer arches. |
 | The long hall reads badly in a 360x240 scene on a phone. | The wide view stands high over Safa and looks along the hall. The browser test checks that the three names of step 1 do not overlap at four sizes. |
 | A swap leaves a blank scene, or an old frame. | The scene starts again on a new key, and the browser test checks the Kaabah pixel after a swap back to tawaf. |
 | The step text has a mistake in a ruling. | The "not yet reviewed" notice stays on each step, and the site stays hidden from search engines (D14). A qualified person reviews it before a public launch (shape O1). |
