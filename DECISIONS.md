@@ -600,3 +600,73 @@ Why: the site is hidden from search engines and has a few testers, as for the wa
 Rejected: A flag in the address (more code, and a second path to test).
 Source: specs/tawaf-check.md
 Status: active
+
+## D64 · 2026-11-24 · The sa'i walk is 13 steps: three before, walk 1 in full, one for each later walk, one to close
+
+Why: the person sees each place of the walk once, and then counts to seven, as in the
+tawaf walk (D22). The seven beads count the walks. The walk ends at Marwah, after walk 7.
+Rejected: Each walk in full (about 25 steps, and the same places show seven times), One
+walk and then "do six more" (the person does not count to seven).
+Source: specs/sai-walk.md
+Status: active
+
+## D65 · 2026-11-24 · A rite switch in the top bar opens sa'i, until full-umrah joins the walks
+
+Why: "Tawaf" and "Sa'i" sit beside BM and EN, so a person reaches sa'i in one tap from
+any step, and an ustaz moves between the rites on a projector.
+Rejected: A button on tawaf step 15 (step 15 already has "Mula semakan" and "Mula
+semula"), A link only (a person cannot find sa'i without someone's link).
+Source: specs/sai-walk.md
+Status: active
+
+## D66 · 2026-11-24 · The sa'i place is the mas'a alone
+
+Why: a long stylised hall with Safa, Marwah and the two green lights shows each spot of
+sa'i. The model stays small, and the text says where the Kaabah is.
+Rejected: The mas'a beside the mataf in one place (a larger model near the 500 KB
+ceiling of D16, and the way between the two belongs to full-umrah).
+Source: specs/sai-walk.md
+Status: active
+
+## D67 · 2026-11-24 · The sa'i walk shows two short recitations
+
+Why: "Innas-safa wal-marwata min sha'a'irillah" at Safa, and "Rabbighfir warham" between
+the green lights. They mark the two places of sa'i that a person must find.
+Rejected: Three, with the takbir and tahlil at Safa (a long block on a phone), One, at
+Safa only (the green lights get no recitation).
+Source: specs/sai-walk.md
+Status: active
+
+## D68 · 2026-11-24 · The sa'i walk ends at Marwah; tahallul stays in full-umrah
+
+Why: the shape gives tahallul to full-umrah, and the mas'a model has no place for it.
+Rejected: A tahallul step at the end (it pulls part of full-umrah into this slice).
+Source: specs/sai-walk.md
+Status: active
+
+## D69 · 2026-11-24 · The sa'i check is its own slice, after sai-walk
+
+Why: sai-walk stays at five scenarios and two areas. sai-check reuses the check of
+tawaf-check.
+Rejected: The check in this slice (more than five scenarios and three areas, so the
+slice test fails), No sa'i check (sa'i stays unchecked until full-umrah).
+Source: specs/sai-walk.md
+Status: active
+
+## D70 · 2026-11-24 · sai-walk uses the gold marker; the pilgrim figure comes later for both walks
+
+Why: the /shape pass of D46 has not run. Sa'i uses the gold marker and the path line of
+D28, so the later pass adds the figure to the two walks at once.
+Rejected: Run the /shape pass first (sai-walk waits, and the figure is planned for one
+more walk than exists).
+Source: specs/sai-walk.md
+Status: active
+
+## D71 · 2026-11-24 · The rite switch opens step 1 of the other rite
+
+Why: the step lives only in the address (D30), so step 1 needs no new state. The Back
+button of the browser returns to the step the person left.
+Rejected: The last step seen in that rite (kept in the open page, so a reload forgets
+it, and one more state to test).
+Source: specs/sai-walk.md
+Status: active
