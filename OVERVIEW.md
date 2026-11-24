@@ -1,6 +1,6 @@
 # Virtual Hajj
 
-**Status:** Active · **Updated:** 2026-11-23 by /ship tawaf-walk
+**Status:** Active · **Updated:** 2026-11-24 by /ship tawaf-check
 
 A learning website that works as a virtual hajj and umrah.
 People who prepare to go for hajj or umrah use it.
@@ -29,6 +29,7 @@ People who prepare to go for hajj or umrah use it.
 | ---------------- | ------- | ------------ | ---- |
 | walking-skeleton | Shipped | A person opens the deployed site and sees one 3D place, with one step of text in Malay or English. | docs/specs/walking-skeleton.md |
 | tawaf-walk       | Shipped | The site leads a person through tawaf in 15 steps, in a 3D mataf, from the Kaabah and its parts to the end of circuit 7. | docs/specs/tawaf-walk.md |
+| tawaf-check      | Shipped | After the tawaf walk, the person answers seven questions on where each step happens and what to do there, and the result shows on screen. | docs/specs/tawaf-check.md |
 
 ## More
 

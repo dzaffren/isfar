@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-type Action = { label: string; onAct: () => void };
+type Action = { label: string; onAct: () => void; off?: boolean };
 type Props = { back?: Action; next: Action; focusNext?: boolean };
 
 // Back and Next. The bar stays at the bottom edge of the screen, where a thumb reaches it.
@@ -41,7 +41,8 @@ export function StepActions({ back, next, focusNext }: Props) {
         ) : (
           <span />
         )}
-        <button type="button" className="vh-button" onClick={next.onAct} autoFocus={focusNext}>
+        {/* An off button keeps the focus, so a keyboard person stays in the bar (D62). */}
+        <button type="button" className="vh-button" onClick={next.off ? undefined : next.onAct} autoFocus={focusNext} aria-disabled={next.off || undefined}>
           {next.label}
         </button>
       </div>

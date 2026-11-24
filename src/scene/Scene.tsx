@@ -7,7 +7,7 @@ import type { Name, Place } from "./place";
 
 export type SceneState = "loading" | "shown" | "unsupported" | "failed";
 
-type Props = { step: number; words: Words; where: string; state: SceneState; onState: (state: SceneState) => void };
+type Props = { step: number; names?: boolean; words: Words; where: string; state: SceneState; onState: (state: SceneState) => void };
 
 const PART_LIST = Object.keys(PARTS) as Part[];
 
@@ -21,7 +21,7 @@ function canDraw3D(): boolean {
   }
 }
 
-export function Scene({ step, words, where, state, onState }: Props) {
+export function Scene({ step, names: namesOn = true, words, where, state, onState }: Props) {
   const section = useRef<HTMLElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const names = useRef<Partial<Record<Part, HTMLSpanElement>>>({});
@@ -29,6 +29,8 @@ export function Scene({ step, words, where, state, onState }: Props) {
   const place = useRef<Place | null>(null);
   const stepNow = useRef(step);
   stepNow.current = step;
+  const namesNow = useRef(namesOn);
+  namesNow.current = namesOn;
 
   // The place loads once. A step change or a language change does not load it again.
   useEffect(() => {
@@ -54,6 +56,7 @@ export function Scene({ step, words, where, state, onState }: Props) {
         if (cancelled) return shown.stop();
         place.current = shown;
         shown.goTo(stepNow.current);
+        shown.setNames(namesNow.current);
       })
       .catch(() => {
         if (!cancelled) onState("failed");
@@ -69,11 +72,16 @@ export function Scene({ step, words, where, state, onState }: Props) {
     place.current?.goTo(step);
   }, [step]);
 
+  // The check hides the names until the person answers, because a name can give the answer away (D57).
+  useEffect(() => {
+    place.current?.setNames(namesOn);
+  }, [namesOn]);
+
   const still = state === "unsupported" || state === "failed";
   return (
     <section ref={section} className="scene" data-scene data-state={state} aria-busy={state === "loading"}>
       <div className="scene__frame vh-marble">
-        {still && <MatafMap step={step} words={words} label={`${words.map}. ${where}`} />}
+        {still && <MatafMap step={step} words={words} label={`${words.map}. ${where}`} showNames={namesOn} />}
         <canvas ref={canvas} className="scene__view scene__canvas" role="img" aria-label={where} hidden={still} />
         <div className="scene__names" aria-hidden="true" hidden={state !== "shown"}>
           <svg className="scene__view">

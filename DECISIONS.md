@@ -452,3 +452,151 @@ an older person on a phone, no use with a clicker, and D2 rejected a free walk),
 Nintendo's own textures and patterns (they are Nintendo's art).
 Source: specs/tawaf-walk.md
 Status: active
+
+## D47 · 2026-11-24 · A check question shows the spot in the place, with three text answers
+
+Why: the gold marker at a spot tests "where" and "what to do there" (shape O12). It
+reuses the camera views of the walk, and the map serves a device with no 3D.
+Rejected: Text only (it does not test where), A tap on a spot on the map (hard on a
+phone, and a new kind of control).
+Source: specs/tawaf-check.md
+Status: active
+
+## D48 · 2026-11-24 · The tawaf check has seven questions
+
+Why: seven cover the start, its actions, the Kaabah on the left, Hijr Ismail, Rukun
+Yamani, the doa and the end of circuit 7, in about 2 minutes.
+Rejected: Five (drops the doa and the end), One for each of the 15 steps (circuits 2
+to 7 repeat one question).
+Source: specs/tawaf-check.md
+Status: active
+
+## D49 · 2026-11-24 · Right or wrong shows after each answer, with one line why
+
+Why: the person learns at the question, and the answer option of the design system
+already has the right and wrong states.
+Rejected: Only at the end (it feels like a test, and the person learns less on the
+way).
+Source: specs/tawaf-check.md
+Status: active
+
+## D50 · 2026-11-24 · The result shows a plain count and the missed questions, and keeps nothing
+
+Why: "6 daripada 7 betul" is a fact for the person. Each missed question links to its
+step, so the person goes back to it. No stars or badges (D46).
+Rejected: The missed list only (the person does not see how far they are), A done
+message only (it shows nothing to go back to).
+Source: specs/tawaf-check.md
+Status: active
+
+## D51 · 2026-11-24 · The check opens from step 15 and from the address #semak
+
+Why: the person goes on from the end of the walk, and an ustaz opens the check from a
+link.
+Rejected: Step 15 only (no link opens the check), A button on each step (the person
+checks before they finish the walk).
+Source: specs/tawaf-check.md
+Status: active
+
+## D52 · 2026-11-24 · The check goes on only after an answer
+
+Why: Next, the Right arrow key and Page Down wait for an answer. The ustaz taps the
+answer that the class calls out, then clicks on.
+Rejected: A skip that counts as missed (a clicker press skips a question by mistake).
+Source: specs/tawaf-check.md
+Status: active
+
+## D53 · 2026-11-24 · A reload starts the check again at question 1
+
+Why: the answers live only in the open page (shape O5). Seven questions take about 2
+minutes, and "Cuba lagi" (D20) reloads too.
+Rejected: The question in the address, as #semak-4 (the result then counts part of the
+check), The answers stored on the device (the site keeps nothing).
+Source: specs/tawaf-check.md
+Status: active
+
+## D54 · 2026-11-24 · The questions and the answers have a fixed order
+
+Why: a class sees the same screen as the ustaz, and the tests stay simple. The right
+answer stands in a different place from question to question.
+Rejected: Answers in a new order on each try (the class and the ustaz see different
+screens), Both in a new order (the walk order is lost).
+Source: specs/tawaf-check.md
+Status: active
+
+## D55 · 2026-11-24 · Claude drafts the check text, and the user corrects it
+
+Why: the same as D24 for the step text. The draft comes from the step text at pause 2,
+and the "not yet reviewed" notice stays.
+Rejected: The user writes each question (pause 2 waits for the text).
+Source: specs/tawaf-check.md
+Status: active
+
+## D56 · 2026-11-24 · In the check, the seven beads count the questions
+
+Why: seven beads and seven questions. A done bead is an answered question, and the
+current bead is this question. The beads show progress, not right or wrong.
+Rejected: A label only (the person loses the progress that always shows).
+Source: specs/tawaf-check.md
+Status: active
+
+## D57 · 2026-11-24 · The names of the parts hide until the answer
+
+Why: a name such as "Hajar Aswad" on question 1 gives the answer away. After the tap,
+the name shows with the line why, so the person joins the name to the spot.
+Rejected: No names in the check (the person does not see the name on the spot), Names
+always, as in the walk (they give answers away).
+Source: specs/tawaf-check.md
+Status: active
+
+## D58 · 2026-11-24 · On step 15, "Mula semakan" takes the gold place, and "Mula semula" moves into the panel
+
+Why: one gold act on each screen (D3). The Right arrow key and Page Down on step 15
+then open the check, so an ustaz goes on with the clicker.
+Rejected: A gold button in the panel beside a gold "Mula semula" in the bar (two acts
+in gold on one screen).
+Source: specs/tawaf-check.md
+Status: active
+
+## D59 · 2026-11-24 · "Keluar" leaves the check for step 15
+
+Why: a short label fits beside "Seterusnya" at 360 px. The answers are dropped (D53).
+Rejected: No left button (only the browser's Back button leaves the check), "Kembali"
+to the last question (one more state to build and test).
+Source: specs/tawaf-check.md
+Status: active
+
+## D60 · 2026-11-24 · The button and the answer option have padding above and below their text
+
+Why: a two-line answer or label touched the edge. The min-height drops by the same
+padding, so a one-line control keeps its height of 52 px or 56 px.
+Rejected: Keep each answer to one line at 360 px (Malay answers such as "Apabila anda
+sampai semula sejajar dengan Hajar Aswad" do not fit).
+Source: specs/tawaf-check.md
+Status: active
+
+## D61 · 2026-11-24 · The check uses motion tier 2, as the walk does
+
+Why: each question fades in over 320 ms, and the camera flies to the next spot in about
+1 second, so the person keeps the walk order. Under reduced motion, the camera cuts.
+Rejected: Tier 1 (the camera cuts between the spots of the questions).
+Source: specs/tawaf-check.md
+Status: active
+
+## D62 · 2026-11-24 · An off Next button keeps the keyboard focus
+
+Why: in the check, "Seterusnya" is off until a pick. With `disabled`, the browser drops
+the focus to the page after each question. With `aria-disabled`, the focus stays and the
+click does nothing.
+Rejected: The `disabled` attribute (a keyboard person loses the place on each
+question), Hide the button until a pick (the bar changes its layout).
+Source: specs/tawaf-check.md
+Status: active
+
+## D63 · 2026-11-24 · The check ships with no feature flag
+
+Why: the site is hidden from search engines and has a few testers, as for the walk
+(D42). A rollback is one click in the Cloudflare dashboard, or a git revert and a push.
+Rejected: A flag in the address (more code, and a second path to test).
+Source: specs/tawaf-check.md
+Status: active

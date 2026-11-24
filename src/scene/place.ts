@@ -32,7 +32,7 @@ type Events = {
   onMoving: (moving: boolean) => void;
 };
 
-export type Place = { stop: () => void; goTo: (step: number) => void };
+export type Place = { stop: () => void; goTo: (step: number) => void; setNames: (on: boolean) => void };
 
 // Read a colour token from the design system, so the 3D place follows light and dark.
 function token(name: string): Color {
@@ -148,6 +148,7 @@ export async function showPlace(canvas: HTMLCanvasElement, events: Events): Prom
 
     const camera = new PerspectiveCamera(40, 1, 1, 1000);
     let step = events.step;
+    let namesOn = true;
     let view: View = viewOf(step);
     let move: { from: View; to: View; ms: number; start: number | null; frames: number } | null = null;
 
@@ -167,7 +168,7 @@ export async function showPlace(canvas: HTMLCanvasElement, events: Events): Prom
         .map((part) => {
           const { name, lead } = names[part];
           point.copy(toThree(nameAnchor(part))).project(camera);
-          const visible = spot.names.includes(part) && point.z < 1 && Math.abs(point.x) <= 1.2 && Math.abs(point.y) <= 1.2;
+          const visible = namesOn && spot.names.includes(part) && point.z < 1 && Math.abs(point.x) <= 1.2 && Math.abs(point.y) <= 1.2;
           name.toggleAttribute("hidden", !visible);
           lead.toggleAttribute("hidden", !visible);
           if (!visible) return null;
@@ -274,7 +275,14 @@ export async function showPlace(canvas: HTMLCanvasElement, events: Events): Prom
       canvas.removeEventListener("webglcontextlost", lost);
       renderer.dispose();
     };
-    return { stop, goTo };
+    // A name hides or shows with no camera move, so the place asks for one frame (D40).
+    const setNames = (on: boolean) => {
+      if (on === namesOn) return;
+      namesOn = on;
+      request();
+    };
+
+    return { stop, goTo, setNames };
   } catch (error) {
     renderer.dispose();
     throw error;

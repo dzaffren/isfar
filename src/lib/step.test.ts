@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { readStep, stepHash } from "./step";
+import { isCheck, readStep, stepHash } from "./step";
 
 describe("readStep", () => {
   it("reads the step of an address in the walk", () => {
@@ -27,5 +27,15 @@ describe("readStep", () => {
 describe("stepHash", () => {
   it("gives the address part of a step", () => {
     expect(stepHash(7)).toBe("#tawaf-7");
+  });
+});
+
+describe("isCheck", () => {
+  it("opens the check at #semak only", () => {
+    expect(isCheck("#semak")).toBe(true);
+    expect(isCheck("#semak-4")).toBe(false);
+    expect(isCheck("#SEMAK")).toBe(false);
+    expect(isCheck("#tawaf-15")).toBe(false);
+    expect(isCheck("")).toBe(false);
   });
 });

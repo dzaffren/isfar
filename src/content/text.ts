@@ -26,6 +26,19 @@ const ms = {
   partYamani: "Rukun Yamani",
   partMaqam: "Maqam Ibrahim",
   partGreenLight: "Lampu hijau",
+  checkStart: "Mula semakan",
+  checkProgress: "Semakan · Soalan {n} daripada {total}",
+  checkQuestion: "Soalan {n} daripada {total}",
+  checkDone: "Semakan · Selesai",
+  checkRight: "Betul.",
+  checkWrong: "Belum tepat.",
+  checkScore: "{n} daripada {total} betul",
+  checkAll: "Anda tahu tempat dan amalan setiap langkah.",
+  checkMissed: "Ulang kaji langkah ini:",
+  checkStep: "Langkah {n} · {title}",
+  checkAgain: "Cuba semula",
+  checkLeave: "Keluar",
+  checkWhere: "Penanda emas di mataf. Nama tempat muncul selepas anda menjawab.",
 };
 
 export type Words = Record<keyof typeof ms, string>;
@@ -55,6 +68,19 @@ const en: Words = {
   partYamani: "Rukun Yamani",
   partMaqam: "Maqam Ibrahim",
   partGreenLight: "Green light",
+  checkStart: "Start the check",
+  checkProgress: "Check · Question {n} of {total}",
+  checkQuestion: "Question {n} of {total}",
+  checkDone: "Check · Done",
+  checkRight: "Yes.",
+  checkWrong: "Not quite.",
+  checkScore: "{n} of {total} right",
+  checkAll: "You know the place and the act of each step.",
+  checkMissed: "Go over these steps:",
+  checkStep: "Step {n} · {title}",
+  checkAgain: "Try again",
+  checkLeave: "Leave",
+  checkWhere: "A gold marker in the mataf. The name of the place shows after you answer.",
 };
 
 export const TEXT: Record<Language, Words> = { ms, en };

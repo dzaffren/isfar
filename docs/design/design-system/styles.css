@@ -39,9 +39,10 @@ body {
 /* Button */
 
 .vh-button {
-  min-height: var(--vh-control);
+  /* The padding keeps a two-line label off the edge. The min-height takes it back, so a one-line button keeps its height. */
+  min-height: calc(var(--vh-control) - 2 * var(--vh-space-3));
   margin: 0 0 var(--vh-lip);
-  padding: 0 var(--vh-space-6);
+  padding: var(--vh-space-3) var(--vh-space-6);
   border: var(--vh-stroke) solid var(--vh-gold-line);
   border-radius: var(--vh-radius-control);
   background: var(--vh-gold);
@@ -357,9 +358,9 @@ body {
 
 .vh-option {
   width: 100%;
-  min-height: var(--vh-option);
+  min-height: calc(var(--vh-option) - 2 * var(--vh-space-3));
   margin: 0 0 var(--vh-lip);
-  padding: 0 var(--vh-space-4);
+  padding: var(--vh-space-3) var(--vh-space-4);
   border: var(--vh-stroke) solid var(--vh-edge);
   border-radius: var(--vh-radius-control);
   background-color: var(--vh-cloth);

@@ -1,16 +1,8 @@
 import { expect, test, type Page } from "@playwright/test";
 import { HIJR, RUKUN_YAMANI } from "../src/scene/mataf";
-
-const SIZES = [
-  { width: 360, height: 800 },
-  { width: 960, height: 540 },
-  { width: 1280, height: 720 },
-  { width: 1920, height: 1080 },
-];
+import { MODEL, SIZES, expectBeads, expectCamera, expectNotices, lightAt, markerAt, names, noWebGL, scene, title } from "./helpers";
 
 const MS = {
-  review: "Kandungan ini belum disemak oleh orang yang bertauliah.",
-  layout: "Susun atur pada hari sebenar mungkin berbeza. Ikut mutawwif anda dan papan tanda.",
   no3d: "Peranti ini tidak dapat memaparkan tempat 3D.",
   failed: "Tempat 3D tidak dapat dimuatkan.",
   retry: "Cuba lagi",
@@ -18,54 +10,14 @@ const MS = {
   next: "Seterusnya",
   back: "Kembali",
   startAgain: "Mula semula",
+  checkStart: "Mula semakan",
   note: "Mazhab lain berbeza di sini",
 };
 
-const MODEL = "**/models/mataf.glb";
-
-const title = (page: Page) => page.getByRole("heading", { level: 1 });
-const scene = (page: Page) => page.locator("[data-scene]");
-const names = (page: Page) => page.locator("[data-scene] .scene__name").filter({ visible: true });
 const next = (page: Page) => page.getByRole("button", { name: MS.next, exact: true });
-
-async function expectNotices(page: Page) {
-  await expect(page.getByText(MS.review, { exact: true })).toBeAttached();
-  await expect(page.getByText(MS.layout, { exact: true })).toBeAttached();
-}
-
-async function expectBeads(page: Page, done: number, now: number | null) {
-  const beads = page.locator(".vh-panel .vh-bead");
-  await expect(beads).toHaveCount(7);
-  await expect(page.locator(".vh-panel .vh-bead--done")).toHaveCount(done);
-  if (now === null) await expect(page.locator(".vh-panel .vh-bead--now")).toHaveCount(0);
-  else await expect(beads.nth(now - 1)).toHaveClass(/vh-bead--now/);
-}
-
-// The camera is at the view of a step when the place says so, and no move is under way.
-async function expectCamera(page: Page, step: number) {
-  await expect(scene(page)).toHaveAttribute("data-camera", String(step), { timeout: 15_000 });
-  await expect(scene(page)).not.toHaveAttribute("data-moving", "true");
-}
 
 async function tapNext(page: Page, times: number) {
   for (let tap = 0; tap < times; tap += 1) await next(page).click();
-}
-
-// The page decodes a screenshot of the canvas, and reads the light of one pixel.
-async function lightAt(page: Page, x: number, y: number) {
-  const canvas = page.locator("[data-scene] canvas");
-  await expect(canvas).toBeVisible();
-  const png = (await canvas.screenshot()).toString("base64");
-  return page.evaluate(
-    async ({ data, x, y }) => {
-      const image = await createImageBitmap(await (await fetch("data:image/png;base64," + data)).blob());
-      const sheet = new OffscreenCanvas(image.width, image.height).getContext("2d")!;
-      sheet.drawImage(image, 0, 0);
-      const [r, g, b] = sheet.getImageData(Math.round(image.width * x), Math.round(image.height * y), 1, 1).data;
-      return 0.2126 * r + 0.7152 * g + 0.0722 * b;
-    },
-    { data: png, x, y },
-  );
 }
 
 async function kaabahIsDrawn(page: Page) {
@@ -91,20 +43,6 @@ function expectApart(boxes: { x: number; y: number; width: number; height: numbe
     }
   });
 }
-
-// A marker on the map, back in the plan's metres. The map draws y down.
-async function markerAt(page: Page): Promise<[number, number]> {
-  const marker = page.locator("[data-marker]");
-  return [Number(await marker.getAttribute("cx")), -Number(await marker.getAttribute("cy"))];
-}
-
-const noWebGL = () => {
-  const original = HTMLCanvasElement.prototype.getContext;
-  HTMLCanvasElement.prototype.getContext = function (this: HTMLCanvasElement, type: string, ...rest: unknown[]) {
-    if (type.includes("webgl")) return null;
-    return original.call(this, type, ...(rest as []));
-  } as typeof original;
-};
 
 for (const size of SIZES) {
   test.describe(`${size.width}x${size.height}`, () => {
@@ -152,6 +90,7 @@ for (const size of SIZES) {
         await expect(title(page)).toHaveText("Tawaf selesai");
         await expectBeads(page, 7, null);
         await expect(next(page)).toHaveCount(0);
+        await expect(page.locator(".walk__actions").getByRole("button", { name: MS.checkStart })).toBeVisible();
         await expectCamera(page, 15);
 
         await page.getByRole("button", { name: MS.startAgain }).click();

@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
 
 type Props = {
-  title: string;
-  text: string;
+  title?: string;
+  text?: string;
   progress?: { label: string; beads: ReactNode };
   step?: number;
   children?: ReactNode;
@@ -20,8 +20,8 @@ export function StepPanel({ title, text, progress, step, children }: Props) {
         </header>
       )}
       <div key={step} className={step === undefined ? "vh-panel__body" : "vh-panel__body walk__step"} aria-live={step === undefined ? undefined : "polite"}>
-        <h1 className="vh-title">{title}</h1>
-        <p className="vh-text">{text}</p>
+        {title && <h1 className="vh-title">{title}</h1>}
+        {text && <p className="vh-text">{text}</p>}
         {children}
       </div>
     </article>
