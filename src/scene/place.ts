@@ -106,15 +106,16 @@ const pathLine = () =>
 
 // The path of one sa'i walk: dashes along the middle of the mas'a, with arrows towards the hill of the walk (D28).
 // way is 1 towards Marwah, and -1 back towards Safa.
-const hallLine = (way: 1 | -1) =>
+export const hallLine = (way: 1 | -1) =>
   floorShapes((quad, flat) => {
     for (let x = WALK.from; x + 3.5 <= WALK.to; x += 6) {
       quad([[x, -0.2], [x + 3.5, -0.2], [x + 3.5, 0.2], [x, 0.2]]);
     }
+    // The arrow turns round in x and in y, so its corners keep their order and it still faces up.
     for (const x of [-40, -20, 0, 20, 40]) {
       flat(x + way * 1.4, 0);
-      flat(x - way * 0.9, 0.9);
-      flat(x - way * 0.9, -0.9);
+      flat(x - way * 0.9, way * 0.9);
+      flat(x - way * 0.9, -way * 0.9);
     }
   });
 
