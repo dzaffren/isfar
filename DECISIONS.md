@@ -754,3 +754,28 @@ revert and a push.
 Rejected: A flag in the address (more code, and a second path to test).
 Source: specs/sai-walk.md
 Status: active
+
+## D81 · 2026-11-24 · The mas'a has two one-way lanes, with a low barrier between them
+
+Why: in the real mas'a, pilgrims go to Marwah in one lane and come back to Safa in the
+other. The barrier stops short of each hill, where the person turns.
+Rejected: One middle line for both ways (v1, not how the hall is). Four lanes, with the
+narrow lanes for the elderly (the sources disagree on where those lanes are).
+Source: specs/sai-walk.md
+Status: active
+
+## D82 · 2026-11-24 · The lane to Marwah is on the right, seen from Safa
+
+Why: no source found names the side, and Saudi roads keep right. It is an accepted risk
+(O20) until the user checks it against a photo or the course notes.
+Rejected: The lane to Marwah on the left.
+Source: specs/sai-walk.md
+Status: active
+
+## D83 · 2026-11-24 · Steps 4 and 7 tell the person to keep to the lane of the walk
+
+Why: the lane is new to a first-timer. Step 4 starts the first walk to Marwah, and step
+7 is the first walk back to Safa.
+Rejected: The same text, with the lanes in the 3D place and the map only.
+Source: specs/sai-walk.md
+Status: active
