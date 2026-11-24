@@ -264,9 +264,9 @@ The scene has the same four states as the tawaf walk. The loading card says "Mem
 | Part | Material |
 | --- | --- |
 | Floor | Marble, as the mataf floor |
-| Walls and the ceiling | The cloth colour, with plain arches along the walls |
+| Walls | The sunken colour, with plain arches along the walls. The hall has no roof (O16). |
 | Safa and Marwah | A low mound of rock at each end, in the sunken and edge colours |
-| Two green lights | Bands of `--vh-lamp` across the ceiling and down the walls (O11) |
+| Two green lights | A beam of `--vh-lamp` across the top of the walls, with bands down the walls (O11, O16) |
 | Marker and path line | The gold marker and the gold path line of the tawaf walk (D28) |
 
 **Motion tier:** 2, as the tawaf walk (O13). The step text fades in and rises 12 px in 320 ms. The camera flies along the mas'a in about 1 second. Under reduced motion, the text fades in 160 ms, and the camera cuts.
@@ -349,8 +349,214 @@ This is a draft in the Shafi'i school (D24). Its source is `src/content/sai.ts`.
 | O11 | D35 keeps `--vh-lamp` for the green light of the tawaf start only. The sa'i green lights need a green too. | question | spec p2 | user | Resolved | Reuse `--vh-lamp`. D72 supersedes D35: the one green is for the green lights of the place. "A new token" was rejected. 2026-11-24 |
 | O12 | O4 named the second recitation "Rabbighfir warham, wa antal a'azzul akram". The form that the books of manasik usually give, from Ibn Mas'ud, says "innaka antal a'azzul akram". I did not check a source. | question | spec p2 | user | Resolved | "Rabbighfir warham, innaka antal a'azzul akram". "wa antal a'azzul akram" was rejected. The user checks it against the course notes with the rest of the text. 2026-11-24 |
 | O13 | Which motion tier does the sa'i walk use? | question | spec p2 | user | Resolved | Tier 2, as the tawaf walk. "Tier 1" was rejected. 2026-11-24 |
+| O14 | The 3D mas'a holds 30 frames a second at phone speed. The dev machine has no graphics chip, so nothing here can measure it. | unproven | spec p3 | user | Open | The user chose `/poc` first, on a computer with a graphics chip. "Prove it at /ship" was rejected. 2026-11-24 |
+| O15 | A rite change drops one 3D place and loads the other, with a new 3D context. | flag | spec p3 | user | Resolved | Swap the place: the scene starts again for the new rite, with a short loading card. "Keep both places loaded" was rejected (D77). 2026-11-24 |
+| O16 | Pause 2 put the green lights across the ceiling. A camera at about 12 m cannot see under a roof. | question | spec p3 | user | Resolved | No roof. Each green light is a beam across the top of the walls, with bands down them. "A roof, with the camera inside" was rejected (D79). 2026-11-24 |
+| O17 | Does the sa'i walk ship behind a feature flag? | question | spec p3 | user | Resolved | No flag. The rollback is the Cloudflare dashboard, or a `git revert`. "A flag in the address" was rejected (D80). 2026-11-24 |
 
 _Never delete this section or its rows. See references/ledger.md._
+
+## Technical plan
+
+### Approach
+
+The address names the rite and the step, as `#sai-5`. `App.tsx` reads both, picks the sa'i text, and gives the rite and the step to `Scene.tsx`.
+`Scene.tsx` starts again on a rite change, and `place.ts` loads the model of that rite: `mataf.glb` or a new `masa.glb`.
+A second Blender script builds `masa.glb` from the `masa` part of `plan.json`, the same numbers that the map and the camera read.
+
+Relies on: D5, D13, D16, D18, D19, D20, D28, D29, D30, D31, D40, D43, D44, D64, D65, D66, D71, D72, D75, and the drafted D76 to D80
+
+```mermaid
+flowchart TB
+    HASH[("Address: #sai-5")]
+    APP["App.tsx: rite, step, keys, rite switch"]
+    STEP["lib/step.ts: readPlace, stepHash"]
+    TEXT["content/sai.ts: 13 steps"]
+    SCENE["scene/Scene.tsx, keyed by rite"]
+    PLACE["scene/place.ts: SITES.tawaf or SITES.sai"]
+    VIEWS["scene/views.ts: saiViewOf, alongHall"]
+    PLAN[("scene/plan.json, masa part")]
+    GLB[("/models/masa.glb")]
+    HASH -- "hashchange" --> APP
+    APP -- "hash text" --> STEP
+    APP -- "rite, step number" --> TEXT
+    APP -- "rite, step number" --> SCENE
+    SCENE -- "showPlace(canvas, sai), goTo(step)" --> PLACE
+    PLACE -- "camera of the step" --> VIEWS
+    VIEWS -- "sizes and spots" --> PLAN
+    PLACE -- "GET, then draws" --> GLB
+    PLAN -- "tools/masa.py, in Blender" --> GLB
+```
+
+The address holds the rite and the step, `App.tsx` turns them into words, and `place.ts` draws the model of that rite at the camera of the step.
+
+```mermaid
+sequenceDiagram
+    participant U as Person
+    participant A as App.tsx
+    participant H as Address
+    participant S as Scene.tsx
+    participant P as place.ts
+    U->>A: taps "Sa'i" in the top bar, on tawaf step 9
+    A->>H: location.hash = "#sai-1"
+    H-->>A: hashchange
+    A->>A: readPlace("#sai-1") gives sai, step 1
+    A-->>U: sa'i step 1 text, no bead lit
+    A->>S: key changes from tawaf to sai
+    S->>S: stops the mataf, forces its 3D context lost, shows the loading card
+    S->>P: showPlace(canvas, site sai, step 1)
+    P->>P: GET /models/masa.glb, from the cache after the first time
+    P-->>U: draws the mas'a, wide view
+    P-->>U: console: [isfar] place shown in 1840 ms
+```
+
+A rite change goes through the address, the scene starts again for the new rite, and the text shows while the mas'a loads.
+
+No data crosses a trust boundary. The address is the only new input, and `readPlace` accepts only `#tawaf-1` to `#tawaf-15` and `#sai-1` to `#sai-13`.
+
+### Changes
+
+| File | What changes | Why |
+| --- | --- | --- |
+| `src/lib/step.ts:1-12` | `readStep` becomes `readPlace(hash)`, which gives `{ rite, step }`. `#sai-N` gives sa'i, `#sai-99` gives sa'i step 1, and each other text gives tawaf step 1. `stepHash(rite, step)` writes the address. `CHECK_HASH` and `isCheck` stay. | Scenario 2, D30 |
+| `src/App.tsx:19-44` | Holds the rite from `readPlace`. Picks `TAWAF` or `SAI`, `beadsAt` or `saiBeadsAt`, the progress label and the bead words by rite. The check sets the rite to tawaf. | Scenarios 1 and 2 |
+| `src/App.tsx:24-26`, `:64-84` | `goTo(step)` writes the address of the rite on screen. On sa'i step 13, the Right arrow key and Page Down do nothing, as on step 15 before the check. | Scenario 2, D31 |
+| `src/App.tsx:108` | Passes the `rite` prop to `TopBar`. A tap writes `stepHash(rite, 1)` (D71). | Scenarios 1 and 2, D65 |
+| `src/App.tsx:110`, `:142-151` | `<Scene key={rite} rite={rite} …>`. On sa'i step 13, "Mula semula" takes the gold place, with no check button. | Scenario 1, O15 |
+| `src/scene/Scene.tsx:10`, `:34-68` | Takes `rite`. Calls `onState("loading")` when it starts, so a swap shows the loading card. Hands `rite` to `showPlace`. Holds the names of the parts of that rite. | Scenarios 2 and 4 |
+| `src/scene/Scene.tsx:88-99` | Shows `MasaMap` for sa'i and `MatafMap` for tawaf. The loading card says "Memuatkan mas'a" for sa'i. | Scenario 4 |
+| `src/scene/place.ts:21-57` | A `Site` record for each rite: the model path, the colour map, the spots, the camera of a step, the move between two cameras, the name anchors and the path line. `SITES.tawaf` holds what is there now. `SITES.sai` holds the mas'a. | Scenarios 1 and 2, D76 |
+| `src/scene/place.ts:65-95` | The path line of the mas'a: dashes along the hall, with arrows towards the hill of the walk. It turns round on each walk. | Scenario 1, D28 |
+| `src/scene/place.ts:139-143` | The floor joints stay for tawaf only. The mas'a floor is plain marble. | Scenario 1 |
+| `src/scene/place.ts:271-277` | `stop()` also calls `renderer.forceContextLoss()`, so a swap frees the old 3D context at once. | O15 |
+| `src/scene/views.ts` | `saiViewOf(step)`: a wide view over the whole hall for steps 1 and 13, and a view from behind and above the marker, towards the next hill, for each other step. `alongHall(from, to, t)` moves the camera on a straight line (D78). `saiNameAnchor(part)` and the name offsets. | Scenarios 1 and 2 |
+| `src/scene/masa.ts` | Kept from pause 2. Gains the heights of the names. | Scenario 1 |
+| `tools/masa.py` (new) | A Blender script that reads the `masa` part of `plan.json`. It builds the floor, two long walls with arches, a low rock mound at each end, and two green beams across the top of the walls with bands down them (D79). Each mesh has a name, and the file has no materials. | D19, D66, O16 |
+| `public/models/masa.glb` (new) | The exported model, committed. | D19 |
+| `package.json:19` | `model` runs `tools/mataf.py`, then `tools/masa.py`. | D19 |
+| `src/components/TopBar.tsx`, `src/components/MasaMap.tsx`, `src/content/sai.ts`, `src/content/text.ts` | Kept from pause 2. | Scenarios 1 to 4 |
+| `e2e/sai.spec.ts` (new) | Scenarios 1 to 4, at four sizes. | Scenarios 1 to 4 |
+| `e2e/helpers.ts:15` | `MODEL` becomes `mataf.glb`, and `MASA_MODEL` names `masa.glb`. | Scenario 4 |
+| `e2e/speed.spec.ts:23-57` | Runs twice: from `/` through 15 tawaf steps, and from `/#sai-1` through 13 sa'i steps. | Scenario 5 |
+| `src/lib/step.test.ts`, `src/content/sai.test.ts` (new), `src/scene/views.test.ts` | Unit tests, listed in the test plan. | Scenarios 1 to 3 |
+| `preview/`, `src/preview/` (deleted) | The preview goes when the browser test passes. | Nothing ships it |
+| `CHANGELOG.md` | One "Added" line for the sa'i walk. | The repo's rule |
+
+Reusing: `pickLanguage` and `storeLanguage` in `src/lib/language.ts`, `token()` in `src/scene/place.ts:38`, the draw-on-change loop and the name placer in `src/scene/place.ts:163-236`, `canDraw3D` in `src/scene/Scene.tsx:12`, `expectBeads`, `expectCamera`, `lightAt`, `markerAt` and `noWebGL` in `e2e/helpers.ts`, and `scripts/check-size.mjs`, which already counts each file in `dist/models`.
+
+### Earn-it
+
+| Added | Triggered by |
+| --- | --- |
+| `readPlace` in place of `readStep` | Scenario 2: the address must name the rite as well as the step |
+| The `Site` record in `place.ts` | Scenarios 1 and 2: two places with their own model, spots and camera. Two real entries, not a plugin system. |
+| `key={rite}` on `Scene` | O15: the simplest swap, with no second scene in memory |
+| `forceContextLoss()` in `stop()` | O15: an ustaz who swaps rites often must not run out of 3D contexts |
+| `alongHall` | D78: the arc of D45 goes around the Kaabah, and the mas'a has none |
+| `tools/masa.py` and `masa.glb` | D19, D76 |
+| `e2e/sai.spec.ts` | Scenarios 1 to 4 |
+
+Cut: a router, a state library, a second `Scene` component, one model file for both places, a cache of loaded places, a feature flag.
+
+### Non-functionals
+
+|                      |     |
+| -------------------- | --- |
+| **Load**             | A few visits a day: the user and a few testers. The site is static files on Cloudflare's network. |
+| **Breaks first**     | Nothing at 10 times the visits: the site has no server. The nearest limit is the 500 KB ceiling of D16. Today the 3D download is 165.5 KB, and `masa.glb` should add under 15 KB, as `mataf.glb` is 13.2 KB compressed. `pnpm size` fails the build over the ceiling. |
+| **Security surface** | Anyone can open the site. The inputs are the device language, one stored value and the address. `readPlace` accepts only the two step patterns, and the page never writes the address into its HTML. React escapes the step text. No new secret, and the site stores nothing new. |
+| **Proof it works**   | The smoke step prints `smoke: https://isfar-57q.pages.dev ok`. On `#sai-1` the console prints `[isfar] place shown in 1840 ms`, and `[isfar] camera at step 5: 54 frames in 900 ms` after each move. No number comes from real visitors (shape O5). |
+| **Rollout**          | No flag (O17). The rite switch shows when the PR merges. Rollback: "Rollback to this deployment" on the earlier deployment in the Cloudflare dashboard, or `git revert` and a push. |
+
+### Test plan
+
+| Scenario | Test | Command |
+| -------- | ---- | ------- |
+| 1. Aminah walks sa'i from the first step to the last | `e2e/sai.spec.ts`, at four sizes. `src/content/sai.test.ts`: 13 steps in each language, the beads of steps 1, 3, 4, 6, 7, 12 and 13. | `pnpm e2e --project=firefox` here, `pnpm e2e --project=chromium` in CI. `pnpm test` |
+| 2. Ustaz Hafiz opens a sa'i step by its link, and moves between the rites | `e2e/sai.spec.ts`. `src/lib/step.test.ts`: `#sai-5`, `#sai-13`, `#sai-0`, `#sai-99`, `#sai-05`, `#tawaf-6`, `#abc` and an empty address. | `pnpm e2e --project=firefox`, `pnpm test` |
+| 3. A recitation and a note | `e2e/sai.spec.ts`. `src/content/sai.test.ts`: recitations on steps 3 and 5, a note on step 2 only, in each language. | `pnpm e2e --project=firefox`, `pnpm test` |
+| 4. The sa'i walk works with no 3D | `e2e/sai.spec.ts`: 3D off, then a failed download of `masa.glb` | `pnpm e2e --project=firefox` |
+| 5. The mas'a runs at old-phone speed | `e2e/speed.spec.ts`, run by the user after the deploy, on a computer with a graphics chip | `SPEED_URL=https://isfar-57q.pages.dev pnpm e2e:speed` |
+| Rule: each step text is 40 words or fewer | `src/content/sai.test.ts` | `pnpm test` |
+| Rule: the camera cuts under reduced motion | `e2e/sai.spec.ts`, with reduced motion set in Playwright | `pnpm e2e --project=firefox` |
+| Rule: the camera stays inside the ends of the hall, above the walls | `src/scene/views.test.ts`: each sa'i view and 10 points on each move between two neighbour steps | `pnpm test` |
+| Rule: the tawaf walk and the check do not change | `e2e/walk.spec.ts` and `e2e/check.spec.ts`, as they are | `pnpm e2e --project=firefox` |
+| Rule: the 3D download stays under 500 KB | `scripts/check-size.mjs` | `pnpm build && pnpm size` |
+
+**E2E:** `e2e/sai.spec.ts` walks scenarios 1 to 4. The Playwright setup exists, and CI on `main` is green with it.
+
+The other commands: `pnpm typecheck`, `pnpm model`. Stop the `pnpm dev` server on port 5199 and any `vite preview` server before `pnpm e2e` (lesson `stop-preview-before-e2e`). Prove the 3D half in Firefox here (lesson `local-chromium-loses-3d`).
+
+### Chunks
+
+Single chunk. `App.tsx`, `Scene.tsx` and `place.ts` share one contract, and the one browser test needs all three.
+
+Order inside the chunk:
+
+1. `step.ts` and its test. Then `App.tsx` with the rite, the switch and the keys. `Scene.tsx` shows `MasaMap` for sa'i. Scenarios 2, 3 and the no-3D half of 4 pass.
+2. `views.ts` with `saiViewOf` and `alongHall`, and its test.
+3. `tools/masa.py` and `masa.glb`. Then the `Site` record in `place.ts`, the swap and `forceContextLoss`.
+4. `e2e/sai.spec.ts` in full, then `e2e/speed.spec.ts`. Delete the preview.
+
+### Risks
+
+| Risk | Mitigation |
+| ---- | ---------- |
+| The mas'a does not hold 30 frames a second at phone speed. | O14: `/poc` settles it on a computer with a graphics chip before /build. Scenario 5 checks it again at /ship. |
+| The long hall reads badly in a 360x240 scene on a phone. | The wide view stands high over Safa and looks along the hall. The browser test checks that the three names of step 1 do not overlap at four sizes. |
+| A swap leaves a blank scene, or an old frame. | The scene starts again on a new key, and the browser test checks the Kaabah pixel after a swap back to tawaf. |
+| The step text has a mistake in a ruling. | The "not yet reviewed" notice stays on each step, and the site stays hidden from search engines (D14). A qualified person reviews it before a public launch (shape O1). |
+| A change to `place.ts` breaks the tawaf walk. | `e2e/walk.spec.ts` and `e2e/check.spec.ts` run as they are, at four sizes. |
+
+### Decisions to record
+
+```
+## D76 · 2026-11-24 · Each rite has its own model file
+
+Why: masa.glb and mataf.glb stay small, and a person downloads only the place of the
+rite on screen. tools/masa.py reads the masa part of plan.json, as tools/mataf.py reads
+the rest (D43).
+Rejected: One model file with both places (each visitor downloads both, and the camera
+must fly a long way between them).
+Source: specs/sai-walk.md
+Status: active
+
+## D77 · 2026-11-24 · A rite change starts the scene again with the place of the new rite
+
+Why: Scene.tsx is keyed by the rite, so the old place stops and frees its 3D context, and
+the new one loads. After the first download, the model comes from the browser cache.
+Rejected: Keep both places loaded (twice the memory on a phone, and place.ts holds two
+scenes).
+Source: specs/sai-walk.md
+Status: active
+
+## D78 · 2026-11-24 · In the mas'a, the camera moves on a straight line
+
+Why: the mas'a is a straight hall, so the camera flies along it between two spots and
+stays inside its ends.
+Rejected: The arc around the Kaabah of D45 (the mas'a has no Kaabah, and an arc leaves
+the hall).
+Source: specs/sai-walk.md
+Status: active
+
+## D79 · 2026-11-24 · The mas'a has no roof, and each green light is a beam across the walls
+
+Why: the camera looks down from about 12 m, as in the mataf. An open hall shows Safa,
+the two green lights and Marwah in one view.
+Rejected: A roof with the camera inside the hall (low views, and the person never sees
+the whole mas'a at once).
+Source: specs/sai-walk.md
+Status: active
+
+## D80 · 2026-11-24 · The sa'i walk ships with no feature flag
+
+Why: the site is hidden from search engines and has a few testers, as for the walk and
+the check (D42, D63). A rollback is one click in the Cloudflare dashboard, or a git
+revert and a push.
+Rejected: A flag in the address (more code, and a second path to test).
+Source: specs/sai-walk.md
+Status: active
+```
 
 ## Decisions
 
