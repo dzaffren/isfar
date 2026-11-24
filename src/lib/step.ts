@@ -1,14 +1,21 @@
-// The step of the walk lives in the address, as #tawaf-6 (D30). Any other address opens step 1.
-const STEP = /^#tawaf-([1-9]\d*)$/;
+// The rite and the step of the walk live in the address, as #tawaf-6 or #sai-5 (D30).
+// A step outside its walk opens step 1 of that rite. Any other address opens step 1 of tawaf.
+export type Rite = "tawaf" | "sai";
 
-export function readStep(hash: string, total: number): number {
-  const match = STEP.exec(hash);
-  const step = match ? Number(match[1]) : 1;
-  return step <= total ? step : 1;
+export const TOTAL: Record<Rite, number> = { tawaf: 15, sai: 13 };
+
+const PLACE = /^#(tawaf|sai)-([1-9]\d*)$|^#(tawaf|sai)-/;
+
+export function readPlace(hash: string): { rite: Rite; step: number } {
+  const match = PLACE.exec(hash);
+  if (!match) return { rite: "tawaf", step: 1 };
+  const rite = (match[1] ?? match[3]) as Rite;
+  const step = match[2] ? Number(match[2]) : 1;
+  return { rite, step: step <= TOTAL[rite] ? step : 1 };
 }
 
-export function stepHash(step: number): string {
-  return `#tawaf-${step}`;
+export function stepHash(rite: Rite, step: number): string {
+  return `#${rite}-${step}`;
 }
 
 // The check has one address, so a reload starts it again at question 1 (D51, D53).

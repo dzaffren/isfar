@@ -14,6 +14,7 @@ export const NOTICE = {
 };
 
 export const MODEL = "**/models/mataf.glb";
+export const MASA_MODEL = "**/models/masa.glb";
 
 export const title = (page: Page) => page.getByRole("heading", { level: 1 });
 export const scene = (page: Page) => page.locator("[data-scene]");
@@ -53,6 +54,30 @@ export async function lightAt(page: Page, x: number, y: number) {
     },
     { data: png, x, y },
   );
+}
+
+export async function kaabahIsDrawn(page: Page) {
+  expect(await lightAt(page, 0.5, 0.45), "the kiswah is dark at the centre of the wide view").toBeLessThan(80);
+}
+
+export function expectApart(boxes: { x: number; y: number; width: number; height: number }[]) {
+  boxes.forEach((one, index) => {
+    for (const two of boxes.slice(index + 1)) {
+      const apart = one.x + one.width <= two.x || two.x + two.width <= one.x || one.y + one.height <= two.y || two.y + two.height <= one.y;
+      expect(apart, "two names overlap").toBe(true);
+    }
+  });
+}
+
+// The names of the mesh nodes in a model file, read from the JSON chunk of the .glb.
+export async function modelParts(page: Page, model: "mataf" | "masa"): Promise<string[]> {
+  return page.evaluate(async (model) => {
+    const bytes = await (await fetch(`/models/${model}.glb`)).arrayBuffer();
+    const view = new DataView(bytes);
+    const length = view.getUint32(12, true);
+    const json = JSON.parse(new TextDecoder().decode(new Uint8Array(bytes, 20, length)));
+    return json.nodes.map((node: { name: string }) => node.name);
+  }, model);
 }
 
 // A marker on the map, back in the plan's metres. The map draws y down.

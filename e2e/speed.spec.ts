@@ -1,8 +1,13 @@
 import { expect, test } from "@playwright/test";
 
-// Scenario 5, run by hand against the live site: SPEED_URL=https://isfar-57q.pages.dev pnpm e2e:speed
+// Scenario 5 of tawaf-walk and of sai-walk, run by hand against the live site: SPEED_URL=https://isfar-57q.pages.dev pnpm e2e:speed
 // It drives real Chrome with a window, because CI draws 3D in software and its frame rate means nothing.
-test("the fuller place runs at old-phone speed", async ({ page }) => {
+const WALKS = [
+  { name: "the mataf", address: "/", steps: 15 },
+  { name: "the mas'a", address: "/#sai-1", steps: 13 },
+];
+
+for (const walk of WALKS) test(`${walk.name} runs at old-phone speed`, async ({ page }) => {
   test.skip(!process.env.SPEED_URL, "Set SPEED_URL to the live site.");
   await page.setViewportSize({ width: 360, height: 800 });
 
@@ -27,7 +32,7 @@ test("the fuller place runs at old-phone speed", async ({ page }) => {
     (window as unknown as { renderer: string }).renderer = info ? String(gl!.getParameter(info.UNMASKED_RENDERER_WEBGL)) : "unknown";
     gl?.getExtension("WEBGL_lose_context")?.loseContext();
   });
-  await page.goto("/");
+  await page.goto(walk.address);
 
   const scene = page.locator("[data-scene]");
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
@@ -44,13 +49,13 @@ test("the fuller place runs at old-phone speed", async ({ page }) => {
   expect(renderer, "the renderer must be known").not.toBe("unknown");
   expect(renderer, "run on a machine with a graphics chip").not.toMatch(/swiftshader|llvmpipe|software/i);
 
-  // Step 1 to step 15, one step each 2 seconds. The place logs the frames of each camera move.
-  for (let step = 2; step <= 15; step += 1) {
+  // Step 1 to the last step, one step each 2 seconds. The place logs the frames of each camera move.
+  for (let step = 2; step <= walk.steps; step += 1) {
     await page.keyboard.press("ArrowRight");
     await page.waitForTimeout(2_000);
   }
-  await expect(scene).toHaveAttribute("data-camera", "15");
-  // A move to the same view, as from step 8 to step 9, cuts in 0 ms and draws one frame.
+  await expect(scene).toHaveAttribute("data-camera", String(walk.steps));
+  // A move to the same view, as from tawaf step 8 to step 9, cuts in 0 ms and draws one frame.
   // The first frame of a move is at 0 ms, so N frames span N - 1 gaps.
   const moves = lines.flatMap((line) => {
     const move = /camera at step (\d+): (\d+) frames in (\d+) ms/.exec(line);

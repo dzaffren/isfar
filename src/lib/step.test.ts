@@ -1,32 +1,44 @@
 import { describe, expect, it } from "vitest";
-import { isCheck, readStep, stepHash } from "./step";
+import { isCheck, readPlace, stepHash } from "./step";
 
-describe("readStep", () => {
-  it("reads the step of an address in the walk", () => {
-    expect(readStep("#tawaf-6", 15)).toBe(6);
-    expect(readStep("#tawaf-15", 15)).toBe(15);
-    expect(readStep("#tawaf-1", 15)).toBe(1);
+describe("readPlace", () => {
+  it("reads the rite and the step of an address in a walk", () => {
+    expect(readPlace("#tawaf-6")).toEqual({ rite: "tawaf", step: 6 });
+    expect(readPlace("#tawaf-15")).toEqual({ rite: "tawaf", step: 15 });
+    expect(readPlace("#tawaf-1")).toEqual({ rite: "tawaf", step: 1 });
+    expect(readPlace("#sai-5")).toEqual({ rite: "sai", step: 5 });
+    expect(readPlace("#sai-13")).toEqual({ rite: "sai", step: 13 });
   });
 
-  it("gives step 1 to an address outside the walk", () => {
-    expect(readStep("#tawaf-0", 15)).toBe(1);
-    expect(readStep("#tawaf-99", 15)).toBe(1);
-    expect(readStep("#tawaf-16", 15)).toBe(1);
-    expect(readStep("#abc", 15)).toBe(1);
-    expect(readStep("", 15)).toBe(1);
+  it("gives step 1 of the same rite to a step outside its walk", () => {
+    expect(readPlace("#tawaf-0")).toEqual({ rite: "tawaf", step: 1 });
+    expect(readPlace("#tawaf-99")).toEqual({ rite: "tawaf", step: 1 });
+    expect(readPlace("#tawaf-16")).toEqual({ rite: "tawaf", step: 1 });
+    expect(readPlace("#sai-0")).toEqual({ rite: "sai", step: 1 });
+    expect(readPlace("#sai-14")).toEqual({ rite: "sai", step: 1 });
+    expect(readPlace("#sai-99")).toEqual({ rite: "sai", step: 1 });
+  });
+
+  it("gives step 1 of tawaf to any other address", () => {
+    expect(readPlace("#abc")).toEqual({ rite: "tawaf", step: 1 });
+    expect(readPlace("")).toEqual({ rite: "tawaf", step: 1 });
+    expect(readPlace("#semak")).toEqual({ rite: "tawaf", step: 1 });
+    expect(readPlace("#SAI-5")).toEqual({ rite: "tawaf", step: 1 });
   });
 
   it("gives step 1 to an address that only looks like a step", () => {
-    expect(readStep("#tawaf-06", 15)).toBe(1);
-    expect(readStep("#tawaf-6x", 15)).toBe(1);
-    expect(readStep("#tawaf-1e1", 15)).toBe(1);
-    expect(readStep("#tawaf- 6", 15)).toBe(1);
+    expect(readPlace("#tawaf-06")).toEqual({ rite: "tawaf", step: 1 });
+    expect(readPlace("#tawaf-6x")).toEqual({ rite: "tawaf", step: 1 });
+    expect(readPlace("#tawaf-1e1")).toEqual({ rite: "tawaf", step: 1 });
+    expect(readPlace("#tawaf- 6")).toEqual({ rite: "tawaf", step: 1 });
+    expect(readPlace("#sai-05")).toEqual({ rite: "sai", step: 1 });
   });
 });
 
 describe("stepHash", () => {
   it("gives the address part of a step", () => {
-    expect(stepHash(7)).toBe("#tawaf-7");
+    expect(stepHash("tawaf", 7)).toBe("#tawaf-7");
+    expect(stepHash("sai", 5)).toBe("#sai-5");
   });
 });
 

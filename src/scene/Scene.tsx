@@ -1,15 +1,20 @@
 import { useEffect, useRef } from "react";
 import { LoadingCard } from "../components/LoadingCard";
+import { MasaMap, SAI_PART_WORD } from "../components/MasaMap";
 import { MatafMap, PART_WORD } from "../components/MatafMap";
 import type { Words } from "../content/text";
-import { PARTS, type Part } from "./mataf";
+import type { Rite } from "../lib/step";
+import { SAI_PARTS } from "./masa";
+import { PARTS } from "./mataf";
 import type { Name, Place } from "./place";
 
 export type SceneState = "loading" | "shown" | "unsupported" | "failed";
 
-type Props = { step: number; names?: boolean; words: Words; where: string; state: SceneState; onState: (state: SceneState) => void };
+type Props = { rite: Rite; step: number; names?: boolean; words: Words; where: string; state: SceneState; onState: (state: SceneState) => void };
 
-const PART_LIST = Object.keys(PARTS) as Part[];
+// The names of the parts of each place, and the word on screen for each.
+const PART_WORDS: Record<Rite, Record<string, keyof Words>> = { tawaf: PART_WORD, sai: SAI_PART_WORD };
+const PART_LISTS: Record<Rite, string[]> = { tawaf: Object.keys(PARTS), sai: Object.keys(SAI_PARTS) };
 
 function canDraw3D(): boolean {
   try {
@@ -21,28 +26,32 @@ function canDraw3D(): boolean {
   }
 }
 
-export function Scene({ step, names: namesOn = true, words, where, state, onState }: Props) {
+// App.tsx keys the scene by the rite, so a rite change starts it again with the place of that rite (D77).
+export function Scene({ rite, step, names: namesOn = true, words, where, state, onState }: Props) {
   const section = useRef<HTMLElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
-  const names = useRef<Partial<Record<Part, HTMLSpanElement>>>({});
-  const leads = useRef<Partial<Record<Part, SVGLineElement>>>({});
+  const names = useRef<Partial<Record<string, HTMLSpanElement>>>({});
+  const leads = useRef<Partial<Record<string, SVGLineElement>>>({});
+  const partList = PART_LISTS[rite];
   const place = useRef<Place | null>(null);
   const stepNow = useRef(step);
   stepNow.current = step;
   const namesNow = useRef(namesOn);
   namesNow.current = namesOn;
 
-  // The place loads once. A step change or a language change does not load it again.
+  // The place loads once for its rite. A step change or a language change does not load it again.
   useEffect(() => {
     if (!canDraw3D()) {
       onState("unsupported");
       return;
     }
+    onState("loading");
     let cancelled = false;
-    const parts = Object.fromEntries(PART_LIST.map((part) => [part, { name: names.current[part]!, lead: leads.current[part]! }])) as Record<Part, Name>;
+    const parts: Record<string, Name> = Object.fromEntries(partList.map((part) => [part, { name: names.current[part]!, lead: leads.current[part]! }]));
     import("./place")
       .then(({ showPlace }) =>
         showPlace(canvas.current!, {
+          rite,
           step: stepNow.current,
           names: parts,
           onShown: () => onState("shown"),
@@ -66,7 +75,7 @@ export function Scene({ step, names: namesOn = true, words, where, state, onStat
       place.current?.stop();
       place.current = null;
     };
-  }, [onState]);
+  }, [onState, rite, partList]);
 
   useEffect(() => {
     place.current?.goTo(step);
@@ -81,21 +90,22 @@ export function Scene({ step, names: namesOn = true, words, where, state, onStat
   return (
     <section ref={section} className="scene" data-scene data-state={state} aria-busy={state === "loading"}>
       <div className="scene__frame vh-marble">
-        {still && <MatafMap step={step} words={words} label={`${words.map}. ${where}`} showNames={namesOn} />}
+        {still && rite === "tawaf" && <MatafMap step={step} words={words} label={`${words.map}. ${where}`} showNames={namesOn} />}
+        {still && rite === "sai" && <MasaMap step={step} words={words} label={`${words.masaMap}. ${where}`} />}
         <canvas ref={canvas} className="scene__view scene__canvas" role="img" aria-label={where} hidden={still} />
         <div className="scene__names" aria-hidden="true" hidden={state !== "shown"}>
           <svg className="scene__view">
-            {PART_LIST.map((part) => (
+            {partList.map((part) => (
               <line key={part} ref={(line) => void (leads.current[part] = line ?? undefined)} className="scene__lead" />
             ))}
           </svg>
-          {PART_LIST.map((part) => (
+          {partList.map((part) => (
             <span key={part} ref={(name) => void (names.current[part] = name ?? undefined)} className="scene__name" hidden>
-              {words[PART_WORD[part]]}
+              {words[PART_WORDS[rite][part]]}
             </span>
           ))}
         </div>
-        {state === "loading" && <LoadingCard title={words.loadingTitle} hint={words.loadingHint} />}
+        {state === "loading" && <LoadingCard title={rite === "sai" ? words.loadingMasa : words.loadingTitle} hint={words.loadingHint} />}
       </div>
     </section>
   );

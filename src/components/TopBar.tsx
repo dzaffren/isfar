@@ -1,6 +1,5 @@
 import type { Language } from "../lib/language";
-
-export type Rite = "tawaf" | "sai";
+import type { Rite } from "../lib/step";
 
 type Props = {
   siteName: string;
