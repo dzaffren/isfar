@@ -434,7 +434,7 @@ No data crosses a trust boundary. The address is the only new input, and `readPl
 | `src/App.tsx:19-44` | Holds the rite from `readPlace`. Picks `TAWAF` or `SAI`, `beadsAt` or `saiBeadsAt`, the progress label and the bead words by rite. The check sets the rite to tawaf. | Scenarios 1 and 2 |
 | `src/App.tsx:24-26`, `:64-84` | `goTo(step)` writes the address of the rite on screen. On sa'i step 13, the Right arrow key and Page Down do nothing, as on step 15 before the check. | Scenario 2, D31 |
 | `src/App.tsx:108` | Passes the `rite` prop to `TopBar`. A tap writes `stepHash(rite, 1)` (D71). | Scenarios 1 and 2, D65 |
-| `src/App.tsx:110`, `:142-151` | `<Scene key={rite} rite={rite} …>`. On sa'i step 13, "Mula semula" takes the gold place, with no check button. | Scenario 1, O15 |
+| `src/App.tsx:110`, `:142-151` | `Scene` takes the rite as its React key and as a prop. On sa'i step 13, "Mula semula" takes the gold place, with no check button. | Scenario 1, O15 |
 | `src/scene/Scene.tsx:10`, `:34-68` | Takes `rite`. Calls `onState("loading")` when it starts, so a swap shows the loading card. Hands `rite` to `showPlace`. Holds the names of the parts of that rite. | Scenarios 2 and 4 |
 | `src/scene/Scene.tsx:88-99` | Shows `MasaMap` for sa'i and `MatafMap` for tawaf. The loading card says "Memuatkan mas'a" for sa'i. | Scenario 4 |
 | `src/scene/place.ts:21-57` | A `Site` record for each rite: the model path, the colour map, the spots, the camera of a step, the move between two cameras, the name anchors and the path line. `SITES.tawaf` holds what is there now. `SITES.sai` holds the mas'a. | Scenarios 1 and 2, D76 |
@@ -462,7 +462,7 @@ Reusing: `pickLanguage` and `storeLanguage` in `src/lib/language.ts`, `token()` 
 | --- | --- |
 | `readPlace` in place of `readStep` | Scenario 2: the address must name the rite as well as the step |
 | The `Site` record in `place.ts` | Scenarios 1 and 2: two places with their own model, spots and camera. Two real entries, not a plugin system. |
-| `key={rite}` on `Scene` | O15: the simplest swap, with no second scene in memory |
+| The rite as the React key of `Scene` | O15: the simplest swap, with no second scene in memory |
 | `forceContextLoss()` in `stop()` | O15: an ustaz who swaps rites often must not run out of 3D contexts |
 | `alongHall` | D78: the arc of D45 goes around the Kaabah, and the mas'a has none |
 | `tools/masa.py` and `masa.glb` | D19, D76 |
