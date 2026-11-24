@@ -39,6 +39,17 @@ const ms = {
   checkAgain: "Cuba semula",
   checkLeave: "Keluar",
   checkWhere: "Penanda emas di mataf. Nama tempat muncul selepas anda menjawab.",
+  riteSwitch: "Ibadah",
+  riteTawaf: "Tawaf",
+  riteSai: "Sa'i",
+  saiProgress: "Sa'i · Langkah {n} daripada {total}",
+  walk: "Perjalanan {n} daripada 7",
+  noWalk: "Perjalanan belum bermula",
+  allWalks: "Tujuh perjalanan selesai",
+  masaMap: "Peta mas'a dari atas",
+  loadingMasa: "Memuatkan mas'a",
+  partSafa: "Bukit Safa",
+  partMarwah: "Bukit Marwah",
 };
 
 export type Words = Record<keyof typeof ms, string>;
@@ -81,6 +92,17 @@ const en: Words = {
   checkAgain: "Try again",
   checkLeave: "Leave",
   checkWhere: "A gold marker in the mataf. The name of the place shows after you answer.",
+  riteSwitch: "Rite",
+  riteTawaf: "Tawaf",
+  riteSai: "Sa'i",
+  saiProgress: "Sa'i · Step {n} of {total}",
+  walk: "Walk {n} of 7",
+  noWalk: "No walk has started",
+  allWalks: "Seven walks are done",
+  masaMap: "Map of the mas'a from above",
+  loadingMasa: "Loading the mas'a",
+  partSafa: "Safa",
+  partMarwah: "Marwah",
 };
 
 export const TEXT: Record<Language, Words> = { ms, en };

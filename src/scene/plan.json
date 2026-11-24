@@ -9,5 +9,14 @@
   "arch": { "from": 0.2, "to": 0.8, "spring": 3.4, "rise": 1.8 },
   "lamp": { "up": 6, "size": 0.7 },
   "guide": { "width": 0.7 },
-  "path": { "centre": [0, -2.5], "across": 14, "along": 15.5 }
+  "path": { "centre": [0, -2.5], "across": 14, "along": 15.5 },
+  "masa": {
+    "length": 120,
+    "width": 20,
+    "height": 9,
+    "safa": { "at": [-60, 0], "radius": 8, "height": 3 },
+    "marwah": { "at": [60, 0], "radius": 7, "height": 2.5 },
+    "green": { "at": [-30, -10], "depth": 1.5 },
+    "walk": { "from": -52, "to": 53 }
+  }
 }
