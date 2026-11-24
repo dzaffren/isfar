@@ -11,6 +11,17 @@ export const MARWAH = point(plan.masa.marwah.at);
 // The two green lights cross the mas'a. Men walk quickly between them.
 export const GREEN = plan.masa.green.at;
 export const WALK = plan.masa.walk;
+// Each way has its own lane, with a low barrier between them that stops short of each hill (D81).
+// y is the middle of each lane. The lane to Marwah is on the right of a person at Safa who faces Marwah (D82).
+export const LANES = plan.masa.lanes;
+export const BARRIER = plan.masa.barrier;
+
+// The path of one walk: off the hill, into its lane, along the barrier, and up onto the other hill.
+export function laneLine(towards: "marwah" | "safa"): Point[] {
+  const y = towards === "marwah" ? LANES.toMarwah : LANES.toSafa;
+  const line: Point[] = [[WALK.from, 0], [BARRIER.from, y], [BARRIER.to, y], [WALK.to, 0]];
+  return towards === "marwah" ? line : line.reverse();
+}
 
 export type SaiPart = "safa" | "marwah" | "green";
 
@@ -51,8 +62,8 @@ export const SAI_SPOTS: SaiSpot[] = [
   { at: null, names: ["safa", "marwah", "green"], towards: null, view: "wide" },
   { at: [WALK.from + 4, 0], names: ["safa"], towards: null, view: "safa" },
   { at: ON_SAFA, names: ["safa"], towards: null, view: "marwah" },
-  { at: [GREEN[0] - 8, 0], names: ["green"], towards: "marwah", view: "marwah" },
-  { at: [(GREEN[0] + GREEN[1]) / 2, 0], names: ["green"], towards: "marwah", view: "marwah" },
+  { at: [GREEN[0] - 8, LANES.toMarwah], names: ["green"], towards: "marwah", view: "marwah" },
+  { at: [(GREEN[0] + GREEN[1]) / 2, LANES.toMarwah], names: ["green"], towards: "marwah", view: "marwah" },
   { at: ON_MARWAH, names: ["marwah"], towards: "marwah", view: "safa" },
   { at: ON_SAFA, names: ["safa"], towards: "safa", view: "marwah" },
   { at: ON_MARWAH, names: ["marwah"], towards: "marwah", view: "safa" },

@@ -109,6 +109,47 @@ Rules that hold for each scenario:
 | A self-check for sa'i | `sai-check`, the next slice (O6) |
 | A pilgrim figure that walks on Next | The /shape pass of D46 (O7) |
 
+## Interface
+
+The walk screen does not change. The scene shows the lanes, in 3D or on the top-view map, and two step texts gain a line.
+
+```mermaid
+flowchart TB
+    PLAN[("plan.json: lanes, barrier")] -- "lane middles and barrier ends" --> SPOTS["masa.ts: laneLine, SAI_SPOTS"]
+    SPOTS -- "path of the walk, marker spot" --> MAP["MasaMap: lower lane to Marwah, upper lane to Safa, barrier line"]
+    SPOTS -- "path of the walk, marker spot" --> SCENE["3D mas'a: barrier, lane path line, marker"]
+    TEXT["content/sai.ts: steps 4 and 7"] -- "one line about the lane" --> PANEL["Step panel"]
+```
+
+The plan holds the lanes once, `masa.ts` turns them into the path and the spots, and the map and the 3D place both draw from that.
+
+| Part | What changes |
+| --- | --- |
+| Top-view map | A barrier line along the middle, stopping short of each hill. The lane to Marwah is the lower lane, and the lane to Safa is the upper lane, as seen from above with Safa on the left. The path line leaves the hill, runs in the lane of the walk and climbs onto the other hill. The arrows sit in that lane. |
+| Marker | Steps 4 and 5 stand in the lane to Marwah. The hill steps stay on the slope, in the middle of the open floor. |
+| 3D mas'a | The same lanes, barrier and path line, from the same plan numbers. /build makes it. The barrier is 1 m high, in the colour of the walls. |
+| Step panel | The new lines of steps 4 and 7, below. The scene description for a screen reader names the lane on steps 4 and 5. |
+
+**Motion tier:** 2, as in v1 (O13). Nothing new moves.
+
+**Components used:** `MasaMap`, Step panel. No new component. `.map__barrier` in `src/app.css` uses `--vh-edge`, as `.map__guide` does.
+
+**Preview:** `http://localhost:5199/preview/sai-walk.html`, after `pnpm dev --port 5199`. It has 9 frames, and each frame is a working sa'i screen. The top-view map stands in for the 3D mas'a.
+
+**Built in this pause, for /build to keep:** the `lanes` and `barrier` parts of `src/scene/plan.json`, `LANES`, `BARRIER` and `laneLine` in `src/scene/masa.ts`, and the spots of steps 4 and 5. Also the lanes in `src/components/MasaMap.tsx`, `.map__barrier` in `src/app.css`, and the text of steps 4 and 7 in `src/content/sai.ts`.
+**For the preview only:** `preview/sai-walk.html` and `src/preview/`. No build ships them.
+
+**Checks:** The static drift check passes on 7 files. The rendered drift check passes on steps 4 and 7, in light and dark. `pnpm typecheck` and `pnpm test` pass. The `design-taste-frontend` skill is not installed, so its inspector did not run.
+
+### New text
+
+| Step | Malay | English |
+| --- | --- | --- |
+| 4 | Turun dari Safa dan berjalan ke arah Marwah seperti biasa. **Ikut lorong ke Marwah, bukan lorong orang yang kembali ke Safa.** Anda boleh berzikir atau berdoa dalam apa-apa bahasa sepanjang sa'i. | Come down from Safa and walk towards Marwah at a usual pace. **Keep to the lane to Marwah, not the lane back to Safa.** You can make zikir or doa in any language for the whole sa'i. |
+| 7 | **Di Marwah, pusing masuk ke lorong ke Safa, dan berjalan kembali ke Safa.** Perjalanan ini dikira sebagai perjalanan kedua. Lelaki berjalan cepat lagi di antara lampu hijau. | **At Marwah, turn into the lane to Safa, and walk back to Safa.** This counts as the second walk. Men walk quickly again between the green lights. |
+
+The new words are in bold. The text names no side, so a fix to O20 changes the plan only.
+
 ## Open items
 
 | ID  | What | Type | Raised at | Owner | Status | Answer |

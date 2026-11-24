@@ -17,6 +17,8 @@
     "safa": { "at": [-60, 0], "radius": 8, "height": 3 },
     "marwah": { "at": [60, 0], "radius": 7, "height": 2.5 },
     "green": { "at": [-30, -10], "depth": 1.5 },
-    "walk": { "from": -52, "to": 53 }
+    "walk": { "from": -52, "to": 53 },
+    "lanes": { "toMarwah": -5, "toSafa": 5 },
+    "barrier": { "from": -46, "to": 47, "height": 1 }
   }
 }

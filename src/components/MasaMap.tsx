@@ -1,6 +1,6 @@
 import type { Words } from "../content/text";
 import type { Point } from "../scene/mataf";
-import { GREEN, MASA, SAI_PARTS, SAI_SPOTS, WALK, type SaiPart } from "../scene/masa";
+import { BARRIER, GREEN, MASA, SAI_PARTS, SAI_SPOTS, laneLine, type SaiPart } from "../scene/masa";
 
 export const SAI_PART_WORD: Record<SaiPart, keyof Words> = {
   safa: "partSafa",
@@ -20,14 +20,18 @@ const HALF_Y = 22;
 const ARROWS = [-40, -20, 0, 20, 40];
 
 const percent = ([x, y]: Point) => ({ left: `${((x + HALF_X) / (2 * HALF_X)) * 100}%`, top: `${((y + HALF_Y) / (2 * HALF_Y)) * 100}%` });
+// The plan has y to the left of a person who faces Marwah, and the map has y down, so plan points flip to sit as seen from above.
+const flip = ([x, y]: Point): Point => [x, -y];
 
 type Props = { step: number; words: Words; label: string };
 
 // The top view of the mas'a, for a device that cannot show the 3D place. Safa is on the left, Marwah on the right.
+// The lane to Marwah is the lower lane, and the lane to Safa the upper one.
 export function MasaMap({ step, words, label }: Props) {
   const spot = SAI_SPOTS[step - 1];
   const half = MASA.width / 2;
   const turn = spot.towards === "safa" ? 180 : 0;
+  const path = spot.towards && laneLine(spot.towards).map(flip);
   return (
     <div className="map map--masa" data-still role="img" aria-label={label}>
       <svg className="map__plan" viewBox={`${-HALF_X} ${-HALF_Y} ${2 * HALF_X} ${2 * HALF_Y}`} aria-hidden="true">
@@ -37,11 +41,12 @@ export function MasaMap({ step, words, label }: Props) {
         {GREEN.map((x) => (
           <rect key={x} className="map__lamp" x={x - MASA.green.depth / 2} y={-half} width={MASA.green.depth} height={MASA.width} />
         ))}
-        {spot.towards && (
+        <line className="map__barrier" x1={BARRIER.from} y1="0" x2={BARRIER.to} y2="0" />
+        {path && (
           <>
-            <line className="map__path" x1={WALK.from} y1="0" x2={WALK.to} y2="0" />
+            <polyline className="map__path" data-path points={path.map((point) => point.join(" ")).join(" ")} />
             {ARROWS.map((x) => (
-              <path key={x} className="map__arrow" d="M-1.6 -1.4L1.6 0L-1.6 1.4Z" transform={`translate(${x} 0) rotate(${turn})`} />
+              <path key={x} className="map__arrow" d="M-1.6 -1.4L1.6 0L-1.6 1.4Z" transform={`translate(${x} ${path[1][1]}) rotate(${turn})`} />
             ))}
           </>
         )}
@@ -50,7 +55,7 @@ export function MasaMap({ step, words, label }: Props) {
           const [toX, toY] = NAME_AT[part];
           return <line key={part} className="map__lead" x1={fromX} y1={fromY} x2={toX} y2={toY} />;
         })}
-        {spot.at && <circle className="map__marker" data-marker cx={spot.at[0]} cy={spot.at[1]} r="2.2" />}
+        {spot.at && <circle className="map__marker" data-marker cx={spot.at[0]} cy={-spot.at[1]} r="2.2" />}
       </svg>
       {spot.names.map((part) => (
         <span key={part} className="scene__name" style={percent(NAME_AT[part])}>
