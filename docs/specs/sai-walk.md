@@ -448,9 +448,9 @@ No data crosses a trust boundary. The address is the only new input, and `readPl
 | `package.json:19` | `model` runs `tools/mataf.py`, then `tools/masa.py`. | D19 |
 | `src/components/TopBar.tsx`, `src/components/MasaMap.tsx`, `src/content/sai.ts`, `src/content/text.ts` | Kept from pause 2. | Scenarios 1 to 4 |
 | `e2e/sai.spec.ts` (new) | Scenarios 1 to 4, at four sizes. | Scenarios 1 to 4 |
-| `e2e/helpers.ts:15` | `MODEL` becomes `mataf.glb`, and `MASA_MODEL` names `masa.glb`. | Scenario 4 |
+| `e2e/helpers.ts:15` | `MASA_MODEL` names `masa.glb`, beside `MODEL` for `mataf.glb`. `kaabahIsDrawn`, `expectApart` and `modelParts` move here from `e2e/walk.spec.ts` (O19). | Scenario 4 |
 | `e2e/speed.spec.ts:23-57` | Runs twice: from `/` through 15 tawaf steps, and from `/#sai-1` through 13 sa'i steps. | Scenario 5 |
-| `src/lib/step.test.ts`, `src/content/sai.test.ts` (new), `src/scene/views.test.ts` | Unit tests, listed in the test plan. | Scenarios 1 to 3 |
+| `src/lib/step.test.ts`, `src/content/sai.test.ts` (new), `src/scene/views.test.ts`, `src/scene/masa.test.ts` (new), `src/scene/place.test.ts` (new) | Unit tests, listed in the test plan. The last two came from the review. | Scenarios 1 to 3 |
 | `preview/`, `src/preview/` (deleted) | The preview goes when the browser test passes. | Nothing ships it |
 | `CHANGELOG.md` | One "Added" line for the sa'i walk. | The repo's rule |
 
