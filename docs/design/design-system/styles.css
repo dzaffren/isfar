@@ -250,6 +250,7 @@ body {
 .vh-switch button {
   min-width: var(--vh-control);
   height: var(--vh-switch);
+  padding-inline: var(--vh-space-3);
   border: 0;
   border-radius: var(--vh-radius-inner);
   background: transparent;

@@ -18,14 +18,17 @@ import {
   WebGLRenderer,
 } from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import type { Rite } from "../lib/step";
+import { SAI_SPOTS, WALK, groundAt, type SaiPart } from "./masa";
 import { SPOTS, onPath, type Part } from "./mataf";
-import { between, nameAnchor, namePlace, viewOf, type V3, type View } from "./views";
+import { alongHall, between, nameAnchor, namePlace, saiNameAnchor, saiNamePlace, saiViewOf, viewOf, type V3, type View } from "./views";
 
 export type Name = { name: HTMLElement; lead: SVGLineElement };
 
 type Events = {
+  rite: Rite;
   step: number;
-  names: Record<Part, Name>;
+  names: Record<string, Name>;
   onShown: () => void;
   onLost: () => void;
   onCamera: (step: number) => void;
@@ -39,7 +42,7 @@ function token(name: string): Color {
   return new Color(getComputedStyle(document.documentElement).getPropertyValue(name).trim());
 }
 
-// Each mesh in mataf.glb takes its colour from its name.
+// Each mesh in mataf.glb and masa.glb takes its colour from its name.
 const COLOURS: Record<string, string> = {
   kiswah: "--vh-kiswah",
   band: "--vh-gold",
@@ -53,6 +56,8 @@ const COLOURS: Record<string, string> = {
   arch: "--vh-edge",
   guide: "--vh-edge",
   lamp: "--vh-lamp",
+  wall: "--vh-sunken",
+  rock: "--vh-edge",
 };
 const FLAT = new Set(["floor", "guide", "lamp"]);
 
@@ -62,37 +67,105 @@ const easeOut = (t: number) => 1 - (1 - t) ** 3;
 // The plan is z up, and three.js is y up.
 const toThree = ([x, y, z]: V3) => new Vector3(x, z, -y);
 
-// The path of the circuit as dashes on the floor, with an arrow for the way of the walk (D28).
-function pathLine(): BufferGeometry {
+// Flat shapes on the floor, in the plan's x and y.
+function floorShapes(draw: (quad: (corners: [number, number][]) => void, flat: (x: number, y: number) => void) => void): BufferGeometry {
   const points: number[] = [];
   const flat = (x: number, y: number) => points.push(x, 0.03, -y);
   const quad = (corners: [number, number][]) => {
     const [a, b, c, d] = corners;
     for (const [x, y] of [a, b, c, a, c, d]) flat(x, y);
   };
-  for (let degrees = 0; degrees < 360; degrees += 6) {
-    const [x, y] = onPath(degrees);
-    const [nextX, nextY] = onPath(degrees + 3.5);
-    const length = Math.hypot(nextX - x, nextY - y);
-    const [sideX, sideY] = [(-(nextY - y) / length) * 0.2, ((nextX - x) / length) * 0.2];
-    quad([[x - sideX, y - sideY], [nextX - sideX, nextY - sideY], [nextX + sideX, nextY + sideY], [x + sideX, y + sideY]]);
-  }
-  for (const degrees of [20, 80, 150, 210, 250, 290, 330]) {
-    const [x, y] = onPath(degrees);
-    const [nextX, nextY] = onPath(degrees + 1);
-    const length = Math.hypot(nextX - x, nextY - y);
-    const [alongX, alongY] = [(nextX - x) / length, (nextY - y) / length];
-    for (const [px, py] of [
-      [x + alongX * 1.4, y + alongY * 1.4],
-      [x - alongX * 0.9 - alongY * 0.9, y - alongY * 0.9 + alongX * 0.9],
-      [x - alongX * 0.9 + alongY * 0.9, y - alongY * 0.9 - alongX * 0.9],
-    ])
-      flat(px, py);
-  }
+  draw(quad, flat);
   const geometry = new BufferGeometry();
   geometry.setAttribute("position", new Float32BufferAttribute(points, 3));
   return geometry;
 }
+
+// The path of the circuit as dashes on the floor, with an arrow for the way of the walk (D28).
+const pathLine = () =>
+  floorShapes((quad, flat) => {    for (let degrees = 0; degrees < 360; degrees += 6) {
+      const [x, y] = onPath(degrees);
+      const [nextX, nextY] = onPath(degrees + 3.5);
+      const length = Math.hypot(nextX - x, nextY - y);
+      const [sideX, sideY] = [(-(nextY - y) / length) * 0.2, ((nextX - x) / length) * 0.2];
+      quad([[x - sideX, y - sideY], [nextX - sideX, nextY - sideY], [nextX + sideX, nextY + sideY], [x + sideX, y + sideY]]);
+    }
+    for (const degrees of [20, 80, 150, 210, 250, 290, 330]) {
+      const [x, y] = onPath(degrees);
+      const [nextX, nextY] = onPath(degrees + 1);
+      const length = Math.hypot(nextX - x, nextY - y);
+      const [alongX, alongY] = [(nextX - x) / length, (nextY - y) / length];
+      for (const [px, py] of [
+        [x + alongX * 1.4, y + alongY * 1.4],
+        [x - alongX * 0.9 - alongY * 0.9, y - alongY * 0.9 + alongX * 0.9],
+        [x - alongX * 0.9 + alongY * 0.9, y - alongY * 0.9 - alongX * 0.9],
+      ])
+        flat(px, py);
+    }
+  });
+
+// The path of one sa'i walk: dashes along the middle of the mas'a, with arrows towards the hill of the walk (D28).
+// way is 1 towards Marwah, and -1 back towards Safa.
+export const hallLine = (way: 1 | -1) =>
+  floorShapes((quad, flat) => {
+    for (let x = WALK.from; x + 3.5 <= WALK.to; x += 6) {
+      quad([[x, -0.2], [x + 3.5, -0.2], [x + 3.5, 0.2], [x, 0.2]]);
+    }
+    // The arrow turns round in x and in y, so its corners keep their order and it still faces up.
+    for (const x of [-40, -20, 0, 20, 40]) {
+      flat(x + way * 1.4, 0);
+      flat(x - way * 0.9, way * 0.9);
+      flat(x - way * 0.9, -way * 0.9);
+    }
+  });
+
+// What differs between the two places: the model, the spots, the camera and the names (D76).
+type Site = {
+  model: string;
+  joints: boolean;
+  paths: () => BufferGeometry[];
+  pathAt: (step: number) => number | null;
+  markerAt: (step: number) => V3 | null;
+  namesAt: (step: number) => string[];
+  anchor: (part: string) => V3;
+  push: (part: string, step: number) => readonly [number, number];
+  view: (step: number) => View;
+  move: (one: View, two: View, t: number) => View;
+};
+
+const SITES: Record<Rite, Site> = {
+  tawaf: {
+    model: "/models/mataf.glb",
+    joints: true,
+    paths: () => [pathLine()],
+    pathAt: (step) => (SPOTS[step - 1].path ? 0 : null),
+    markerAt: (step) => {
+      const { at } = SPOTS[step - 1];
+      return at && [at[0], at[1], 0];
+    },
+    namesAt: (step) => SPOTS[step - 1].names,
+    anchor: (part) => nameAnchor(part as Part),
+    push: (part, step) => namePlace(part as Part, SPOTS[step - 1].view),
+    view: viewOf,
+    move: between,
+  },
+  sai: {
+    model: "/models/masa.glb",
+    joints: false,
+    paths: () => [hallLine(1), hallLine(-1)],
+    pathAt: (step) => ({ marwah: 0, safa: 1, none: null })[SAI_SPOTS[step - 1].towards ?? "none"],
+    // On a hill, the marker stands on its slope, level with the high side of its disc.
+    markerAt: (step) => {
+      const { at } = SAI_SPOTS[step - 1];
+      return at && [at[0], at[1], Math.max(...[-1.5, 0, 1.5].map((dx) => groundAt([at[0] + dx, at[1]])))];
+    },
+    namesAt: (step) => SAI_SPOTS[step - 1].names,
+    anchor: (part) => saiNameAnchor(part as SaiPart),
+    push: (part, step) => saiNamePlace(part as SaiPart, SAI_SPOTS[step - 1].view),
+    view: saiViewOf,
+    move: alongHall,
+  },
+};
 
 // The gold marker on the floor, with a pole and a pin that show it from far.
 function marker(): Group {
@@ -112,9 +185,10 @@ function marker(): Group {
 
 export async function showPlace(canvas: HTMLCanvasElement, events: Events): Promise<Place> {
   const { names, onShown, onLost, onCamera, onMoving } = events;
+  const site = SITES[events.rite];
   const renderer = new WebGLRenderer({ canvas, antialias: true });
   try {
-    const gltf = await new GLTFLoader().loadAsync("/models/mataf.glb");
+    const gltf = await new GLTFLoader().loadAsync(site.model);
     // The device can drop 3D while the model downloads, before the listener below exists.
     if (renderer.getContext().isContextLost()) throw new Error("WebGL context lost while the model downloaded");
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -136,45 +210,50 @@ export async function showPlace(canvas: HTMLCanvasElement, events: Events): Prom
     });
     scene.add(gltf.scene);
 
-    const joints = new GridHelper(48, 6, token("--vh-edge"), token("--vh-edge"));
-    joints.position.y = 0.01;
-    joints.material.transparent = true;
-    joints.material.opacity = 0.25;
-    scene.add(joints);
+    // The mataf floor has joints. The mas'a floor is plain marble.
+    if (site.joints) {
+      const joints = new GridHelper(48, 6, token("--vh-edge"), token("--vh-edge"));
+      joints.position.y = 0.01;
+      joints.material.transparent = true;
+      joints.material.opacity = 0.25;
+      scene.add(joints);
+    }
 
-    const path = new Mesh(pathLine(), new MeshBasicMaterial({ color: token("--vh-gold-edge") }));
+    const gold = new MeshBasicMaterial({ color: token("--vh-gold-edge") });
+    const paths = site.paths().map((line) => new Mesh(line, gold));
     const pin = marker();
-    scene.add(path, pin);
+    scene.add(...paths, pin);
 
     const camera = new PerspectiveCamera(40, 1, 1, 1000);
     let step = events.step;
     let namesOn = true;
-    let view: View = viewOf(step);
+    let view: View = site.view(step);
     let move: { from: View; to: View; ms: number; start: number | null; frames: number } | null = null;
 
     const showStep = () => {
-      const spot = SPOTS[step - 1];
-      path.visible = spot.path;
-      pin.visible = spot.at !== null;
-      if (spot.at) pin.position.copy(toThree([spot.at[0], spot.at[1], 0]));
+      const shown = site.pathAt(step);
+      paths.forEach((path, index) => (path.visible = index === shown));
+      const at = site.markerAt(step);
+      pin.visible = at !== null;
+      if (at) pin.position.copy(toThree(at));
     };
     showStep();
 
     // Each name sits beside the screen point of its part. Two names that would overlap move apart (D44).
     const point = new Vector3();
     const placeNames = (width: number, height: number) => {
-      const spot = SPOTS[step - 1];
-      const shown = (Object.keys(names) as Part[])
+      const named = site.namesAt(step);
+      const shown = Object.keys(names)
         .map((part) => {
           const { name, lead } = names[part];
-          point.copy(toThree(nameAnchor(part))).project(camera);
-          const visible = namesOn && spot.names.includes(part) && point.z < 1 && Math.abs(point.x) <= 1.2 && Math.abs(point.y) <= 1.2;
+          point.copy(toThree(site.anchor(part))).project(camera);
+          const visible = namesOn && named.includes(part) && point.z < 1 && Math.abs(point.x) <= 1.2 && Math.abs(point.y) <= 1.2;
           name.toggleAttribute("hidden", !visible);
           lead.toggleAttribute("hidden", !visible);
           if (!visible) return null;
           const atX = ((point.x + 1) / 2) * width;
           const atY = ((1 - point.y) / 2) * height;
-          const push = namePlace(part, spot.view);
+          const push = site.push(part, step);
           const wide = name.offsetWidth;
           const tall = name.offsetHeight;
           const x = Math.min(Math.max(atX + push[0], wide / 2 + 4), width - wide / 2 - 4);
@@ -211,7 +290,7 @@ export async function showPlace(canvas: HTMLCanvasElement, events: Events): Prom
       if (move) {
         move.start ??= now;
         const t = move.ms === 0 ? 1 : Math.min((now - move.start) / move.ms, 1);
-        view = between(move.from, move.to, easeOut(t));
+        view = site.move(move.from, move.to, easeOut(t));
         move.frames += 1;
         if (t === 1) {
           console.log(`[isfar] camera at step ${step}: ${move.frames} frames in ${move.ms === 0 ? 0 : Math.round(now - move.start)} ms`);
@@ -260,7 +339,7 @@ export async function showPlace(canvas: HTMLCanvasElement, events: Events): Prom
       if (next === step) return;
       step = next;
       showStep();
-      const to = viewOf(step);
+      const to = site.view(step);
       const still = JSON.stringify(to) === JSON.stringify(view) || matchMedia("(prefers-reduced-motion: reduce)").matches;
       // A new step during a move sends the camera on from where it is now.
       move = { from: view, to, ms: still ? 0 : MOVE_MS, start: null, frames: 0 };
@@ -274,6 +353,8 @@ export async function showPlace(canvas: HTMLCanvasElement, events: Events): Prom
       document.removeEventListener("visibilitychange", visible);
       canvas.removeEventListener("webglcontextlost", lost);
       renderer.dispose();
+      // A rite change makes a new place, so free this 3D context now rather than when the browser collects it (D77).
+      renderer.forceContextLoss();
     };
     // A name hides or shows with no camera move, so the place asks for one frame (D40).
     const setNames = (on: boolean) => {

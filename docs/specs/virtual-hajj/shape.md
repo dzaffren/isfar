@@ -1,6 +1,7 @@
 # Virtual Hajj
 
 **Project type:** web UI, greenfield · **Status:** Shaped
+**Board:** https://claude.ai/artifact/HdgBbUemwBTHWvFECHFD3d
 
 ## Problem
 
@@ -32,8 +33,10 @@ flowchart LR
     S0[0 walking-skeleton] -->|3D on a phone, two languages| S1[1 tawaf-walk]
     S1 -->|a finished walk to ask about| S2[2 tawaf-check]
     S1 -->|the guided walk, reused| S3[3 sai-walk]
-    S3 -->|tawaf and sa'i to join| S4[4 full-umrah]
-    S4 -->|each rite, to tailor| S5[5 pilgrim-choice]
+    S2 -->|the check, reused| S4[4 sai-check]
+    S3 -->|a finished walk to ask about| S4
+    S3 -->|tawaf and sa'i to join| S5[5 full-umrah]
+    S5 -->|each rite, to tailor| S6[6 pilgrim-choice]
 ```
 
 Slice 0 proves the rails, slice 1 is the first thing worth using, and slices 2 and 3 each work without the other.
@@ -44,15 +47,16 @@ Slice 0 proves the rails, slice 1 is the first thing worth using, and slices 2 a
 | 1 | tawaf-walk | The site leads the person through tawaf in 3D, from the start line to the end of the seventh circuit. Each step shows where to stand and what to do. Each step notes where the other schools differ. | Tawaf is the smallest piece that removes the pain alone. Hajj reuses it later. |
 | 2 | tawaf-check | After the tawaf walk, the person answers where each step happens and what to do there. The result shows on screen and is not kept. | It measures "they can explain it back" before we build two more rites. |
 | 3 | sai-walk | The site leads the person through sa'i in 3D, between Safa and Marwah. | Sa'i is the next rite in the real order. It reuses the guided walk from slice 1. |
-| 4 | full-umrah | The walk starts with ihram at the miqat and ends with tahallul. A person walks one whole umrah, first step to last. | The first and last steps are the least about a place. They join the two walks into one journey. |
-| 5 | pilgrim-choice | The person chooses a man or a woman at the start. Each step then shows the text for that person. | The steps differ for men and women in each rite. After full-umrah, one slice covers them all at once. |
+| 4 | sai-check | After the sa'i walk, the person answers where each step of sa'i happens and what to do there. The result shows on screen and is not kept. | It checks sa'i before the two walks join, and it reuses the check of slice 2. |
+| 5 | full-umrah | The walk starts with ihram at the miqat and ends with tahallul. A person walks one whole umrah, first step to last. | The first and last steps are the least about a place. They join the two walks into one journey. |
+| 6 | pilgrim-choice | The person chooses a man or a woman at the start. Each step then shows the text for that person. | The steps differ for men and women in each rite. After full-umrah, one slice covers them all at once. |
 
 Each slice must look right at phone size and at projector size.
 Each slice ships its text in Malay and English.
 
 ## Not doing
 
-- **Hajj.** Mina, Arafah, Muzdalifah and the jamarat get their own shape after umrah ships (O7). Umrah alone is six slices.
+- **Hajj.** Mina, Arafah, Muzdalifah and the jamarat get their own shape after umrah ships (O7). Umrah alone is seven slices.
 - **Free walk in 3D.** The person must find the place of each step alone, and a free walk does not show the order.
 - **360-degree photos.** The person stands at fixed spots, with no path between the steps.
 - **Map and pictures.** It has no look-around.
@@ -80,6 +84,7 @@ Each slice ships its text in Malay and English.
 | O13 | Does the person choose a man or a woman? | question | spec tawaf-walk p1 | user | Resolved | Yes, in the new slice `pilgrim-choice`, after `full-umrah`. Until then one walk serves both, and the text says "for men". 2026-11-23 |
 | O14 | O1 says the user writes the content from course notes. Who drafts it? | question | spec tawaf-walk p1 | user | Resolved | Claude drafts the step text, and the user corrects it against the course notes. The review of O1 stays. 2026-11-23 |
 | O15 | The user asked for a gamified walk: interactive, with the feel of Animal Crossing. | question | spec tawaf-walk p3 | user | Resolved | A /shape pass after `tawaf-walk` plans a pilgrim figure that walks on Next, a softer look, and where `pilgrim-choice` fits. Points, a hand-steered character and Nintendo's own art were rejected (D46). 2026-11-23 |
+| O16 | Does sa'i get a self-check, as tawaf does? | question | spec sai-walk p1 | user | Resolved | Yes, in the new slice `sai-check`, after `sai-walk`. "In sai-walk" and "no sa'i check" were rejected (D69). 2026-11-24 |
 
 ## Glossary
 

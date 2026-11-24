@@ -9,25 +9,27 @@ import { StepActions } from "./components/StepActions";
 import { StepPanel } from "./components/StepPanel";
 import { TopBar } from "./components/TopBar";
 import { CHECK } from "./content/check";
+import { SAI, saiBeadsAt } from "./content/sai";
 import { TAWAF, beadsAt } from "./content/tawaf";
 import { TEXT } from "./content/text";
 import type { Picks } from "./lib/check";
 import { pickLanguage, readStoredLanguage, storeLanguage, type Language } from "./lib/language";
-import { CHECK_HASH, isCheck, readStep, stepHash } from "./lib/step";
+import { CHECK_HASH, TOTAL, isCheck, readPlace, stepHash, type Rite } from "./lib/step";
 import { Scene, type SceneState } from "./scene/Scene";
 
-const TOTAL = TAWAF.ms.length;
 const QUESTIONS = CHECK.ms.length;
 const NO_PICKS: Picks = Array(QUESTIONS).fill(null);
 
-// Each step change goes through the address, so a reload, a link and the Back button of the browser keep the step (D30).
-const goTo = (step: number) => {
-  location.hash = stepHash(step);
+// Each step change and each rite change goes through the address, so a reload, a link and the Back button of the browser keep the step (D30).
+const goTo = (rite: Rite, step: number) => {
+  location.hash = stepHash(rite, step);
 };
+
+const WALKS = { tawaf: { steps: TAWAF, beadsAt }, sai: { steps: SAI, beadsAt: saiBeadsAt } };
 
 export function App() {
   const [language, setLanguage] = useState<Language>(() => pickLanguage(readStoredLanguage(), navigator.language));
-  const [step, setStep] = useState(() => readStep(location.hash, TOTAL));
+  const [{ rite, step }, setPlace] = useState(() => readPlace(location.hash));
   const [check, setCheck] = useState(() => isCheck(location.hash));
   // The question and the picks live only in the open page, so a reload starts the check again (D53).
   const [at, setAt] = useState<number | "result">(1);
@@ -37,9 +39,11 @@ export function App() {
   const [scene, setScene] = useState<SceneState>("loading");
   const onScene = useCallback((state: SceneState) => setScene(state), []);
   const words = TEXT[language];
-  const now = TAWAF[language][step - 1];
-  const beads = beadsAt(step);
-  const last = step === TOTAL;
+  const walk = WALKS[rite];
+  const total = TOTAL[rite];
+  const now = walk.steps[language][step - 1];
+  const beads = walk.beadsAt(step);
+  const last = step === total;
   const told = typeof at === "number" && picks[at - 1] !== null;
   document.documentElement.lang = language;
 
@@ -51,7 +55,7 @@ export function App() {
 
   useEffect(() => {
     const onHash = () => {
-      setStep(readStep(location.hash, TOTAL));
+      setPlace(readPlace(location.hash));
       const inCheck = isCheck(location.hash);
       setCheck(inCheck);
       setMoved(true);
@@ -62,7 +66,7 @@ export function App() {
   }, []);
 
   // The arrow keys and a presenter clicker, which sends Page Up and Page Down (D31).
-  // In the check, Next waits for a pick (D52). On step 15, Next opens the check (D58).
+  // In the check, Next waits for a pick (D52). On tawaf step 15, Next opens the check (D58). On sa'i step 13, Next does nothing.
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
@@ -72,16 +76,16 @@ export function App() {
         if (!forward) return;
         if (told) nextQuestion();
       } else if (forward) {
-        if (step < TOTAL) goTo(step + 1);
-        else location.hash = CHECK_HASH;
+        if (step < total) goTo(rite, step + 1);
+        else if (rite === "tawaf") location.hash = CHECK_HASH;
       } else if (backward) {
-        if (step > 1) goTo(step - 1);
+        if (step > 1) goTo(rite, step - 1);
       } else return;
       event.preventDefault();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [step, check, told]);
+  }, [rite, step, total, check, told]);
 
   const chooseLanguage = (next: Language) => {
     storeLanguage(next);
@@ -90,10 +94,10 @@ export function App() {
 
   // The camera of a question is the camera of its walk step, and the result shows the wide view of step 15.
   const questions = CHECK[language];
-  const sceneStep = !check ? step : at === "result" ? TOTAL : questions[at - 1].step;
+  const sceneStep = !check ? step : at === "result" ? TOTAL.tawaf : questions[at - 1].step;
   // Before the pick, the text for a screen reader names no place, as the names hide on screen (D57).
   const names = !check || at === "result" || told;
-  const where = names ? TAWAF[language][sceneStep - 1].where : words.checkWhere;
+  const where = names ? walk.steps[language][sceneStep - 1].where : words.checkWhere;
   const notices = (
     <>
       {scene === "unsupported" && <MessageCard message={words.no3d} />}
@@ -102,12 +106,28 @@ export function App() {
     </>
   );
 
-  const circuits = beads.now ? words.circuit.replace("{n}", String(beads.now)) : beads.done === 7 ? words.allCircuits : words.noCircuit;
+  // The check belongs to tawaf, so the address #semak reads as tawaf.
+  const sai = rite === "sai";
+  const beadWords = sai ? { one: words.walk, none: words.noWalk, all: words.allWalks } : { one: words.circuit, none: words.noCircuit, all: words.allCircuits };
+  const counted = beads.now ? beadWords.one.replace("{n}", String(beads.now)) : beads.done === 7 ? beadWords.all : beadWords.none;
   return (
     <div className="app">
-      <TopBar siteName={words.siteName} switchLabel={words.languageSwitch} language={language} onLanguage={chooseLanguage} />
+      <TopBar
+        siteName={words.siteName}
+        switchLabel={words.languageSwitch}
+        language={language}
+        onLanguage={chooseLanguage}
+        rite={{
+          label: words.riteSwitch,
+          tawaf: words.riteTawaf,
+          sai: words.riteSai,
+          now: rite,
+          // The other rite opens at its step 1 (D71).
+          onRite: (other) => (other !== rite ? goTo(other, 1) : undefined),
+        }}
+      />
       <main className="app__main">
-        <Scene step={sceneStep} names={names} words={words} where={where} state={scene} onState={onScene} />
+        <Scene key={rite} rite={rite} step={sceneStep} names={names} words={words} where={where} state={scene} onState={onScene} />
         <div className="app__side">
           {scene === "failed" && <MessageCard message={words.failed} retry={{ label: words.retry, onRetry: () => location.reload() }} />}
           {check ? (
@@ -119,9 +139,9 @@ export function App() {
               picks={picks}
               onPick={(answer) => setPicks((before) => before.map((pick, index) => (index === (at as number) - 1 ? answer : pick)))}
               onNext={nextQuestion}
-              onLeave={() => goTo(TOTAL)}
+              onLeave={() => goTo("tawaf", TOTAL.tawaf)}
               onAgain={restart}
-              onStep={goTo}
+              onStep={(question) => goTo("tawaf", question)}
               focusFirst={moved}
             >
               {notices}
@@ -133,22 +153,28 @@ export function App() {
                 text={now.text}
                 step={step}
                 progress={{
-                  label: words.progress.replace("{n}", String(step)).replace("{total}", String(TOTAL)),
-                  beads: <Beads done={beads.done} now={beads.now} label={circuits} />,
+                  label: (sai ? words.saiProgress : words.progress).replace("{n}", String(step)).replace("{total}", String(total)),
+                  beads: <Beads done={beads.done} now={beads.now} label={counted} />,
                 }}
               >
                 {now.recitation && <ArabicBlock {...now.recitation} />}
                 {now.note && <Note label={words.noteLabel} text={now.note} />}
-                {last && (
-                  <button type="button" className="vh-button vh-button--quiet walk__again" onClick={() => goTo(1)}>
+                {last && !sai && (
+                  <button type="button" className="vh-button vh-button--quiet walk__again" onClick={() => goTo(rite, 1)}>
                     {words.startAgain}
                   </button>
                 )}
               </StepPanel>
               {notices}
               <StepActions
-                back={step > 1 ? { label: words.back, onAct: () => goTo(step - 1) } : undefined}
-                next={last ? { label: words.checkStart, onAct: () => (location.hash = CHECK_HASH) } : { label: words.next, onAct: () => goTo(step + 1) }}
+                back={step > 1 ? { label: words.back, onAct: () => goTo(rite, step - 1) } : undefined}
+                next={
+                  !last
+                    ? { label: words.next, onAct: () => goTo(rite, step + 1) }
+                    : sai
+                      ? { label: words.startAgain, onAct: () => goTo(rite, 1) }
+                      : { label: words.checkStart, onAct: () => (location.hash = CHECK_HASH) }
+                }
                 focusNext={moved}
               />
             </>

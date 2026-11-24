@@ -348,7 +348,7 @@ token belongs to the place, and no interface part uses it.
 Rejected: A gold light with the name beside it (the light is not green), A full
 /design-system pass for one colour (pause 2 waits for it).
 Source: specs/tawaf-walk.md
-Status: active
+Status: superseded by D72
 
 ## D36 · 2026-11-23 · On a phone, the 3D place is 240 px high in the walk
 
@@ -599,4 +599,158 @@ Why: the site is hidden from search engines and has a few testers, as for the wa
 (D42). A rollback is one click in the Cloudflare dashboard, or a git revert and a push.
 Rejected: A flag in the address (more code, and a second path to test).
 Source: specs/tawaf-check.md
+Status: active
+
+## D64 · 2026-11-24 · The sa'i walk is 13 steps: three before, walk 1 in full, one for each later walk, one to close
+
+Why: the person sees each place of the walk once, and then counts to seven, as in the
+tawaf walk (D22). The seven beads count the walks. The walk ends at Marwah, after walk 7.
+Rejected: Each walk in full (about 25 steps, and the same places show seven times), One
+walk and then "do six more" (the person does not count to seven).
+Source: specs/sai-walk.md
+Status: active
+
+## D65 · 2026-11-24 · A rite switch in the top bar opens sa'i, until full-umrah joins the walks
+
+Why: "Tawaf" and "Sa'i" sit beside BM and EN, so a person reaches sa'i in one tap from
+any step, and an ustaz moves between the rites on a projector.
+Rejected: A button on tawaf step 15 (step 15 already has "Mula semakan" and "Mula
+semula"), A link only (a person cannot find sa'i without someone's link).
+Source: specs/sai-walk.md
+Status: active
+
+## D66 · 2026-11-24 · The sa'i place is the mas'a alone
+
+Why: a long stylised hall with Safa, Marwah and the two green lights shows each spot of
+sa'i. The model stays small, and the text says where the Kaabah is.
+Rejected: The mas'a beside the mataf in one place (a larger model near the 500 KB
+ceiling of D16, and the way between the two belongs to full-umrah).
+Source: specs/sai-walk.md
+Status: active
+
+## D67 · 2026-11-24 · The sa'i walk shows two short recitations
+
+Why: "Innas-safa wal-marwata min sha'a'irillah" at Safa, and "Rabbighfir warham" between
+the green lights. They mark the two places of sa'i that a person must find.
+Rejected: Three, with the takbir and tahlil at Safa (a long block on a phone), One, at
+Safa only (the green lights get no recitation).
+Source: specs/sai-walk.md
+Status: active
+
+## D68 · 2026-11-24 · The sa'i walk ends at Marwah; tahallul stays in full-umrah
+
+Why: the shape gives tahallul to full-umrah, and the mas'a model has no place for it.
+Rejected: A tahallul step at the end (it pulls part of full-umrah into this slice).
+Source: specs/sai-walk.md
+Status: active
+
+## D69 · 2026-11-24 · The sa'i check is its own slice, after sai-walk
+
+Why: sai-walk stays at five scenarios and two areas. sai-check reuses the check of
+tawaf-check.
+Rejected: The check in this slice (more than five scenarios and three areas, so the
+slice test fails), No sa'i check (sa'i stays unchecked until full-umrah).
+Source: specs/sai-walk.md
+Status: active
+
+## D70 · 2026-11-24 · sai-walk uses the gold marker; the pilgrim figure comes later for both walks
+
+Why: the /shape pass of D46 has not run. Sa'i uses the gold marker and the path line of
+D28, so the later pass adds the figure to the two walks at once.
+Rejected: Run the /shape pass first (sai-walk waits, and the figure is planned for one
+more walk than exists).
+Source: specs/sai-walk.md
+Status: active
+
+## D71 · 2026-11-24 · The rite switch opens step 1 of the other rite
+
+Why: the step lives only in the address (D30), so step 1 needs no new state. The Back
+button of the browser returns to the step the person left.
+Rejected: The last step seen in that rite (kept in the open page, so a reload forgets
+it, and one more state to test).
+Source: specs/sai-walk.md
+Status: active
+
+## D72 · 2026-11-24 · One green token, --vh-lamp, for the green lights of the place
+
+Why: the light at the tawaf start and the two lights of the sa'i run are green on the
+day, and they mean the same thing: a green light in the place. The token belongs to the
+place, and no interface part uses it.
+Rejected: A second green token for sa'i (two greens that mean the same thing), A gold
+light with the name beside it (the light is not green).
+Supersedes: D35
+Source: specs/sai-walk.md
+Status: active
+
+## D73 · 2026-11-24 · On a phone, the top bar drops the site name to fit the rite switch
+
+Why: at 360 px, the Kaabah mark, "Isfar", the rite switch and BM and EN do not fit in
+one row. The name shows from 800 px wide, and the step text keeps its place on screen.
+Rejected: The rite switch on a second row (the top bar grows by about 56 px, and the
+step text starts lower).
+Source: specs/sai-walk.md
+Status: active
+
+## D74 · 2026-11-24 · The switch buttons have padding on their sides
+
+Why: "Tawaf" touched the edge of its button, because the switch had only a minimum
+width. `.vh-switch button` gains `padding-inline: var(--vh-space-3)`, and BM and EN keep
+their size.
+Rejected: Leave the switch as it is ("Tawaf" stays tight against its edges).
+Source: specs/sai-walk.md
+Status: active
+
+## D75 · 2026-11-24 · The sa'i walk uses motion tier 2, as the tawaf walk does
+
+Why: the step text fades in over 320 ms, and the camera flies along the mas'a in about
+1 second, so the person sees the way from one hill to the other. Under reduced motion,
+the camera cuts.
+Rejected: Tier 1 (the camera cuts between the spots).
+Source: specs/sai-walk.md
+Status: active
+
+## D76 · 2026-11-24 · Each rite has its own model file
+
+Why: masa.glb and mataf.glb stay small, and a person downloads only the place of the
+rite on screen. tools/masa.py reads the masa part of plan.json, as tools/mataf.py reads
+the rest (D43).
+Rejected: One model file with both places (each visitor downloads both, and the camera
+must fly a long way between them).
+Source: specs/sai-walk.md
+Status: active
+
+## D77 · 2026-11-24 · A rite change starts the scene again with the place of the new rite
+
+Why: Scene.tsx is keyed by the rite, so the old place stops and frees its 3D context, and
+the new one loads. After the first download, the model comes from the browser cache.
+Rejected: Keep both places loaded (twice the memory on a phone, and place.ts holds two
+scenes).
+Source: specs/sai-walk.md
+Status: active
+
+## D78 · 2026-11-24 · In the mas'a, the camera moves on a straight line
+
+Why: the mas'a is a straight hall, so the camera flies along it between two spots and
+stays inside its ends.
+Rejected: The arc around the Kaabah of D45 (the mas'a has no Kaabah, and an arc leaves
+the hall).
+Source: specs/sai-walk.md
+Status: active
+
+## D79 · 2026-11-24 · The mas'a has no roof, and each green light is a beam across the walls
+
+Why: the camera looks down from about 12 m, as in the mataf. An open hall shows Safa,
+the two green lights and Marwah in one view.
+Rejected: A roof with the camera inside the hall (low views, and the person never sees
+the whole mas'a at once).
+Source: specs/sai-walk.md
+Status: active
+
+## D80 · 2026-11-24 · The sa'i walk ships with no feature flag
+
+Why: the site is hidden from search engines and has a few testers, as for the walk and
+the check (D42, D63). A rollback is one click in the Cloudflare dashboard, or a git
+revert and a push.
+Rejected: A flag in the address (more code, and a second path to test).
+Source: specs/sai-walk.md
 Status: active

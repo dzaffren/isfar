@@ -73,3 +73,14 @@ html { scroll-padding-bottom: calc(var(--vh-control) + var(--vh-space-8)); }
 .check__missed { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--vh-space-3); }
 .check__missed .vh-button { width: 100%; justify-content: flex-start; text-align: left; }
 .walk__again { justify-self: start; }
+
+/* The sa'i walk: the rite switch in the top bar, and the top-view map of the mas'a, a strip three times as wide as it is high. */
+.topbar__rite { margin-left: auto; }
+/* On a phone, the top bar holds the Kaabah mark and the two switches in one row, and the site name shows from 800 px. */
+@media (max-width: 799px) {
+  .topbar { gap: var(--vh-space-4); }
+  .topbar__name { display: none; }
+}
+.map--masa { width: min(100cqw, 300cqh); height: auto; aspect-ratio: 3; }
+.map__hall { fill: var(--vh-cloth); stroke: var(--vh-edge); stroke-width: 0.5; }
+.map__hill { fill: var(--vh-sunken); stroke: var(--vh-edge); stroke-width: 0.5; }

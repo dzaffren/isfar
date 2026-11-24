@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { HIJR, RUKUN_YAMANI } from "../src/scene/mataf";
-import { MODEL, SIZES, expectBeads, expectCamera, expectNotices, lightAt, markerAt, names, noWebGL, scene, title } from "./helpers";
+import { MODEL, SIZES, expectApart, expectBeads, expectCamera, expectNotices, kaabahIsDrawn, markerAt, modelParts, names, noWebGL, scene, title } from "./helpers";
 
 const MS = {
   no3d: "Peranti ini tidak dapat memaparkan tempat 3D.",
@@ -20,30 +20,6 @@ async function tapNext(page: Page, times: number) {
   for (let tap = 0; tap < times; tap += 1) await next(page).click();
 }
 
-async function kaabahIsDrawn(page: Page) {
-  expect(await lightAt(page, 0.5, 0.45), "the kiswah is dark at the centre of the wide view").toBeLessThan(80);
-}
-
-// The names of the mesh nodes in the model file, read from the JSON chunk of the .glb.
-async function modelParts(page: Page): Promise<string[]> {
-  return page.evaluate(async () => {
-    const bytes = await (await fetch("/models/mataf.glb")).arrayBuffer();
-    const view = new DataView(bytes);
-    const length = view.getUint32(12, true);
-    const json = JSON.parse(new TextDecoder().decode(new Uint8Array(bytes, 20, length)));
-    return json.nodes.map((node: { name: string }) => node.name);
-  });
-}
-
-function expectApart(boxes: { x: number; y: number; width: number; height: number }[]) {
-  boxes.forEach((one, index) => {
-    for (const two of boxes.slice(index + 1)) {
-      const apart = one.x + one.width <= two.x || two.x + two.width <= one.x || one.y + one.height <= two.y || two.y + two.height <= one.y;
-      expect(apart, "two names overlap").toBe(true);
-    }
-  });
-}
-
 for (const size of SIZES) {
   test.describe(`${size.width}x${size.height}`, () => {
     test.use({ viewport: size });
@@ -59,7 +35,7 @@ for (const size of SIZES) {
         await expect(scene(page)).toHaveAttribute("data-state", "shown", { timeout: 15_000 });
         await expectCamera(page, 1);
         await kaabahIsDrawn(page);
-        expect(await modelParts(page)).toEqual(expect.arrayContaining(["kiswah", "stone", "hijr", "maqam", "arcade", "arch", "guide", "lamp"]));
+        expect(await modelParts(page, "mataf")).toEqual(expect.arrayContaining(["kiswah", "stone", "hijr", "maqam", "arcade", "arch", "guide", "lamp"]));
         await expect(names(page)).toHaveText(["Hajar Aswad", "Pintu Kaabah", "Hijr Ismail", "Rukun Yamani", "Maqam Ibrahim"], { useInnerText: true });
         const frame = (await page.locator(".scene__frame").boundingBox())!;
         const boxes = await Promise.all((await names(page).all()).map(async (name) => (await name.boundingBox())!));
