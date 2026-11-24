@@ -7,7 +7,7 @@ The one design system for Virtual Hajj. The reasons for each value are in `docs/
 - **Friendly, simple, encouraging.** Never preachy, heavy or old-fashioned.
 - **Materials from the pilgrimage.** Marble is the ground. Ihram cloth is each panel. The kiswah, with one flat gold band, holds the panel header and the recitation.
 - **Gold means "act here".** The main button, the current bead, the switch that is on.
-- **One green, for one lamp.** `--vh-lamp` is the green light that marks the start of tawaf. It belongs to the place, and no interface part uses it.
+- **One green, for the green lights of the place.** `--vh-lamp` is the light that marks the start of tawaf, and the two lights of the sa'i run. It belongs to the place, and no interface part uses it.
 - **Progress is seven counter beads.** Tawaf and sa'i each count seven.
 - **Large text.** 18px body, 16px at the smallest, 48px touch targets. Text passes WCAG AA in light and dark.
 - **Light is the default.** Dark is near-black and gold.
