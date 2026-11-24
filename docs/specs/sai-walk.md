@@ -1,6 +1,6 @@
 # Sa'i walk
 
-**Version:** v1 · **Status:** Refined · **Type:** Feature · **Project type:** Web UI
+**Version:** v1 · **Status:** Built · **Type:** Feature · **Project type:** Web UI
 
 **Shape doc:** docs/specs/virtual-hajj/shape.md
 **Depends on:** `tawaf-walk`
@@ -353,6 +353,8 @@ This is a draft in the Shafi'i school (D24). Its source is `src/content/sai.ts`.
 | O15 | A rite change drops one 3D place and loads the other, with a new 3D context. | flag | spec p3 | user | Resolved | Swap the place: the scene starts again for the new rite, with a short loading card. "Keep both places loaded" was rejected (D77). 2026-11-24 |
 | O16 | Pause 2 put the green lights across the ceiling. A camera at about 12 m cannot see under a roof. | question | spec p3 | user | Resolved | No roof. Each green light is a beam across the top of the walls, with bands down them. "A roof, with the camera inside" was rejected (D79). 2026-11-24 |
 | O17 | Does the sa'i walk ship behind a feature flag? | question | spec p3 | user | Resolved | No flag. The rollback is the Cloudflare dashboard, or a `git revert`. "A flag in the address" was rejected (D80). 2026-11-24 |
+| O18 | The rule "the camera stays inside the ends of the hall" cannot hold for the wide view. With a 40° view, the 120 m hall fits on screen only from about 160 m up, or from behind one of its ends. | flag | build | user | Decided alone | Chose: the wide view of steps 1 and 13 stands 40 m up, 50 m beyond the end behind Safa or Marwah, and looks along the hall. Each view and each move stays above the walls, and each walk view stays inside the ends. Other: a wide view from about 160 m above the middle of the hall, where the hall is a thin strip. Undo: change the wide branch of `saiViewOf` in `src/scene/views.ts` and its test. 2026-11-24 |
+| O19 | `e2e/sai.spec.ts` needs `kaabahIsDrawn`, `expectApart` and `modelParts` from `e2e/walk.spec.ts`, which the plan did not name. | flag | build | user | Decided alone | Chose: move the three into `e2e/helpers.ts`, and give `modelParts` the model name. The tawaf tests stay the same. Other: copy them into `e2e/sai.spec.ts`. Undo: move them back into `e2e/walk.spec.ts`. 2026-11-24 |
 
 _Never delete this section or its rows. See references/ledger.md._
 
@@ -479,7 +481,7 @@ Cut: a router, a state library, a second `Scene` component, one model file for b
 | 5. The mas'a runs at old-phone speed | `e2e/speed.spec.ts`. Not run: no computer with a graphics chip is at hand (O14). The test stays, for when one is. | `SPEED_URL=https://isfar-57q.pages.dev pnpm e2e:speed` |
 | Rule: each step text is 40 words or fewer | `src/content/sai.test.ts` | `pnpm test` |
 | Rule: the camera cuts under reduced motion | `e2e/sai.spec.ts`, with reduced motion set in Playwright | `pnpm e2e --project=firefox` |
-| Rule: the camera stays inside the ends of the hall, above the walls | `src/scene/views.test.ts`: each sa'i view and 10 points on each move between two neighbour steps | `pnpm test` |
+| Rule: the camera stays above the walls, and each walk view stays inside the ends of the hall (O18) | `src/scene/views.test.ts`: each sa'i view, and 11 points on each move between two neighbour steps | `pnpm test` |
 | Rule: the tawaf walk and the check do not change | `e2e/walk.spec.ts` and `e2e/check.spec.ts`, as they are | `pnpm e2e --project=firefox` |
 | Rule: the 3D download stays under 500 KB | `scripts/check-size.mjs` | `pnpm build && pnpm size` |
 
