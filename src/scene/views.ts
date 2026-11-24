@@ -1,3 +1,4 @@
+import { MASA, SAI_NAME_HEIGHT, SAI_PARTS, SAI_SPOTS, type SaiPart, type SaiSpot } from "./masa";
 import { GREEN_LIGHT, HAJAR_ASWAD, PARTS, SPOTS, type Part, type Spot } from "./mataf";
 
 // The camera of each step, in the plan's metres: x and y on the floor, z up. three.js is y up, and place.ts turns it.
@@ -67,4 +68,42 @@ const WIDE_PUSH: Record<Part, readonly [number, number]> = {
 
 export function namePlace(part: Part, view: Spot["view"]): readonly [number, number] {
   return view === "wide" ? WIDE_PUSH[part] : [0, -38];
+}
+
+// The camera of a sa'i step. A wide view stands high behind one hill and looks along the whole hall.
+// A walk view stands behind and above the marker, inside the hall, and looks the way of the view.
+const WIDE_BACK = MASA.length / 2 + 50;
+const HALL_END = MASA.length / 2 + 10;
+
+export function saiViewOf(step: number): View {
+  const spot = SAI_SPOTS[step - 1];
+  if (spot.view === "wide") {
+    const end = spot.at && spot.at[0] > 0 ? 1 : -1;
+    return { from: [end * WIDE_BACK, 0, 40], to: [end * 20, 0, 0] };
+  }
+  const [x] = spot.at!;
+  const way = spot.view === "marwah" ? 1 : -1;
+  const back = Math.min(Math.max(x - way * 18, -HALL_END), HALL_END);
+  return { from: [back, -6, 22], to: [x + way * 14, 0, 1] };
+}
+
+// The camera between two views of the mas'a, at t from 0 to 1, on a straight line along the hall (D78).
+export function alongHall(one: View, two: View, t: number): View {
+  const mix = (a: V3, b: V3): V3 => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
+  return { from: mix(one.from, two.from), to: mix(one.to, two.to) };
+}
+
+export function saiNameAnchor(part: SaiPart): V3 {
+  return [SAI_PARTS[part][0], SAI_PARTS[part][1], SAI_NAME_HEIGHT[part]];
+}
+
+// A wide view looks along the hall, so the three parts stand in one line down the middle. Each name moves to one side.
+const SAI_WIDE_PUSH: Record<SaiPart, readonly [number, number]> = {
+  safa: [84, -24],
+  green: [-84, -6],
+  marwah: [84, 8],
+};
+
+export function saiNamePlace(part: SaiPart, view: SaiSpot["view"]): readonly [number, number] {
+  return view === "wide" ? SAI_WIDE_PUSH[part] : [0, -38];
 }

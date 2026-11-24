@@ -16,7 +16,7 @@
     "e2e": "playwright test",
     "e2e:speed": "playwright test --project=speed",
     "size": "node scripts/check-size.mjs",
-    "model": "blender -b -P tools/mataf.py"
+    "model": "blender -b -P tools/mataf.py && blender -b -P tools/masa.py"
   },
   "dependencies": {
     "react": "19.3.1",

@@ -20,25 +20,44 @@ export const SAI_PARTS: Record<SaiPart, Point> = {
   green: [(GREEN[0] + GREEN[1]) / 2, 0],
 };
 
-// Where the marker stands on each step, which names show, and which way the path line runs.
+// The height of each name above the floor, in metres: over the top of each hill, and over the walls for the green lights.
+export const SAI_NAME_HEIGHT: Record<SaiPart, number> = {
+  safa: MASA.safa.height + 2.5,
+  marwah: MASA.marwah.height + 2.5,
+  green: MASA.height + 1.5,
+};
+
+// The floor rises over each hill: a low mound, half an ellipsoid, as tools/masa.py builds it.
+export function groundAt([x, y]: Point): number {
+  for (const hill of [MASA.safa, MASA.marwah]) {
+    const across = (x - hill.at[0]) / hill.radius;
+    const along = (y - hill.at[1]) / (MASA.width / 2);
+    const inside = 1 - across ** 2 - along ** 2;
+    if (inside > 0) return hill.height * Math.sqrt(inside);
+  }
+  return 0;
+}
+
+// Where the marker stands on each step, which names show, which way the path line runs, and the way the camera looks.
 // "marwah" runs from Safa to Marwah, "safa" runs back. Null shows no path line.
-export type SaiSpot = { at: Point | null; names: SaiPart[]; towards: "marwah" | "safa" | null };
+// A wide view looks along the whole hall, from behind Safa, or from behind Marwah when the marker is there.
+export type SaiSpot = { at: Point | null; names: SaiPart[]; towards: "marwah" | "safa" | null; view: "wide" | "marwah" | "safa" };
 
 const ON_SAFA: Point = [WALK.from - 3, 0];
 const ON_MARWAH: Point = [WALK.to + 2, 0];
 
 export const SAI_SPOTS: SaiSpot[] = [
-  { at: null, names: ["safa", "marwah", "green"], towards: null },
-  { at: [WALK.from + 4, 0], names: ["safa"], towards: null },
-  { at: ON_SAFA, names: ["safa"], towards: null },
-  { at: [GREEN[0] - 8, 0], names: ["green"], towards: "marwah" },
-  { at: [(GREEN[0] + GREEN[1]) / 2, 0], names: ["green"], towards: "marwah" },
-  { at: ON_MARWAH, names: ["marwah"], towards: "marwah" },
-  { at: ON_SAFA, names: ["safa"], towards: "safa" },
-  { at: ON_MARWAH, names: ["marwah"], towards: "marwah" },
-  { at: ON_SAFA, names: ["safa"], towards: "safa" },
-  { at: ON_MARWAH, names: ["marwah"], towards: "marwah" },
-  { at: ON_SAFA, names: ["safa"], towards: "safa" },
-  { at: ON_MARWAH, names: ["marwah"], towards: "marwah" },
-  { at: ON_MARWAH, names: ["safa", "marwah", "green"], towards: null },
+  { at: null, names: ["safa", "marwah", "green"], towards: null, view: "wide" },
+  { at: [WALK.from + 4, 0], names: ["safa"], towards: null, view: "safa" },
+  { at: ON_SAFA, names: ["safa"], towards: null, view: "marwah" },
+  { at: [GREEN[0] - 8, 0], names: ["green"], towards: "marwah", view: "marwah" },
+  { at: [(GREEN[0] + GREEN[1]) / 2, 0], names: ["green"], towards: "marwah", view: "marwah" },
+  { at: ON_MARWAH, names: ["marwah"], towards: "marwah", view: "marwah" },
+  { at: ON_SAFA, names: ["safa"], towards: "safa", view: "safa" },
+  { at: ON_MARWAH, names: ["marwah"], towards: "marwah", view: "marwah" },
+  { at: ON_SAFA, names: ["safa"], towards: "safa", view: "safa" },
+  { at: ON_MARWAH, names: ["marwah"], towards: "marwah", view: "marwah" },
+  { at: ON_SAFA, names: ["safa"], towards: "safa", view: "safa" },
+  { at: ON_MARWAH, names: ["marwah"], towards: "marwah", view: "marwah" },
+  { at: ON_MARWAH, names: ["safa", "marwah", "green"], towards: null, view: "wide" },
 ];

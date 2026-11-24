@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
+import { SAI_SPOTS } from "./masa";
 import { SPOTS } from "./mataf";
 import plan from "./plan.json" with { type: "json" };
-import { between, viewOf, type V3, type View } from "./views";
+import { alongHall, between, saiViewOf, viewOf, type V3, type View } from "./views";
 
 const STEPS = SPOTS.length;
 const across = (view: View) => Math.hypot(view.from[0], view.from[1]);
@@ -49,5 +50,57 @@ describe("viewOf", () => {
         }
       }
     });
+  });
+});
+
+describe("the camera in the mas'a", () => {
+  const { length, height } = plan.masa;
+  const END = length / 2 + 10;
+  const SAI_STEPS = SAI_SPOTS.length;
+  const SAI_MOVES: [number, number][] = [];
+  for (let step = 1; step < SAI_STEPS; step += 1) SAI_MOVES.push([step, step + 1], [step + 1, step]);
+  SAI_MOVES.push([SAI_STEPS, 1]);
+
+  it("moves on a straight line from the first view to the second", () => {
+    const one = saiViewOf(4);
+    const two = saiViewOf(5);
+    for (let axis = 0; axis < 3; axis += 1) {
+      expect(alongHall(one, two, 0).from[axis]).toBeCloseTo(one.from[axis]);
+      expect(alongHall(one, two, 1).to[axis]).toBeCloseTo(two.to[axis]);
+      expect(alongHall(one, two, 0.5).from[axis]).toBeCloseTo((one.from[axis] + two.from[axis]) / 2);
+    }
+  });
+
+  it("stays above the walls on each view and on 10 points of each move", () => {
+    for (const [from, to] of SAI_MOVES) {
+      for (let point = 0; point <= 10; point += 1) {
+        const at = alongHall(saiViewOf(from), saiViewOf(to), point / 10).from;
+        expect(at[2], `step ${from} to step ${to}, point ${point}`).toBeGreaterThan(height + 1);
+      }
+    }
+  });
+
+  it("stays inside the ends of the hall on each walk view", () => {
+    SAI_SPOTS.forEach((spot, index) => {
+      if (spot.view === "wide") return;
+      const { from } = saiViewOf(index + 1);
+      expect(Math.abs(from[0]), `step ${index + 1}`).toBeLessThanOrEqual(END);
+      expect(Math.abs(from[1]), `step ${index + 1}`).toBeLessThan(plan.masa.width / 2);
+    });
+  });
+
+  it("looks from behind the marker towards the way of the view", () => {
+    SAI_SPOTS.forEach((spot, index) => {
+      if (!spot.at || spot.view === "wide") return;
+      const { from, to } = saiViewOf(index + 1);
+      const way = spot.view === "marwah" ? 1 : -1;
+      expect(Math.sign(spot.at[0] - from[0]), `step ${index + 1}: the camera is behind the marker`).toBe(way);
+      expect(Math.sign(to[0] - from[0]), `step ${index + 1}: the camera looks the way of the view`).toBe(way);
+    });
+  });
+
+  it("looks along the whole hall from behind the hill of the marker on a wide view", () => {
+    expect(saiViewOf(1).from[0]).toBeLessThan(-END);
+    expect(saiViewOf(13).from[0]).toBeGreaterThan(END);
   });
 });
