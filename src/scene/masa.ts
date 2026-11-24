@@ -41,6 +41,7 @@ export function groundAt([x, y]: Point): number {
 // Where the marker stands on each step, which names show, which way the path line runs, and the way the camera looks.
 // "marwah" runs from Safa to Marwah, "safa" runs back. Null shows no path line.
 // A wide view looks along the whole hall, from behind Safa, or from behind Marwah when the marker is there.
+// On a hill, the camera stands beyond it and looks towards the next hill, back along the walk that just ended.
 export type SaiSpot = { at: Point | null; names: SaiPart[]; towards: "marwah" | "safa" | null; view: "wide" | "marwah" | "safa" };
 
 const ON_SAFA: Point = [WALK.from - 3, 0];
@@ -52,12 +53,12 @@ export const SAI_SPOTS: SaiSpot[] = [
   { at: ON_SAFA, names: ["safa"], towards: null, view: "marwah" },
   { at: [GREEN[0] - 8, 0], names: ["green"], towards: "marwah", view: "marwah" },
   { at: [(GREEN[0] + GREEN[1]) / 2, 0], names: ["green"], towards: "marwah", view: "marwah" },
-  { at: ON_MARWAH, names: ["marwah"], towards: "marwah", view: "marwah" },
-  { at: ON_SAFA, names: ["safa"], towards: "safa", view: "safa" },
-  { at: ON_MARWAH, names: ["marwah"], towards: "marwah", view: "marwah" },
-  { at: ON_SAFA, names: ["safa"], towards: "safa", view: "safa" },
-  { at: ON_MARWAH, names: ["marwah"], towards: "marwah", view: "marwah" },
-  { at: ON_SAFA, names: ["safa"], towards: "safa", view: "safa" },
-  { at: ON_MARWAH, names: ["marwah"], towards: "marwah", view: "marwah" },
+  { at: ON_MARWAH, names: ["marwah"], towards: "marwah", view: "safa" },
+  { at: ON_SAFA, names: ["safa"], towards: "safa", view: "marwah" },
+  { at: ON_MARWAH, names: ["marwah"], towards: "marwah", view: "safa" },
+  { at: ON_SAFA, names: ["safa"], towards: "safa", view: "marwah" },
+  { at: ON_MARWAH, names: ["marwah"], towards: "marwah", view: "safa" },
+  { at: ON_SAFA, names: ["safa"], towards: "safa", view: "marwah" },
+  { at: ON_MARWAH, names: ["marwah"], towards: "marwah", view: "safa" },
   { at: ON_MARWAH, names: ["safa", "marwah", "green"], towards: null, view: "wide" },
 ];

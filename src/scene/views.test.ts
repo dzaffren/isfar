@@ -1,5 +1,6 @@
+import { PerspectiveCamera, Vector3 } from "three";
 import { describe, expect, it } from "vitest";
-import { SAI_SPOTS } from "./masa";
+import { SAI_SPOTS, WALK, groundAt } from "./masa";
 import { SPOTS } from "./mataf";
 import plan from "./plan.json" with { type: "json" };
 import { alongHall, between, saiViewOf, viewOf, type V3, type View } from "./views";
@@ -102,5 +103,35 @@ describe("the camera in the mas'a", () => {
   it("looks along the whole hall from behind the hill of the marker on a wide view", () => {
     expect(saiViewOf(1).from[0]).toBeLessThan(-END);
     expect(saiViewOf(13).from[0]).toBeGreaterThan(END);
+  });
+  // The scene is about square on a projector at 960x540, and 1.5 times as wide as it is high on a phone.
+  const onScreen = (view: View, aspect: number, [x, y, z]: V3) => {
+    const camera = new PerspectiveCamera(40, aspect, 1, 1000);
+    camera.position.set(view.from[0], view.from[2], -view.from[1]);
+    camera.lookAt(view.to[0], view.to[2], -view.to[1]);
+    camera.updateMatrixWorld();
+    const point = new Vector3(x, z, -y).project(camera);
+    return point.z < 1 && Math.abs(point.x) <= 1 && Math.abs(point.y) <= 1;
+  };
+
+  it("shows the marker of each step, on a projector and on a phone", () => {
+    SAI_SPOTS.forEach((spot, index) => {
+      if (!spot.at) return;
+      for (const aspect of [1, 1.5]) {
+        const marker: V3 = [spot.at[0], spot.at[1], groundAt(spot.at)];
+        expect(onScreen(saiViewOf(index + 1), aspect, marker), `step ${index + 1}, aspect ${aspect}`).toBe(true);
+      }
+    });
+  });
+
+  it("shows 20 m or more of the path line on each step of a walk, on a projector and on a phone", () => {
+    SAI_SPOTS.forEach((spot, index) => {
+      if (!spot.towards) return;
+      for (const aspect of [1, 1.5]) {
+        let shown = 0;
+        for (let x = WALK.from; x <= WALK.to; x += 1) if (onScreen(saiViewOf(index + 1), aspect, [x, 0, 0])) shown += 1;
+        expect(shown, `step ${index + 1}, aspect ${aspect}`).toBeGreaterThanOrEqual(20);
+      }
+    });
   });
 });
