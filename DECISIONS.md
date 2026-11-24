@@ -708,3 +708,49 @@ the camera cuts.
 Rejected: Tier 1 (the camera cuts between the spots).
 Source: specs/sai-walk.md
 Status: active
+
+## D76 · 2026-11-24 · Each rite has its own model file
+
+Why: masa.glb and mataf.glb stay small, and a person downloads only the place of the
+rite on screen. tools/masa.py reads the masa part of plan.json, as tools/mataf.py reads
+the rest (D43).
+Rejected: One model file with both places (each visitor downloads both, and the camera
+must fly a long way between them).
+Source: specs/sai-walk.md
+Status: active
+
+## D77 · 2026-11-24 · A rite change starts the scene again with the place of the new rite
+
+Why: Scene.tsx is keyed by the rite, so the old place stops and frees its 3D context, and
+the new one loads. After the first download, the model comes from the browser cache.
+Rejected: Keep both places loaded (twice the memory on a phone, and place.ts holds two
+scenes).
+Source: specs/sai-walk.md
+Status: active
+
+## D78 · 2026-11-24 · In the mas'a, the camera moves on a straight line
+
+Why: the mas'a is a straight hall, so the camera flies along it between two spots and
+stays inside its ends.
+Rejected: The arc around the Kaabah of D45 (the mas'a has no Kaabah, and an arc leaves
+the hall).
+Source: specs/sai-walk.md
+Status: active
+
+## D79 · 2026-11-24 · The mas'a has no roof, and each green light is a beam across the walls
+
+Why: the camera looks down from about 12 m, as in the mataf. An open hall shows Safa,
+the two green lights and Marwah in one view.
+Rejected: A roof with the camera inside the hall (low views, and the person never sees
+the whole mas'a at once).
+Source: specs/sai-walk.md
+Status: active
+
+## D80 · 2026-11-24 · The sa'i walk ships with no feature flag
+
+Why: the site is hidden from search engines and has a few testers, as for the walk and
+the check (D42, D63). A rollback is one click in the Cloudflare dashboard, or a git
+revert and a push.
+Rejected: A flag in the address (more code, and a second path to test).
+Source: specs/sai-walk.md
+Status: active
