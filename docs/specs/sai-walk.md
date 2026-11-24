@@ -231,6 +231,107 @@ New words on the controls: "Tawaf" and "Sa'i" on the rite switch, in both langua
 | Sound for the recitations | No slice. Not in the shape. |
 | The site listed in search engines | `full-umrah` (D14) |
 
+## Interface
+
+The sa'i walk uses the one walk screen, built only from the kiswah and marble design system in `docs/design/design-system/`.
+
+```mermaid
+flowchart TB
+    B["Top bar: Kaabah mark, rite switch Tawaf and Sa'i, BM and EN"] -- "Sa'i: opens #sai-1" --> P["Step panel: Sa'i · Langkah 5 daripada 13, seven beads, title, text, Arabic block, note"]
+    B -- "Tawaf: opens #tawaf-1" --> T["Tawaf walk, as it is"]
+    A["Actions bar: Kembali, Seterusnya or Mula semula"] -- "step number" --> P
+    A -- "step number" --> S["Scene: 3D mas'a with camera, marker, path line and names"]
+    S -- "no 3D, or a failed download" --> M["Top-view map of the mas'a: Safa left, Marwah right"]
+    P -- "a tap on the note" --> N["The note opens: the ruling of sa'i in each school"]
+```
+
+The rite switch picks the walk, the actions bar sets the step, the step panel shows its words, and the scene shows its place in 3D or on the map.
+
+**What is new on the screen**
+
+| Part | What it shows |
+| --- | --- |
+| Rite switch | The language switch primitive, a second time: "Tawaf" and "Sa'i", with the rite on screen in gold. It sits beside BM and EN. |
+| Header of the step panel | "Sa'i · Langkah 5 daripada 13", and the seven beads. The beads count the walks. For a screen reader: "Perjalanan 2 daripada 7". |
+| Scene | The 3D mas'a, or its top-view map. The names "Bukit Safa", "Bukit Marwah" and "Lampu hijau" show for the part in focus. |
+| Top-view map | A strip three times as wide as it is high. Safa is on the left and Marwah on the right. Two green bands cross it. The gold path line has arrows towards the hill of that walk. |
+
+Everything else is the tawaf walk as it is: the step panel, the Arabic block, the note, the notices, the cards and the actions bar.
+The scene has the same four states as the tawaf walk. The loading card says "Memuatkan mas'a".
+
+**The 3D mas'a, as /build makes it**
+
+| Part | Material |
+| --- | --- |
+| Floor | Marble, as the mataf floor |
+| Walls and the ceiling | The cloth colour, with plain arches along the walls |
+| Safa and Marwah | A low mound of rock at each end, in the sunken and edge colours |
+| Two green lights | Bands of `--vh-lamp` across the ceiling and down the walls (O11) |
+| Marker and path line | The gold marker and the gold path line of the tawaf walk (D28) |
+
+**Motion tier:** 2, as the tawaf walk (O13). The step text fades in and rises 12 px in 320 ms. The camera flies along the mas'a in about 1 second. Under reduced motion, the text fades in 160 ms, and the camera cuts.
+
+**Components used:** Step panel with its header, Progress beads, Kaabah mark, Language switch (twice), Button and quiet Button, Arabic block, Note, Notice, Scene card (loading and message), and the marble, cloth and kiswah materials.
+
+**New components:** `MasaMap`, the top-view map of the mas'a. It is scene content, as `MatafMap` is, and it uses the map classes and colours that exist.
+
+**Top bar on a phone:** one row with the Kaabah mark, the rite switch and BM and EN. "Isfar" shows from 800 px wide (O9).
+
+**Access:** The rite switch is a group with the label "Ibadah". Each of its buttons says if it is on. The scene carries a text description of each step's view. Each control is 44 px high or more.
+
+**Preview:** `http://localhost:5199/preview/sai-walk.html`, after `pnpm dev --port 5199`. It lists 15 frames, and each frame is a working sa'i screen from the real components. The top-view map stands in for the 3D mas'a.
+
+**Changed in the design system:** `.vh-switch button` in `styles.css` gains side padding (O10). The readme says that `--vh-lamp` lights both rites (O11).
+
+**Built in this pause, for /build to keep:** `src/content/sai.ts`, `src/scene/masa.ts`, the `masa` part of `src/scene/plan.json`, `src/components/MasaMap.tsx`, the rite prop of `src/components/TopBar.tsx`, the new words in `src/content/text.ts`, and the sa'i rules in `src/app.css`.
+**For the preview only:** `preview/sai-walk.html` and `src/preview/`. No build ships them.
+
+**Checks:** The static drift check passes on 8 files. The rendered drift check passes on 7 frames, in light and dark. `pnpm typecheck` passes. The `design-taste-frontend` skill is not installed, so its inspector did not run.
+
+### Text of the steps
+
+This is a draft in the Shafi'i school (D24). Its source is `src/content/sai.ts`. The user corrects it here. The longest step has 34 words.
+
+| # | Malay | English |
+| --- | --- | --- |
+| 1 | **Mas'a dan bahagiannya.** Sa'i ialah tujuh perjalanan antara Bukit Safa dan Bukit Marwah, selepas tawaf. Kenali tiga tempat ini dahulu: Bukit Safa, Bukit Marwah, dan dua lampu hijau di antaranya. | **The mas'a and its parts.** Sa'i is seven walks between the hills of Safa and Marwah, after a tawaf. First learn these three places: Safa, Marwah, and the two green lights between them. |
+| 2 | **Sebelum bermula.** Sa'i dilakukan selepas tawaf. Wuduk tidak wajib untuk sa'i, tetapi sunat. Selepas solat sunat tawaf dan minum zamzam, pergi ke Bukit Safa di hujung mas'a. | **Before you start.** Sa'i comes after a tawaf. Wuduk is not required for sa'i, but it is sunat. After the two rakaat and the zamzam, go to Safa at one end of the mas'a. |
+| 3 | **Bukit Safa.** Naik sedikit ke Bukit Safa dan berniat sa'i. Hadap ke arah Kaabah, di sebelah masjid, angkat kedua-dua tangan, bertakbir dan berdoa. Pada perjalanan pertama, baca: | **Safa.** Go a little way up Safa and make the niat of sa'i. Face the Kaabah, on the side of the mosque, raise both hands, say takbir and make doa. On the first walk, say: |
+| 4 | **Ke arah Marwah.** Turun dari Safa dan berjalan ke arah Marwah seperti biasa. Anda boleh berzikir atau berdoa dalam apa-apa bahasa sepanjang sa'i. | **Towards Marwah.** Come down from Safa and walk towards Marwah at a usual pace. You can make zikir or doa in any language for the whole sa'i. |
+| 5 | **Antara lampu hijau.** Di antara dua lampu hijau, lelaki berjalan cepat dengan langkah pendek. Wanita berjalan seperti biasa. Baca doa ini: | **Between the green lights.** Between the two green lights, men walk quickly with short steps. Women walk at a usual pace. Say this doa: |
+| 6 | **Bukit Marwah.** Apabila anda sampai di Bukit Marwah, satu perjalanan selesai. Naik sedikit, hadap ke arah Kaabah, dan berdoa seperti di Safa. | **Marwah.** When you reach Marwah, one walk is done. Go a little way up, face the Kaabah, and make doa as at Safa. |
+| 7 | **Perjalanan 2.** Dari Marwah, berjalan kembali ke Safa. Perjalanan ini dikira sebagai perjalanan kedua. Lelaki berjalan cepat lagi di antara lampu hijau. | **Walk 2.** From Marwah, walk back to Safa. This counts as the second walk. Men walk quickly again between the green lights. |
+| 8 | **Perjalanan 3.** Dari Safa ke Marwah sekali lagi. Pada setiap perjalanan, lelaki berjalan cepat di antara dua lampu hijau, dan semua orang berjalan seperti biasa di bahagian lain. | **Walk 3.** From Safa to Marwah again. On each walk, men walk quickly between the two green lights, and everyone walks at a usual pace elsewhere. |
+| 9 | **Perjalanan 4.** Kembali ke Safa. Setiap kali anda sampai di Safa atau Marwah, hadap ke arah Kaabah dan berdoa sebelum meneruskan perjalanan. | **Walk 4.** Back to Safa. Each time you reach Safa or Marwah, face the Kaabah and make doa before you go on. |
+| 10 | **Perjalanan 5.** Ke Marwah. Jika anda ragu tentang bilangan perjalanan, ambil bilangan yang lebih sedikit. Contohnya, jika ragu antara lima dan enam, kira sebagai lima. | **Walk 5.** To Marwah. If you are not sure of the count, take the lower number. For example, if you are not sure between five and six, count five. |
+| 11 | **Perjalanan 6.** Kembali ke Safa. Jika penat, anda boleh berhenti rehat sebentar dan menyambung semula. Jika wuduk terbatal, sa'i anda tetap sah. | **Walk 6.** Back to Safa. If you are tired, you can stop to rest a little, and then go on. If your wuduk breaks, your sa'i is still valid. |
+| 12 | **Perjalanan 7.** Perjalanan terakhir, dari Safa ke Marwah. Sa'i tamat apabila anda sampai di Bukit Marwah. | **Walk 7.** The last walk, from Safa to Marwah. Sa'i ends when you reach Marwah. |
+| 13 | **Sa'i selesai.** Anda telah melengkapkan tujuh perjalanan, dan sa'i tamat di Marwah. Selepas ini ialah tahallul: bercukur atau menggunting rambut. Bahagian itu akan datang kemudian. | **Sa'i is complete.** You have completed seven walks, and sa'i ends at Marwah. Next comes tahallul: a shave or a cut of the hair. That part of the site comes later. |
+
+**Recitations**
+
+| Step | Arabic | Sound | Meaning, Malay | Meaning, English |
+| --- | --- | --- | --- | --- |
+| 3 | إِنَّ الصَّفَا وَالْمَرْوَةَ مِنْ شَعَائِرِ اللَّهِ | Innas-safa wal-marwata min sha'a'irillah | Sesungguhnya Safa dan Marwah ialah sebahagian daripada syiar Allah. | Safa and Marwah are among the signs of Allah. |
+| 5 | رَبِّ اغْفِرْ وَارْحَمْ، إِنَّكَ أَنْتَ الْأَعَزُّ الْأَكْرَمُ | Rabbighfir warham, innaka antal a'azzul akram | Wahai Tuhanku, ampunilah dan rahmatilah. Sesungguhnya Engkau Maha Perkasa lagi Maha Pemurah. | My Lord, forgive and have mercy. You are the Most Mighty, the Most Generous. |
+
+**Note on the other schools**
+
+| Step | Malay | English |
+| --- | --- | --- |
+| 2 | Syafi'i, Maliki dan Hanbali: sa'i ialah rukun umrah, dan umrah tidak sah tanpanya. Hanafi: sa'i wajib tetapi bukan rukun. Jika ditinggalkan, umrah sah dan dam dikenakan. | Shafi'i, Maliki and Hanbali: sa'i is a rukun of umrah, and the umrah is not valid without it. Hanafi: sa'i is required but is not a rukun. If you leave it, the umrah is valid and a dam is due. |
+
+**Other words**
+
+| Part | Malay | English |
+| --- | --- | --- |
+| Rite switch | Tawaf, Sa'i. For a screen reader: Ibadah. | Tawaf, Sa'i. For a screen reader: Rite. |
+| Step count | Sa'i · Langkah 5 daripada 13 | Sa'i · Step 5 of 13 |
+| Beads, for a screen reader | Perjalanan 2 daripada 7. Perjalanan belum bermula. Tujuh perjalanan selesai. | Walk 2 of 7. No walk has started. Seven walks are done. |
+| Names of the parts | Bukit Safa, Bukit Marwah, Lampu hijau | Safa, Marwah, Green light |
+| Map, for a screen reader | Peta mas'a dari atas | Map of the mas'a from above |
+| Loading | Memuatkan mas'a | Loading the mas'a |
+
 ## Open items
 
 | ID  | What | Type | Raised at | Owner | Status | Answer |
@@ -243,12 +344,17 @@ New words on the controls: "Tawaf" and "Sa'i" on the rite switch, in both langua
 | O6  | Does this slice include a self-check for sa'i? | question | spec p1 | user | Resolved | No. A new slice `sai-check` goes into the shape after `sai-walk`. "In this slice" and "no sa'i check" were rejected. 2026-11-24 |
 | O7  | D46 planned a /shape pass after `tawaf-walk` for a pilgrim figure. It has not run. | question | spec p1 | user | Resolved | Spec `sai-walk` now, with the gold marker and the path line. The /shape pass later adds the figure to both walks. "Run the /shape pass first" was rejected. 2026-11-24 |
 | O8  | When the person taps the other rite in the top bar, which step opens? | question | spec p1 | user | Resolved | Step 1 of that rite. The Back button of the browser returns to the step the person left. "The last step seen there" was rejected. 2026-11-24 |
+| O9  | On a 360 px phone, the top bar is too narrow for the mark, "Isfar", the rite switch and BM and EN in one row. | flag | spec p2 | user | Resolved | A: on a phone, one row with the Kaabah mark, the rite switch and BM and EN. "Isfar" shows from 800 px wide. "The rite switch on a second row" was rejected. 2026-11-24 |
+| O10 | The switch buttons have no padding on the sides, so "Tawaf" touches the edge of its button. | flag | spec p2 | user | Resolved | `.vh-switch button` gains `padding-inline: var(--vh-space-3)` in the design system. "Leave it" was rejected. 2026-11-24 |
+| O11 | D35 keeps `--vh-lamp` for the green light of the tawaf start only. The sa'i green lights need a green too. | question | spec p2 | user | Resolved | Reuse `--vh-lamp`. D72 supersedes D35: the one green is for the green lights of the place. "A new token" was rejected. 2026-11-24 |
+| O12 | O4 named the second recitation "Rabbighfir warham, wa antal a'azzul akram". The form that the books of manasik usually give, from Ibn Mas'ud, says "innaka antal a'azzul akram". I did not check a source. | question | spec p2 | user | Resolved | "Rabbighfir warham, innaka antal a'azzul akram". "wa antal a'azzul akram" was rejected. The user checks it against the course notes with the rest of the text. 2026-11-24 |
+| O13 | Which motion tier does the sa'i walk use? | question | spec p2 | user | Resolved | Tier 2, as the tawaf walk. "Tier 1" was rejected. 2026-11-24 |
 
 _Never delete this section or its rows. See references/ledger.md._
 
 ## Decisions
 
-Recorded as D64 to D71 at pause 1.
+Recorded as D64 to D71 at pause 1, and D72 to D75 at pause 2.
 
 ## Glossary
 

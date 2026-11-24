@@ -348,7 +348,7 @@ token belongs to the place, and no interface part uses it.
 Rejected: A gold light with the name beside it (the light is not green), A full
 /design-system pass for one colour (pause 2 waits for it).
 Source: specs/tawaf-walk.md
-Status: active
+Status: superseded by D72
 
 ## D36 · 2026-11-23 · On a phone, the 3D place is 240 px high in the walk
 
@@ -668,5 +668,43 @@ Why: the step lives only in the address (D30), so step 1 needs no new state. The
 button of the browser returns to the step the person left.
 Rejected: The last step seen in that rite (kept in the open page, so a reload forgets
 it, and one more state to test).
+Source: specs/sai-walk.md
+Status: active
+
+## D72 · 2026-11-24 · One green token, --vh-lamp, for the green lights of the place
+
+Why: the light at the tawaf start and the two lights of the sa'i run are green on the
+day, and they mean the same thing: a green light in the place. The token belongs to the
+place, and no interface part uses it.
+Rejected: A second green token for sa'i (two greens that mean the same thing), A gold
+light with the name beside it (the light is not green).
+Supersedes: D35
+Source: specs/sai-walk.md
+Status: active
+
+## D73 · 2026-11-24 · On a phone, the top bar drops the site name to fit the rite switch
+
+Why: at 360 px, the Kaabah mark, "Isfar", the rite switch and BM and EN do not fit in
+one row. The name shows from 800 px wide, and the step text keeps its place on screen.
+Rejected: The rite switch on a second row (the top bar grows by about 56 px, and the
+step text starts lower).
+Source: specs/sai-walk.md
+Status: active
+
+## D74 · 2026-11-24 · The switch buttons have padding on their sides
+
+Why: "Tawaf" touched the edge of its button, because the switch had only a minimum
+width. `.vh-switch button` gains `padding-inline: var(--vh-space-3)`, and BM and EN keep
+their size.
+Rejected: Leave the switch as it is ("Tawaf" stays tight against its edges).
+Source: specs/sai-walk.md
+Status: active
+
+## D75 · 2026-11-24 · The sa'i walk uses motion tier 2, as the tawaf walk does
+
+Why: the step text fades in over 320 ms, and the camera flies along the mas'a in about
+1 second, so the person sees the way from one hill to the other. Under reduced motion,
+the camera cuts.
+Rejected: Tier 1 (the camera cuts between the spots).
 Source: specs/sai-walk.md
 Status: active
