@@ -981,3 +981,12 @@ Rejected: The plane in place of the miqat (the miqat goes unchecked), The plane 
 end of the talbiyah in place of the miqat and the solat sunat (two places go unchecked).
 Source: specs/ihram-check.md
 Status: active
+
+## D105 · 2026-11-25 · The ihram check uses motion tier 2, as the other checks do
+
+Why: the person moves between the checks of three rites, and each one moves in the same
+way. The question fades in over 320 ms, and the camera moves on the straight line of
+D101. Under reduced motion, the camera cuts.
+Rejected: Tier 1 (the camera cuts between the spots, unlike the tawaf and sa'i checks).
+Source: specs/ihram-check.md
+Status: active
