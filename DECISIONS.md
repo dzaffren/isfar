@@ -799,3 +799,12 @@ Rejected: Drop the doa and keep the rule of the lower count (the rule is not tie
 place), Five questions (two of the acts go unchecked).
 Source: specs/sai-check.md
 Status: active
+
+## D86 · 2026-11-25 · The sa'i check uses motion tier 2, as the tawaf check does
+
+Why: each question fades in over 320 ms, and the camera moves along the hall to the next
+spot in about 1 second (D78), so the person keeps the order of the walk. Under reduced
+motion, the camera cuts.
+Rejected: Tier 1 (the camera cuts between the spots of the questions).
+Source: specs/sai-check.md
+Status: active

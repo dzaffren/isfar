@@ -216,7 +216,7 @@ Questions 4 and 5 both show step 5, so a miss on both gives one "Langkah 5 · An
 
 The lane path line shows on each question, as in the walk. On question 6 it shows the walk from Marwah back to Safa, which helps the count and does not give it.
 
-**Motion tier:** 2, as in the tawaf check (D61), if O3 agrees.
+**Motion tier:** 2, as in the tawaf check (O3).
 
 | Move | Time | Under reduced motion |
 | --- | --- | --- |
@@ -263,7 +263,7 @@ The right answer moves from place to place: 2, 1, 3, 1, 2, 3, 1 (D54).
 
 ## Decisions
 
-Recorded as D84, D85 at pause 1.
+Recorded as D84, D85 at pause 1, and D86 at pause 2.
 
 ## Open items
 
@@ -271,8 +271,8 @@ Recorded as D84, D85 at pause 1.
 | --- | ---- | ---- | --------- | ----- | ------ | ------ |
 | O1  | How does a person reach the sa'i check? The tawaf check opens from step 15 and from `#semak` (D51). Sa'i step 13 has "Mula semula" in the gold place today, and Page Down there does nothing. | question | spec p1 | user | Resolved | From sa'i step 13 and the address `#semak-sai`. "Mula semakan" takes the gold place on step 13, "Mula semula" moves into the panel, and Page Down opens the check, as on tawaf step 15. "Step 13 only" and "`#semak-sai` only" were rejected. 2026-11-25 |
 | O2  | Which questions does the sa'i check ask? The walk has eight topics that fit a question, and the seven beads fit seven questions (D56). | question | spec p1 | user | Resolved | Seven, on a place and what to do there. The rule of the lower count on step 10 drops. "Drop the doa" and "five questions" were rejected. 2026-11-25 |
-| O3  | Which motion tier does the sa'i check use? | question | spec p2 | user | Open | — |
-| O4  | Is the draft text of the sa'i check right? | question | spec p2 | user | Open | — |
+| O3  | Which motion tier does the sa'i check use? | question | spec p2 | user | Resolved | Tier 2, as in the tawaf check. Tier 1 was rejected. 2026-11-25 |
+| O4  | Is the draft text of the sa'i check right? | question | spec p2 | user | Resolved | Right as drafted. The "not yet reviewed" notice stays, and a qualified person reviews the text before a public launch (shape O1). 2026-11-25 |
 
 _Never delete this section or its rows. See references/ledger.md._
 
