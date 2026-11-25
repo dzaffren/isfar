@@ -26,6 +26,13 @@ describe("the steps of the sa'i walk", () => {
     expect(SAI.en[4].title).toBe("Between the green lights");
   });
 
+  it("tells the person to keep to the lane of the walk on steps 4 and 7 (D83)", () => {
+    expect(SAI.ms[3].text).toContain("Ikut lorong ke Marwah");
+    expect(SAI.en[3].text).toContain("Keep to the lane to Marwah");
+    expect(SAI.ms[6].text).toContain("pusing masuk ke lorong ke Safa");
+    expect(SAI.en[6].text).toContain("turn into the lane to Safa");
+  });
+
   it("shows a recitation on steps 3 and 5 only, with the same Arabic in each language", () => {
     for (const language of LANGUAGES) {
       const withRecitation = SAI[language].flatMap((step, index) => (step.recitation ? [index + 1] : []));
