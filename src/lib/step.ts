@@ -1,10 +1,10 @@
-// The rite and the step of the walk live in the address, as #tawaf-6 or #sai-5 (D30).
+// The rite and the step of the walk live in the address, as #ihram-2, #tawaf-6 or #sai-5 (D30, D95).
 // A number outside the walk, as #sai-0 or #sai-99, opens step 1 of that rite. Any other address opens step 1 of tawaf.
-export type Rite = "tawaf" | "sai";
+export type Rite = "ihram" | "tawaf" | "sai";
 
-export const TOTAL: Record<Rite, number> = { tawaf: 15, sai: 13 };
+export const TOTAL: Record<Rite, number> = { ihram: 8, tawaf: 15, sai: 13 };
 
-const PLACE = /^#(tawaf|sai)-(\d+)$/;
+const PLACE = /^#(ihram|tawaf|sai)-(\d+)$/;
 const STEP = /^[1-9]\d*$/;
 
 export function readPlace(hash: string): { rite: Rite; step: number } {
@@ -22,7 +22,9 @@ export function stepHash(rite: Rite, step: number): string {
 
 // Each rite's check has one address, so a reload starts it again at question 1 (D51, D53, D84).
 // The address of a check reads as step 1 of its rite, so the scene shows the place of that rite.
-export const CHECK_HASH: Record<Rite, string> = { tawaf: "#semak", sai: "#semak-sai" };
+// Ihram has no check yet (D92).
+export type Checked = Exclude<Rite, "ihram">;
+export const CHECK_HASH: Record<Checked, string> = { tawaf: "#semak", sai: "#semak-sai" };
 
 export function isCheck(hash: string): boolean {
   return hash === CHECK_HASH.tawaf || hash === CHECK_HASH.sai;

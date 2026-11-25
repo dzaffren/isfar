@@ -34,8 +34,16 @@ export const IHRAM_SPOTS: IhramSpot[] = [
   { at: AT_WASHROOMS, names: ["washrooms"] },
   { at: AT_WASHROOMS, names: ["washrooms"] },
   { at: IN_HALL, names: ["hall"] },
-  { at: COURT, names: ["hall"] },
+  { at: COURT, names: [] },
   { at: AT_BUS, names: ["busPark"] },
   { at: AT_BUS, names: ["busPark"] },
   { at: AT_BUS, names: ["hall", "minaret", "washrooms", "busPark"] },
 ];
+
+// The height of each name above the ground, in metres: over the walls, near the top of the minaret, over the washroom roof, and over the buses.
+export const IHRAM_NAME_HEIGHT: Record<IhramPart, number> = {
+  hall: BIRALI.mosque.height + 2,
+  minaret: BIRALI.minaret.height - 6,
+  washrooms: BIRALI.washrooms.height + 2,
+  busPark: 4,
+};

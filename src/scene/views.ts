@@ -1,3 +1,4 @@
+import { IHRAM_NAME_HEIGHT, IHRAM_PARTS, IHRAM_SPOTS, type IhramPart } from "./birali";
 import { MASA, SAI_NAME_HEIGHT, SAI_PARTS, SAI_SPOTS, type SaiPart, type SaiSpot } from "./masa";
 import { GREEN_LIGHT, HAJAR_ASWAD, PARTS, SPOTS, type Part, type Spot } from "./mataf";
 
@@ -106,4 +107,29 @@ const SAI_WIDE_PUSH: Record<SaiPart, readonly [number, number]> = {
 
 export function saiNamePlace(part: SaiPart, view: SaiSpot["view"]): readonly [number, number] {
   return view === "wide" ? SAI_WIDE_PUSH[part] : [0, -38];
+}
+
+// The camera of an ihram step. A wide view stands high in the south-west and looks over the whole of Bir Ali.
+// Each other view stands south-west of the marker, above the walls, and looks down at it, so a straight move stays clear of the minaret (D101).
+export function birAliViewOf(step: number): View {
+  const spot = IHRAM_SPOTS[step - 1];
+  if (step === 1 || step === IHRAM_SPOTS.length || !spot.at) return { from: [-60, -100, 80], to: [-6, 4, 0] };
+  const [x, y] = spot.at;
+  return { from: [x - 8, y - 18, 28], to: [x + 2, y + 5, 0] };
+}
+
+export function birAliNameAnchor(part: IhramPart): V3 {
+  return [IHRAM_PARTS[part][0], IHRAM_PARTS[part][1], IHRAM_NAME_HEIGHT[part]];
+}
+
+// In a wide view each name sits beside its part, and in the other views above it.
+const BIRALI_WIDE_PUSH: Record<IhramPart, readonly [number, number]> = {
+  hall: [0, 30],
+  minaret: [60, -20],
+  washrooms: [-60, -20],
+  busPark: [0, -38],
+};
+
+export function birAliNamePlace(part: IhramPart, step: number): readonly [number, number] {
+  return step === 1 || step === IHRAM_SPOTS.length ? BIRALI_WIDE_PUSH[part] : [0, -38];
 }
