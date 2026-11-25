@@ -93,3 +93,19 @@ export const noWebGL = () => {
     return original.call(this, type, ...(rest as []));
   } as typeof original;
 };
+
+// The answer of each question of a check in Malay: the right one, or the one after it for a question in "wrong".
+type Asked = { ask: string; answers: string[]; right: number };
+
+export function pickOf(questions: Asked[], number: number, wrong: number[] = []) {
+  const question = questions[number - 1];
+  return question.answers[wrong.includes(number) ? (question.right + 1) % 3 : question.right];
+}
+
+export async function answerTo(page: Page, questions: Asked[], last: number, wrong: number[] = []) {
+  for (let number = 1; number <= last; number += 1) {
+    await expect(title(page)).toHaveText(questions[number - 1].ask);
+    await page.getByRole("button", { name: pickOf(questions, number, wrong), exact: true }).click();
+    await page.getByRole("button", { name: "Seterusnya", exact: true }).click();
+  }
+}

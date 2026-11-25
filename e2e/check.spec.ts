@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { CHECK } from "../src/content/check";
 import { SPOTS } from "../src/scene/mataf";
-import { SIZES, expectBeads, expectCamera, expectNotices, markerAt, names, noWebGL, scene, title } from "./helpers";
+import { SIZES, answerTo as answerQuestions, expectBeads, expectCamera, expectNotices, markerAt, names, noWebGL, pickOf as pickAnswer, scene, title } from "./helpers";
 
 const MS = {
   start: "Mula semakan",
@@ -20,19 +20,8 @@ const option = (page: Page, text: string) => page.getByRole("button", { name: te
 const header = (page: Page) => page.locator(".vh-panel .vh-panel__where");
 const line = (page: Page) => page.locator(".vh-result");
 
-// The answer of each question in Malay: the right one, or the one after it for a question in "wrong".
-function pickOf(number: number, wrong: number[] = []) {
-  const question = CHECK.ms[number - 1];
-  return question.answers[wrong.includes(number) ? (question.right + 1) % 3 : question.right];
-}
-
-async function answerTo(page: Page, last: number, wrong: number[] = []) {
-  for (let number = 1; number <= last; number += 1) {
-    await expect(title(page)).toHaveText(CHECK.ms[number - 1].ask);
-    await option(page, pickOf(number, wrong)).click();
-    await next(page).click();
-  }
-}
+const pickOf = (number: number, wrong: number[] = []) => pickAnswer(CHECK.ms, number, wrong);
+const answerTo = (page: Page, last: number) => answerQuestions(page, CHECK.ms, last);
 
 for (const size of SIZES) {
   test.describe(`${size.width}x${size.height}`, () => {
