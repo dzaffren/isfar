@@ -108,10 +108,10 @@ for (const size of SIZES) {
         await expect(title(page)).toHaveText("Sa'i selesai");
         await expectBeads(page, 7, null);
         await expect(next(page)).toHaveCount(0);
-        await expect(page.getByRole("button", { name: MS.checkStart })).toHaveCount(0);
+        await expect(page.locator(".walk__actions").getByRole("button", { name: MS.checkStart })).toBeVisible();
         await expectCamera(page, 13);
 
-        await page.locator(".walk__actions").getByRole("button", { name: MS.startAgain }).click();
+        await page.locator(".vh-panel").getByRole("button", { name: MS.startAgain }).click();
         await expect(page).toHaveURL(/#sai-1$/);
         await expect(title(page)).toHaveText("Mas'a dan bahagiannya");
         await expectCamera(page, 1);
@@ -269,10 +269,9 @@ for (const size of SIZES) {
         await page.goto("/#sai-13");
         await expect(title(page)).toHaveText("Sa'i selesai");
         await expectCamera(page, 13);
-        await page.keyboard.press("ArrowRight");
         await page.keyboard.press("PageDown");
-        await expect(page).toHaveURL(/#sai-13$/);
-        await expect(title(page)).toHaveText("Sa'i selesai");
+        await expect(page).toHaveURL(/#semak-sai$/);
+        await expect(title(page)).toHaveText("Di mana sa'i bermula?");
 
         await page.goto("/#sai-0");
         await expect(title(page)).toHaveText("Mas'a dan bahagiannya");

@@ -22,6 +22,7 @@ People who prepare to go for hajj or umrah use it.
 - The site leads a person through tawaf in 15 steps, in a 3D mataf, from the Kaabah and its parts to the end of circuit 7.
 - After the tawaf walk, the person answers seven questions on where each step happens and what to do there, and the result shows on screen.
 - The site leads a person through sa'i in 13 steps, in a 3D mas'a with a one-way lane for each way, from Safa to the end of walk 7 at Marwah.
+- After the sa'i walk, the person answers seven questions on where each step of sa'i happens and what to do there, and the result shows on screen.
 
 ## Docs
 

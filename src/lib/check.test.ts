@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CHECK } from "../content/check";
+import { CHECK, SAI_CHECK } from "../content/check";
 import { missedSteps, score } from "./check";
 
 const questions = CHECK.ms;
@@ -25,5 +25,19 @@ describe("missedSteps", () => {
 
   it("gives step 3 once when questions 1 and 2 are both missed", () => {
     expect(missedSteps(wrongAt(1, 2, 6), questions)).toEqual([3, 7]);
+  });
+});
+
+describe("missedSteps in the sa'i check", () => {
+  const sai = SAI_CHECK.ms;
+  const saiWrongAt = (...numbers: number[]) => sai.map((question, index) => (numbers.includes(index + 1) ? (question.right + 1) % 3 : question.right));
+
+  it("gives step 5 once when questions 4 and 5 are both missed", () => {
+    expect(missedSteps(saiWrongAt(4, 5), sai)).toEqual([5]);
+    expect(score(saiWrongAt(4, 5), sai)).toBe(5);
+  });
+
+  it("gives step 7 for a wrong count on question 6", () => {
+    expect(missedSteps(saiWrongAt(6), sai)).toEqual([7]);
   });
 });

@@ -23,12 +23,13 @@ const percent = ([x, y]: Point) => ({ left: `${((x + HALF_X) / (2 * HALF_X)) * 1
 // The plan has y to the left of a person who faces Marwah, and the map has y down, so plan points flip to sit as seen from above.
 const flip = ([x, y]: Point): Point => [x, -y];
 
-type Props = { step: number; words: Words; label: string };
+type Props = { step: number; words: Words; label: string; showNames?: boolean };
 
 // The top view of the mas'a, for a device that cannot show the 3D place. Safa is on the left, Marwah on the right.
 // The lane to Marwah is the lower lane, and the lane to Safa the upper one.
-export function MasaMap({ step, words, label }: Props) {
+export function MasaMap({ step, words, label, showNames = true }: Props) {
   const spot = SAI_SPOTS[step - 1];
+  const names = showNames ? spot.names : [];
   const half = MASA.width / 2;
   const turn = spot.towards === "safa" ? 180 : 0;
   const path = spot.towards && laneLine(spot.towards).map(flip);
@@ -50,14 +51,14 @@ export function MasaMap({ step, words, label }: Props) {
             ))}
           </>
         )}
-        {spot.names.map((part) => {
+        {names.map((part) => {
           const [fromX, fromY] = SAI_PARTS[part];
           const [toX, toY] = NAME_AT[part];
           return <line key={part} className="map__lead" x1={fromX} y1={fromY} x2={toX} y2={toY} />;
         })}
         {spot.at && <circle className="map__marker" data-marker cx={spot.at[0]} cy={-spot.at[1]} r="2.2" />}
       </svg>
-      {spot.names.map((part) => (
+      {names.map((part) => (
         <span key={part} className="scene__name" style={percent(NAME_AT[part])}>
           {words[SAI_PART_WORD[part]]}
         </span>

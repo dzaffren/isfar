@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isCheck, readPlace, stepHash } from "./step";
+import { CHECK_HASH, isCheck, readPlace, stepHash } from "./step";
 
 describe("readPlace", () => {
   it("reads the rite and the step of an address in a walk", () => {
@@ -23,6 +23,9 @@ describe("readPlace", () => {
     expect(readPlace("#abc")).toEqual({ rite: "tawaf", step: 1 });
     expect(readPlace("")).toEqual({ rite: "tawaf", step: 1 });
     expect(readPlace("#semak")).toEqual({ rite: "tawaf", step: 1 });
+    expect(readPlace("#SEMAK-SAI")).toEqual({ rite: "tawaf", step: 1 });
+    expect(readPlace("#semak-sai-2")).toEqual({ rite: "tawaf", step: 1 });
+    expect(readPlace("#sai-semak")).toEqual({ rite: "tawaf", step: 1 });
     expect(readPlace("#SAI-5")).toEqual({ rite: "tawaf", step: 1 });
     expect(readPlace("#sai-abc")).toEqual({ rite: "tawaf", step: 1 });
     expect(readPlace("#sai-")).toEqual({ rite: "tawaf", step: 1 });
@@ -37,6 +40,21 @@ describe("readPlace", () => {
     expect(readPlace("#tawaf- 6")).toEqual({ rite: "tawaf", step: 1 });
     expect(readPlace("#sai-05")).toEqual({ rite: "sai", step: 1 });
     expect(readPlace("#sai-6x")).toEqual({ rite: "tawaf", step: 1 });
+  });
+});
+
+describe("the address of a check", () => {
+  it("reads #semak-sai as the sa'i check", () => {
+    expect(readPlace("#semak-sai")).toEqual({ rite: "sai", step: 1 });
+    expect(isCheck("#semak-sai")).toBe(true);
+    expect(CHECK_HASH).toEqual({ tawaf: "#semak", sai: "#semak-sai" });
+  });
+
+  it("reads no other address as the sa'i check", () => {
+    expect(isCheck("#SEMAK-SAI")).toBe(false);
+    expect(isCheck("#semak-sai-2")).toBe(false);
+    expect(isCheck("#sai-semak")).toBe(false);
+    expect(isCheck("#sai-13")).toBe(false);
   });
 });
 
