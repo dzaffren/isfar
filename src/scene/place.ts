@@ -58,6 +58,7 @@ const COLOURS: Record<string, string> = {
   lamp: "--vh-lamp",
   wall: "--vh-sunken",
   rock: "--vh-edge",
+  barrier: "--vh-sunken",
 };
 const FLAT = new Set(["floor", "guide", "lamp"]);
 
