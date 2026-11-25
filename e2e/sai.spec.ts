@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { GREEN, WALK } from "../src/scene/masa";
+import { GREEN, LANES, WALK, laneLine } from "../src/scene/masa";
 import {
   MASA_MODEL,
   SIZES,
@@ -41,6 +41,20 @@ async function masaIsDrawn(page: Page) {
   expect(await lightAt(page, 0.5, 0.87), "the rock of Safa is dark at the bottom of the wide view").toBeLessThan(170);
 }
 
+// The path line on the map, back in the plan's metres. The map draws y down.
+async function mapPath(page: Page): Promise<[number, number][]> {
+  const values = (await page.locator("[data-path]").getAttribute("points"))!.split(" ").map(Number);
+  return values.flatMap((value, index): [number, number][] => (index % 2 === 0 ? [[value, 0 - values[index + 1]]] : []));
+}
+
+// The five arrows on the map sit in the lane of the walk, and point to its hill.
+async function expectArrows(page: Page, towards: "marwah" | "safa") {
+  const lane = towards === "marwah" ? LANES.toMarwah : LANES.toSafa;
+  const arrows = await page.locator(".map__arrow").evaluateAll((nodes) => nodes.map((node) => node.getAttribute("transform")));
+  expect(arrows).toHaveLength(5);
+  for (const arrow of arrows) expect(arrow).toMatch(new RegExp(` ${-lane}\\) rotate\\(${towards === "marwah" ? 0 : 180}\\)$`));
+}
+
 for (const size of SIZES) {
   test.describe(`${size.width}x${size.height}`, () => {
     test.use({ viewport: size });
@@ -60,7 +74,7 @@ for (const size of SIZES) {
         await expect(scene(page)).toHaveAttribute("data-state", "shown", { timeout: 15_000 });
         await expectCamera(page, 1);
         await masaIsDrawn(page);
-        expect(await modelParts(page, "masa")).toEqual(expect.arrayContaining(["floor", "wall", "arch", "rock", "lamp"]));
+        expect(await modelParts(page, "masa")).toEqual(expect.arrayContaining(["floor", "wall", "arch", "rock", "lamp", "barrier"]));
         await expect(names(page)).toHaveText(["Bukit Safa", "Bukit Marwah", "Lampu hijau"], { useInnerText: true });
         const frame = (await page.locator(".scene__frame").boundingBox())!;
         const boxes = await Promise.all((await names(page).all()).map(async (name) => (await name.boundingBox())!));
@@ -166,6 +180,23 @@ for (const size of SIZES) {
         expect(atX, "the marker is between the two green lights").toBeGreaterThan(GREEN[0]);
         expect(atX).toBeLessThan(GREEN[1]);
         expect(modelAsked).toBe(false);
+      });
+
+      test("the top-view map shows the two lanes when the 3D place cannot show", async ({ page }) => {
+        await page.addInitScript(noWebGL);
+        await page.goto("/#sai-4");
+        await expect(title(page)).toHaveText("Ke arah Marwah");
+        await expect(scene(page)).toHaveAttribute("data-state", "unsupported");
+        await expect(page.locator("[data-still] .map__barrier")).toHaveCount(1);
+        const [, y] = await markerAt(page);
+        expect(y, "the marker is in the lane to Marwah").toBe(LANES.toMarwah);
+        expect(await mapPath(page)).toEqual(laneLine("marwah"));
+        await expectArrows(page, "marwah");
+
+        await tapNext(page, 3);
+        await expect(title(page)).toHaveText("Perjalanan 2");
+        expect(await mapPath(page)).toEqual(laneLine("safa"));
+        await expectArrows(page, "safa");
       });
 
       test("the download of the 3D mas'a fails on step 5, and Cuba lagi brings it back", async ({ page }) => {

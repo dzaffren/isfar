@@ -99,4 +99,13 @@ def lamps(bm):
 
 mesh("lamp", lamps)
 
+
+# A low barrier along the middle of the hall between the two one-way lanes. It stops short of each hill (D81).
+def barrier(bm):
+    part = MASA["barrier"]
+    box(bm, (part["to"] - part["from"], 0.4, part["height"]), ((part["from"] + part["to"]) / 2, 0, part["height"] / 2))
+
+
+mesh("barrier", barrier)
+
 bpy.ops.export_scene.gltf(filepath=os.path.normpath(OUT), export_format="GLB", export_materials="NONE", export_apply=True)

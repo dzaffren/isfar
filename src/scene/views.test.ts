@@ -1,6 +1,6 @@
 import { PerspectiveCamera, Vector3 } from "three";
 import { describe, expect, it } from "vitest";
-import { SAI_SPOTS, WALK, groundAt } from "./masa";
+import { SAI_SPOTS, groundAt, laneLine } from "./masa";
 import { SPOTS } from "./mataf";
 import plan from "./plan.json" with { type: "json" };
 import { alongHall, between, saiViewOf, viewOf, type V3, type View } from "./views";
@@ -124,12 +124,21 @@ describe("the camera in the mas'a", () => {
     });
   });
 
-  it("shows 20 m or more of the path line on each step of a walk, on a projector and on a phone", () => {
+  // One point for each metre along the lane path of the walk.
+  const alongLane = (towards: "marwah" | "safa") =>
+    laneLine(towards).flatMap(([x, y], index, line): V3[] => {
+      if (index === 0) return [];
+      const [fromX, fromY] = line[index - 1];
+      const metres = Math.round(Math.hypot(x - fromX, y - fromY));
+      return Array.from({ length: metres }, (_, m) => [fromX + ((x - fromX) * m) / metres, fromY + ((y - fromY) * m) / metres, 0]);
+    });
+
+  it("shows 20 m or more of the lane path on each step of a walk, on a projector and on a phone", () => {
     SAI_SPOTS.forEach((spot, index) => {
       if (!spot.towards) return;
       for (const aspect of [1, 1.5]) {
         let shown = 0;
-        for (let x = WALK.from; x <= WALK.to; x += 1) if (onScreen(saiViewOf(index + 1), aspect, [x, 0, 0])) shown += 1;
+        for (const point of alongLane(spot.towards)) if (onScreen(saiViewOf(index + 1), aspect, point)) shown += 1;
         expect(shown, `step ${index + 1}, aspect ${aspect}`).toBeGreaterThanOrEqual(20);
       }
     });

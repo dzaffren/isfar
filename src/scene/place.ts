@@ -19,7 +19,7 @@ import {
 } from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import type { Rite } from "../lib/step";
-import { SAI_SPOTS, WALK, groundAt, type SaiPart } from "./masa";
+import { SAI_SPOTS, groundAt, laneLine, type SaiPart } from "./masa";
 import { SPOTS, onPath, type Part } from "./mataf";
 import { alongHall, between, nameAnchor, namePlace, saiNameAnchor, saiNamePlace, saiViewOf, viewOf, type V3, type View } from "./views";
 
@@ -58,6 +58,7 @@ const COLOURS: Record<string, string> = {
   lamp: "--vh-lamp",
   wall: "--vh-sunken",
   rock: "--vh-edge",
+  barrier: "--vh-sunken",
 };
 const FLAT = new Set(["floor", "guide", "lamp"]);
 
@@ -104,18 +105,29 @@ const pathLine = () =>
     }
   });
 
-// The path of one sa'i walk: dashes along the middle of the mas'a, with arrows towards the hill of the walk (D28).
-// way is 1 towards Marwah, and -1 back towards Safa.
-export const hallLine = (way: 1 | -1) =>
+// The path of one sa'i walk: dashes along each part of laneLine, with arrows in the lane towards the hill of the walk (D28, D81).
+export const laneLines = (towards: "marwah" | "safa") =>
   floorShapes((quad, flat) => {
-    for (let x = WALK.from; x + 3.5 <= WALK.to; x += 6) {
-      quad([[x, -0.2], [x + 3.5, -0.2], [x + 3.5, 0.2], [x, 0.2]]);
+    const line = laneLine(towards);
+    for (let index = 1; index < line.length; index += 1) {
+      const [fromX, fromY] = line[index - 1];
+      const [toX, toY] = line[index];
+      const length = Math.hypot(toX - fromX, toY - fromY);
+      const [alongX, alongY] = [(toX - fromX) / length, (toY - fromY) / length];
+      const [sideX, sideY] = [-alongY * 0.2, alongX * 0.2];
+      for (let at = 0; at < length; at += 6) {
+        const end = Math.min(at + 3.5, length);
+        const [x, y, nextX, nextY] = [fromX + alongX * at, fromY + alongY * at, fromX + alongX * end, fromY + alongY * end];
+        quad([[x - sideX, y - sideY], [nextX - sideX, nextY - sideY], [nextX + sideX, nextY + sideY], [x + sideX, y + sideY]]);
+      }
     }
     // The arrow turns round in x and in y, so its corners keep their order and it still faces up.
+    const way = towards === "marwah" ? 1 : -1;
+    const y = line[1][1];
     for (const x of [-40, -20, 0, 20, 40]) {
-      flat(x + way * 1.4, 0);
-      flat(x - way * 0.9, way * 0.9);
-      flat(x - way * 0.9, -way * 0.9);
+      flat(x + way * 1.4, y);
+      flat(x - way * 0.9, y + way * 0.9);
+      flat(x - way * 0.9, y - way * 0.9);
     }
   });
 
@@ -152,7 +164,7 @@ const SITES: Record<Rite, Site> = {
   sai: {
     model: "/models/masa.glb",
     joints: false,
-    paths: () => [hallLine(1), hallLine(-1)],
+    paths: () => [laneLines("marwah"), laneLines("safa")],
     pathAt: (step) => ({ marwah: 0, safa: 1, none: null })[SAI_SPOTS[step - 1].towards ?? "none"],
     // On a hill, the marker stands on its slope, level with the high side of its disc.
     markerAt: (step) => {

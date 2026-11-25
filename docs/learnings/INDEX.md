@@ -6,3 +6,4 @@
 - Break the code a browser test guards, and watch the test fail. ([break-the-guarded-code](break-the-guarded-code.md))
 - Wait for the page to stop scrolling before a test sets its own scroll. ([settle-scroll-before-setting-it](settle-scroll-before-setting-it.md))
 - Project the corners of a place at aspect 1 and 1.5 before you fix a camera view or rule. ([fit-the-view-at-the-narrowest-scene](fit-the-view-at-the-narrowest-scene.md))
+- Put back a model that `pnpm model` rebuilt with no change to its script. ([keep-unchanged-models](keep-unchanged-models.md))

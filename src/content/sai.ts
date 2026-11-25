@@ -28,13 +28,13 @@ const ms: Step[] = [
   },
   {
     title: "Ke arah Marwah",
-    text: "Turun dari Safa dan berjalan ke arah Marwah seperti biasa. Anda boleh berzikir atau berdoa dalam apa-apa bahasa sepanjang sa'i.",
-    where: "Penanda antara Safa dan lampu hijau pertama",
+    text: "Turun dari Safa dan berjalan ke arah Marwah seperti biasa. Ikut lorong ke Marwah, bukan lorong orang yang kembali ke Safa. Anda boleh berzikir atau berdoa dalam apa-apa bahasa sepanjang sa'i.",
+    where: "Penanda di lorong ke Marwah, antara Safa dan lampu hijau pertama",
   },
   {
     title: "Antara lampu hijau",
     text: "Di antara dua lampu hijau, lelaki berjalan cepat dengan langkah pendek. Wanita berjalan seperti biasa. Baca doa ini:",
-    where: "Penanda antara dua lampu hijau",
+    where: "Penanda di lorong ke Marwah, antara dua lampu hijau",
     recitation: {
       arabic: RABBIGHFIR,
       sound: RABBIGHFIR_SOUND,
@@ -48,7 +48,7 @@ const ms: Step[] = [
   },
   {
     title: "Perjalanan 2",
-    text: "Dari Marwah, berjalan kembali ke Safa. Perjalanan ini dikira sebagai perjalanan kedua. Lelaki berjalan cepat lagi di antara lampu hijau.",
+    text: "Di Marwah, pusing masuk ke lorong ke Safa, dan berjalan kembali ke Safa. Perjalanan ini dikira sebagai perjalanan kedua. Lelaki berjalan cepat lagi di antara lampu hijau.",
     where: "Penanda di Bukit Safa, perjalanan kedua",
   },
   {
@@ -103,13 +103,13 @@ const en: Step[] = [
   },
   {
     title: "Towards Marwah",
-    text: "Come down from Safa and walk towards Marwah at a usual pace. You can make zikir or doa in any language for the whole sa'i.",
-    where: "The marker between Safa and the first green light",
+    text: "Come down from Safa and walk towards Marwah at a usual pace. Keep to the lane to Marwah, not the lane back to Safa. You can make zikir or doa in any language for the whole sa'i.",
+    where: "The marker in the lane to Marwah, between Safa and the first green light",
   },
   {
     title: "Between the green lights",
     text: "Between the two green lights, men walk quickly with short steps. Women walk at a usual pace. Say this doa:",
-    where: "The marker between the two green lights",
+    where: "The marker in the lane to Marwah, between the two green lights",
     recitation: { arabic: RABBIGHFIR, sound: RABBIGHFIR_SOUND, meaning: "My Lord, forgive and have mercy. You are the Most Mighty, the Most Generous." },
   },
   {
@@ -119,7 +119,7 @@ const en: Step[] = [
   },
   {
     title: "Walk 2",
-    text: "From Marwah, walk back to Safa. This counts as the second walk. Men walk quickly again between the green lights.",
+    text: "At Marwah, turn into the lane to Safa, and walk back to Safa. This counts as the second walk. Men walk quickly again between the green lights.",
     where: "The marker at Safa, second walk",
   },
   {

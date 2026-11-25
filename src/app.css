@@ -84,3 +84,4 @@ html { scroll-padding-bottom: calc(var(--vh-control) + var(--vh-space-8)); }
 .map--masa { width: min(100cqw, 300cqh); height: auto; aspect-ratio: 3; }
 .map__hall { fill: var(--vh-cloth); stroke: var(--vh-edge); stroke-width: 0.5; }
 .map__hill { fill: var(--vh-sunken); stroke: var(--vh-edge); stroke-width: 0.5; }
+.map__barrier { stroke: var(--vh-edge); stroke-width: 0.7; }
