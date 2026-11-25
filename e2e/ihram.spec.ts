@@ -28,6 +28,19 @@ async function expectMarkerClear(page: Page) {
   }
 }
 
+// The contrast of two fills on the map, by the WCAG formula.
+async function contrast(page: Page, one: string, two: string) {
+  const fills = await page.evaluate(
+    (selectors) => selectors.map((selector) => getComputedStyle(document.querySelector(selector)!).fill.match(/\d+/g)!.slice(0, 3).map(Number)),
+    [one, two],
+  );
+  const [a, b] = fills.map((rgb) => {
+    const [r, g, bl] = rgb.map((value) => (value / 255 <= 0.03928 ? value / 255 / 12.92 : ((value / 255 + 0.055) / 1.055) ** 2.4));
+    return 0.2126 * r + 0.7152 * g + 0.0722 * bl;
+  });
+  return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+}
+
 const inside = ([x, y]: [number, number], [cx, cy]: number[], width: number, depth: number) => Math.abs(x - cx) < width / 2 && Math.abs(y - cy) < depth / 2;
 
 for (const size of SIZES) {
@@ -132,6 +145,10 @@ for (const size of SIZES) {
       await expect(names(page)).toHaveText(["Dewan solat"], { useInnerText: true });
       await expectMarkerClear(page);
       expect(modelAsked).toBe(false);
+      for (const colorScheme of ["light", "dark"] as const) {
+        await page.emulateMedia({ colorScheme });
+        expect(await contrast(page, ".map__minaret", ".map__hall"), `the minaret stands out from the hall in ${colorScheme} mode`).toBeGreaterThanOrEqual(3);
+      }
     });
 
     test("an ihram address outside the walk opens step 1", async ({ page }) => {
