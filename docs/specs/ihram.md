@@ -334,6 +334,14 @@ Order inside the chunk:
 
 Recorded as D100, D101, D102.
 
+## Review
+
+2026-11-25 · 8 raw findings, 3 survived, 3 fixed.
+
+- correctness · `src/components/BirAliMap.tsx:14` · move the hall name on the map 30 m east, clear of the step 4 marker · `db246ee`
+- correctness · `src/app.css:92` · draw the map minaret in ink, so it shows at 3:1 or more in dark mode · `bee577a`
+- correctness · `src/app.css:82` · put the language switch before the rite switch, so Tab follows the screen under 800 px · `2d955c3`
+
 ## Open items
 
 | ID  | What | Type | Raised at | Owner | Status | Answer |
