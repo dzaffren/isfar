@@ -11,6 +11,8 @@ import { StepPanel } from "./StepPanel";
 
 type Props = {
   words: Words;
+  // The header of each rite's check: "Semakan · Soalan {n} daripada {total}" and "Semakan · Selesai", or the sa'i words.
+  header: { progress: string; done: string };
   questions: Question[];
   steps: Step[];
   at: number | "result";
@@ -25,7 +27,7 @@ type Props = {
 };
 
 // The step panel and the bar of the check. The children sit between them: the message card and the notices.
-export function CheckSide({ words, questions, steps, at, picks, onPick, onNext, onLeave, onAgain, onStep, focusFirst, children }: Props) {
+export function CheckSide({ words, header, questions, steps, at, picks, onPick, onNext, onLeave, onAgain, onStep, focusFirst, children }: Props) {
   const total = questions.length;
   const leave = { label: words.checkLeave, onAct: onLeave };
 
@@ -36,7 +38,7 @@ export function CheckSide({ words, questions, steps, at, picks, onPick, onNext, 
     }));
     return (
       <>
-        <StepPanel step={total + 1} progress={{ label: words.checkDone, beads: <Beads done={7} now={null} label={words.checkDone} /> }}>
+        <StepPanel step={total + 1} progress={{ label: header.done, beads: <Beads done={7} now={null} label={header.done} /> }}>
           <CheckResult
             score={words.checkScore.replace("{n}", String(score(picks, questions))).replace("{total}", String(total))}
             all={words.checkAll}
@@ -54,7 +56,7 @@ export function CheckSide({ words, questions, steps, at, picks, onPick, onNext, 
   const count = (text: string) => text.replace("{n}", String(at)).replace("{total}", String(total));
   return (
     <>
-      <StepPanel step={at} progress={{ label: count(words.checkProgress), beads: <Beads done={at - 1} now={at} label={count(words.checkQuestion)} /> }}>
+      <StepPanel step={at} progress={{ label: count(header.progress), beads: <Beads done={at - 1} now={at} label={count(words.checkQuestion)} /> }}>
         <CheckQuestion
           question={questions[at - 1]}
           picked={picks[at - 1]}

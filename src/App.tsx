@@ -8,10 +8,10 @@ import { Notice } from "./components/Notice";
 import { StepActions } from "./components/StepActions";
 import { StepPanel } from "./components/StepPanel";
 import { TopBar } from "./components/TopBar";
-import { CHECK } from "./content/check";
+import { CHECK, SAI_CHECK } from "./content/check";
 import { SAI, saiBeadsAt } from "./content/sai";
 import { TAWAF, beadsAt } from "./content/tawaf";
-import { TEXT } from "./content/text";
+import { TEXT, type Words } from "./content/text";
 import type { Picks } from "./lib/check";
 import { pickLanguage, readStoredLanguage, storeLanguage, type Language } from "./lib/language";
 import { CHECK_HASH, TOTAL, isCheck, readPlace, stepHash, type Rite } from "./lib/step";
@@ -25,7 +25,12 @@ const goTo = (rite: Rite, step: number) => {
   location.hash = stepHash(rite, step);
 };
 
-const WALKS = { tawaf: { steps: TAWAF, beadsAt }, sai: { steps: SAI, beadsAt: saiBeadsAt } };
+// Each rite has its walk and its check. The check's own words are its header and the scene text before the pick.
+type CheckWords = { progress: keyof Words; done: keyof Words; where: keyof Words };
+const WALKS = {
+  tawaf: { steps: TAWAF, beadsAt, check: CHECK, checkWords: { progress: "checkProgress", done: "checkDone", where: "checkWhere" } as CheckWords },
+  sai: { steps: SAI, beadsAt: saiBeadsAt, check: SAI_CHECK, checkWords: { progress: "saiCheckProgress", done: "saiCheckDone", where: "saiCheckWhere" } as CheckWords },
+};
 
 export function App() {
   const [language, setLanguage] = useState<Language>(() => pickLanguage(readStoredLanguage(), navigator.language));
@@ -66,7 +71,7 @@ export function App() {
   }, []);
 
   // The arrow keys and a presenter clicker, which sends Page Up and Page Down (D31).
-  // In the check, Next waits for a pick (D52). On tawaf step 15, Next opens the check (D58). On sa'i step 13, Next does nothing.
+  // In the check, Next waits for a pick (D52). On the last step of a walk, Next opens the check of that rite (D58, D84).
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
@@ -77,7 +82,7 @@ export function App() {
         if (told) nextQuestion();
       } else if (forward) {
         if (step < total) goTo(rite, step + 1);
-        else if (rite === "tawaf") location.hash = CHECK_HASH;
+        else location.hash = CHECK_HASH[rite];
       } else if (backward) {
         if (step > 1) goTo(rite, step - 1);
       } else return;
@@ -92,12 +97,12 @@ export function App() {
     setLanguage(next);
   };
 
-  // The camera of a question is the camera of its walk step, and the result shows the wide view of step 15.
-  const questions = CHECK[language];
-  const sceneStep = !check ? step : at === "result" ? TOTAL.tawaf : questions[at - 1].step;
+  // The camera of a question is the camera of its walk step, and the result shows the wide view of the last step.
+  const questions = walk.check[language];
+  const sceneStep = !check ? step : at === "result" ? total : questions[at - 1].step;
   // Before the pick, the text for a screen reader names no place, as the names hide on screen (D57).
   const names = !check || at === "result" || told;
-  const where = names ? walk.steps[language][sceneStep - 1].where : words.checkWhere;
+  const where = names ? walk.steps[language][sceneStep - 1].where : words[walk.checkWords.where];
   const notices = (
     <>
       {scene === "unsupported" && <MessageCard message={words.no3d} />}
@@ -106,7 +111,7 @@ export function App() {
     </>
   );
 
-  // The check belongs to tawaf, so the address #semak reads as tawaf.
+  // The address of a check reads as its rite: #semak as tawaf, #semak-sai as sa'i.
   const sai = rite === "sai";
   const beadWords = sai ? { one: words.walk, none: words.noWalk, all: words.allWalks } : { one: words.circuit, none: words.noCircuit, all: words.allCircuits };
   const counted = beads.now ? beadWords.one.replace("{n}", String(beads.now)) : beads.done === 7 ? beadWords.all : beadWords.none;
@@ -133,15 +138,16 @@ export function App() {
           {check ? (
             <CheckSide
               words={words}
+              header={{ progress: words[walk.checkWords.progress], done: words[walk.checkWords.done] }}
               questions={questions}
-              steps={TAWAF[language]}
+              steps={walk.steps[language]}
               at={at}
               picks={picks}
               onPick={(answer) => setPicks((before) => before.map((pick, index) => (index === (at as number) - 1 ? answer : pick)))}
               onNext={nextQuestion}
-              onLeave={() => goTo("tawaf", TOTAL.tawaf)}
+              onLeave={() => goTo(rite, total)}
               onAgain={restart}
-              onStep={(question) => goTo("tawaf", question)}
+              onStep={(question) => goTo(rite, question)}
               focusFirst={moved}
             >
               {notices}
@@ -159,7 +165,7 @@ export function App() {
               >
                 {now.recitation && <ArabicBlock {...now.recitation} />}
                 {now.note && <Note label={words.noteLabel} text={now.note} />}
-                {last && !sai && (
+                {last && (
                   <button type="button" className="vh-button vh-button--quiet walk__again" onClick={() => goTo(rite, 1)}>
                     {words.startAgain}
                   </button>
@@ -169,11 +175,7 @@ export function App() {
               <StepActions
                 back={step > 1 ? { label: words.back, onAct: () => goTo(rite, step - 1) } : undefined}
                 next={
-                  !last
-                    ? { label: words.next, onAct: () => goTo(rite, step + 1) }
-                    : sai
-                      ? { label: words.startAgain, onAct: () => goTo(rite, 1) }
-                      : { label: words.checkStart, onAct: () => (location.hash = CHECK_HASH) }
+                  !last ? { label: words.next, onAct: () => goTo(rite, step + 1) } : { label: words.checkStart, onAct: () => (location.hash = CHECK_HASH[rite]) }
                 }
                 focusNext={moved}
               />

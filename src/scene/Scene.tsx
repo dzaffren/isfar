@@ -91,7 +91,7 @@ export function Scene({ rite, step, names: namesOn = true, words, where, state, 
     <section ref={section} className="scene" data-scene data-state={state} aria-busy={state === "loading"}>
       <div className="scene__frame vh-marble">
         {still && rite === "tawaf" && <MatafMap step={step} words={words} label={`${words.map}. ${where}`} showNames={namesOn} />}
-        {still && rite === "sai" && <MasaMap step={step} words={words} label={`${words.masaMap}. ${where}`} />}
+        {still && rite === "sai" && <MasaMap step={step} words={words} label={`${words.masaMap}. ${where}`} showNames={namesOn} />}
         <canvas ref={canvas} className="scene__view scene__canvas" role="img" aria-label={where} hidden={still} />
         <div className="scene__names" aria-hidden="true" hidden={state !== "shown"}>
           <svg className="scene__view">
