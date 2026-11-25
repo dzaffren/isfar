@@ -1,8 +1,0 @@
-/* The preview page of a slice. It ships in no build. */
-.preview { padding: var(--vh-space-6) var(--vh-space-4) var(--vh-space-12); display: grid; gap: var(--vh-space-8); }
-.preview__intro { max-width: calc(var(--vh-tile) * 9); display: grid; gap: var(--vh-space-3); }
-.preview__frames { display: flex; flex-wrap: wrap; align-items: flex-start; gap: var(--vh-space-8) var(--vh-space-6); }
-.preview__frame { margin: 0; display: grid; gap: var(--vh-space-2); }
-.preview__frame figcaption { font: var(--vh-text-label); color: var(--vh-ink); }
-.preview__frame iframe { border: var(--vh-stroke) solid var(--vh-edge); border-radius: var(--vh-radius-control); display: block; }
-
