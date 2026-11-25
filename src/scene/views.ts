@@ -115,7 +115,7 @@ export function birAliViewOf(step: number): View {
   const spot = IHRAM_SPOTS[step - 1];
   if (step === 1 || step === IHRAM_SPOTS.length || !spot.at) return { from: [-60, -100, 80], to: [-6, 4, 0] };
   const [x, y] = spot.at;
-  return { from: [x - 8, y - 18, 28], to: [x + 2, y + 5, 0] };
+  return { from: [x - 6, y - 20, 45], to: [x + 1, y + 4, 0] };
 }
 
 export function birAliNameAnchor(part: IhramPart): V3 {
