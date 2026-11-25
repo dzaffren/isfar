@@ -1,6 +1,6 @@
 # Ihram
 
-**Version:** v1 · **Status:** Refined · **Type:** Feature · **Project type:** Web UI
+**Version:** v1 · **Status:** Built · **Type:** Feature · **Project type:** Web UI
 
 **Shape doc:** docs/specs/virtual-hajj/shape.md
 **Depends on:** `sai-walk`
@@ -360,6 +360,7 @@ Recorded as D100, D101, D102.
 | O20 | The 3D Bir Ali holds 30 frames a second at phone speed. The dev machine has no graphics chip, so nothing here can measure it. | unproven | spec ihram p3 | user | Accepted risk | As for the mas'a (sai-walk O14). `/poc` was rejected, because the last spike stopped on the software renderer. The cuts stay ready: no antialias on a phone, a pixel ratio of 1.5. The proof comes on a real phone at /ship (D39). 2026-11-25 |
 | O21 | How does the camera move between the spots, with a 40 m minaret at the north-east corner? | question | spec ihram p3 | user | Resolved | On a straight line, with each view south-west of its spot and above the walls. A unit test walks each move (D101). "An arc round the mosque" was rejected. 2026-11-25 |
 | O22 | Does the ihram walk ship behind a feature flag? | question | spec ihram p3 | user | Resolved | No flag (D102). "A flag in the address" was rejected. 2026-11-25 |
+| O23 | The spots gave step 5 the name of the prayer hall. Its camera stands over the south hall, so the name falls behind the camera. | flag | build | user | Decided alone | Chose: step 5 shows no name, in 3D and on the map. The courtyard has no name of its own (D91). Other: move the anchor of the hall name to the north hall, so it shows on step 5. Undo: set the names of step 5 to `["hall"]` in `src/scene/birali.ts`, and move `IHRAM_PARTS.hall`. 2026-11-25 |
 
 _Never delete this section or its rows. See references/ledger.md._
 
