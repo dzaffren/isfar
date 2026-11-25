@@ -149,6 +149,44 @@ Rules that hold for each scenario:
 | A pilgrim figure that walks on Next | The /shape pass of D46 |
 | A listing in search engines | Not before a qualified review (shape O22) |
 
+## Interface
+
+The walk screen of tawaf and sa'i, with Bir Ali in the scene and a third part in the rite switch.
+
+```mermaid
+flowchart TB
+    PLAN[("plan.json: birali")] -- "mosque, court, minaret, washrooms, bus park" --> SPOTS["birali.ts: IHRAM_PARTS, IHRAM_SPOTS"]
+    SPOTS -- "marker spot and names of the step" --> MAP["BirAliMap: top view, north up"]
+    SPOTS -- "marker spot and names of the step" --> SCENE["3D Bir Ali, made by /build"]
+    TEXT["content/ihram.ts: 8 steps"] -- "title, text, niat, talbiyah, notes" --> PANEL["Step panel: label, no beads"]
+    BAR["TopBar: Ihram, Tawaf, Sa'i"] -- "opens #ihram-1" --> PANEL
+    PANEL -- "step 8: Teruskan ke tawaf" --> TAWAF["#tawaf-1"]
+```
+
+The plan holds Bir Ali once, `birali.ts` turns it into the spots, and the map and the 3D place both draw from that.
+
+| Part | What it shows |
+| --- | --- |
+| Top bar, from 800 px | The mark, "Isfar", the rite switch with Ihram, Tawaf and Sa'i, then BM and EN, in one row. |
+| Top bar, under 800 px | Row 1: the mark, "Isfar" and BM and EN. Row 2: the rite switch, with three equal buttons. The bar is 360 px wide at 360 px (O12). |
+| Step panel | "Ihram · Langkah 5 daripada 8", with no beads (O13). The title, the text, the Arabic block on steps 5 and 6, and the note on steps 2, 3, 6 and 8. |
+| Step 5 | The line for a pilgrim on a plane is one sentence of the step text (O14). |
+| Step 8 | The gold button says "Teruskan ke tawaf". "Mula semula" sits in the panel. |
+| Scene, 3D | Bir Ali, with the four names. /build makes it from the plan, as the mas'a. |
+| Scene, no 3D | The top-view map: the bus park on the north side, the mosque with its courtyard, the minaret at its north-east corner, the washroom block on the west side (O17). The marker and the names of the step. |
+| Loading | The loading card, "Memuatkan Bir Ali". |
+
+**Motion tier:** 2, as the tawaf and sa'i walks (O15). The step text fades in over 320 ms, and the camera flies between the spots. Under reduced motion, the camera cuts.
+
+**Components used:** `TopBar`, `StepPanel`, `StepActions`, `ArabicBlock`, `Note`, `Notice`, `MessageCard`, `LoadingCard`, and the new `BirAliMap`, which uses the map classes of `MasaMap`. No new token. The new map classes in `src/app.css` use `--vh-marble`, `--vh-kiswah`, `--vh-sunken`, `--vh-cloth` and `--vh-edge`.
+
+**Preview:** `http://localhost:5199/preview/ihram.html`, after `pnpm dev --port 5199`. It has 15 frames, and each frame is a working ihram screen. The top-view map stands in for the 3D Bir Ali.
+
+**Built in this pause, for /build to keep:** the `birali` part of `src/scene/plan.json`, `src/scene/birali.ts`, `src/components/BirAliMap.tsx`, the map classes and the two-row top bar in `src/app.css`, `src/content/ihram.ts`, the new words in `src/content/text.ts`, and the list of parts in `TopBar`, with its call in `App.tsx`.
+**For the preview only:** `preview/ihram.html` and `src/preview/`. No build ships them.
+
+**Checks:** The static drift check passes on 8 files. The rendered drift check passes on steps 1, 5, 6 and 8, in light and dark. `pnpm typecheck` passes, and `pnpm test` passes 71 tests. The `design-taste-frontend` skill is not installed, so its inspector did not run. The screen is the kiswah and marble system of the walks (D3), so a one-line prompt would not land on it.
+
 ## Open items
 
 | ID  | What | Type | Raised at | Owner | Status | Answer |
@@ -164,12 +202,19 @@ Rules that hold for each scenario:
 | O9  | Which parts of Bir Ali does the 3D place name? | question | spec ihram p1 | user | Resolved | Four: the prayer hall, the minaret, the washrooms and the bus park. "Three, with no minaret name" and "two, with no bus park" were rejected. 2026-11-25 |
 | O10 | How does a person reach ihram, and how does the person jump between the parts? | question | spec full-umrah p1 | user | Resolved | The rite switch in the top bar. It holds Ihram, Tawaf and Sa'i now, and `full-umrah` adds Tahallul. Each button opens step 1 of its part (D71). "No switch" and "a list of parts on step 1" were rejected. 2026-11-25 |
 | O11 | What does the progress label count, and what is the address? | question | spec full-umrah p1 | user | Resolved | The steps of the part, as "Ihram · Langkah 5 daripada 8", at `#ihram-5`. Old links as `#tawaf-6` keep working. "One count for the whole umrah, at `#umrah-11`" was rejected. 2026-11-25 |
+| O12 | With Ihram, Tawaf and Sa'i, the top bar is 418 px wide on a 360 px phone, so the page scrolls sideways. | flag | spec ihram p2 | user | Resolved | Under 800 px, the rite switch takes its own row, with equal buttons, and "Isfar" shows again in row 1. "Drop the mark and tighten" was rejected: it fits 358 of 360 px, and Tahallul does not fit (D96). 2026-11-25 |
+| O13 | Ihram has no count of seven. What sits beside the progress label? | question | spec ihram p2 | user | Resolved | No beads (D97). "Eight step beads" was rejected. 2026-11-25 |
+| O14 | Where does the line for a pilgrim on the plane sit? The Note component is for the other schools. | question | spec ihram p2 | user | Resolved | One sentence of the step 5 text (D98). "A second kind of note" was rejected. 2026-11-25 |
+| O15 | Which motion tier does the ihram walk use? | question | spec ihram p2 | user | Resolved | Tier 2, as the walks (D99). "Tier 1" was rejected. 2026-11-25 |
+| O16 | Which words of the niat show in Arabic? | question | spec ihram p2 | user | Resolved | "Nawaitul 'umrata wa ahramtu biha lillahi ta'ala". "Labbaika Allahumma 'umratan" was rejected. The user checks it against the course notes with the rest of the text. 2026-11-25 |
+| O17 | Nothing found shows where the washrooms stand at Bir Ali. The plan puts one block west of the mosque. | assumption | spec ihram p2 | user | Accepted risk | Stylised place. The user checks it against a photo or the course notes. A move is four numbers in `plan.json` and `pnpm model`. "Two blocks, east and west" was rejected. 2026-11-25 |
+| O18 | The step text, the notes on the other schools and the meanings are Claude's draft. Nobody has checked the school notes against a source. | flag | spec ihram p2 | user | Accepted risk | Ship the draft, as for tawaf and sa'i (D24). The "not yet reviewed" notice stays, and the user corrects `src/content/ihram.ts` against the course notes. "Correct it before approval" was rejected. 2026-11-25 |
 
 _Never delete this section or its rows. See references/ledger.md._
 
 ## Decisions
 
-Recorded as D87 to D95 at pause 1.
+Recorded as D87 to D95 at pause 1, and D96 to D99 at pause 2.
 
 ## Glossary
 

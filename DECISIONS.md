@@ -689,7 +689,7 @@ one row. The name shows from 800 px wide, and the step text keeps its place on s
 Rejected: The rite switch on a second row (the top bar grows by about 56 px, and the
 step text starts lower).
 Source: specs/sai-walk.md
-Status: active
+Status: superseded by D96
 
 ## D74 · 2026-11-24 · The switch buttons have padding on their sides
 
@@ -892,5 +892,41 @@ Why: the label says "Ihram · Langkah 5 daripada 8" at #ihram-5, as tawaf and sa
 (D30). Old links as #tawaf-6 keep working, and the checks keep their step numbers.
 Rejected: One count for the whole umrah at #umrah-11 (each old link must move to a new
 number, and a change to one part renumbers the parts after it).
+Source: specs/ihram.md
+Status: active
+
+## D96 · 2026-11-25 · On a phone, the rite switch takes its own row, and the site name shows again
+
+Why: with Ihram, Tawaf and Sa'i, one row is 418 px wide on a 360 px phone. A row of its
+own holds three equal buttons, and Tahallul in full-umrah. Row 1 then has room for
+"Isfar". From 800 px wide, the bar stays one row.
+Rejected: Drop the mark and tighten the padding (358 of 360 px, so a longer word breaks
+it, and Tahallul does not fit), The site name hidden on a phone (D73: only needed while
+the switch shared the row).
+Supersedes: D73
+Source: specs/ihram.md
+Status: active
+
+## D97 · 2026-11-25 · The ihram walk shows no beads
+
+Why: the beads count circuits and walks, and ihram has no count of seven. The label
+already says "Langkah 5 daripada 8".
+Rejected: Eight step beads (a new Beads variant for a count the label already gives).
+Source: specs/ihram.md
+Status: active
+
+## D98 · 2026-11-25 · The line for a pilgrim on the plane is part of the step 5 text
+
+Why: one sentence fits in the 40 words of step 5. The note stays for the other schools,
+as its label says.
+Rejected: A second kind of note with its own label (a new component for one sentence).
+Source: specs/ihram.md
+Status: active
+
+## D99 · 2026-11-25 · The ihram walk uses motion tier 2, as the tawaf and sa'i walks do
+
+Why: the step text fades in over 320 ms, and the camera flies between the spots in Bir
+Ali, so the person keeps the order of the day. Under reduced motion, the camera cuts.
+Rejected: Tier 1 (the camera cuts between the spots).
 Source: specs/ihram.md
 Status: active
