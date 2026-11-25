@@ -124,8 +124,10 @@ export function App() {
         onLanguage={chooseLanguage}
         rite={{
           label: words.riteSwitch,
-          tawaf: words.riteTawaf,
-          sai: words.riteSai,
+          parts: [
+            { id: "tawaf", name: words.riteTawaf },
+            { id: "sai", name: words.riteSai },
+          ],
           now: rite,
           // The other rite opens at its step 1 (D71).
           onRite: (other) => (other !== rite ? goTo(other, 1) : undefined),

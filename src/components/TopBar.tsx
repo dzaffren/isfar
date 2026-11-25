@@ -1,15 +1,15 @@
 import type { Language } from "../lib/language";
-import type { Rite } from "../lib/step";
 
-type Props = {
+// The rite switch lists the parts of the umrah in their order, each with its word on screen.
+type Props<Part extends string> = {
   siteName: string;
   switchLabel: string;
   language: Language;
   onLanguage: (language: Language) => void;
-  rite?: { label: string; tawaf: string; sai: string; now: Rite; onRite: (rite: Rite) => void };
+  rite?: { label: string; parts: { id: Part; name: string }[]; now: Part; onRite: (rite: Part) => void };
 };
 
-export function TopBar({ siteName, switchLabel, language, onLanguage, rite }: Props) {
+export function TopBar<Part extends string>({ siteName, switchLabel, language, onLanguage, rite }: Props<Part>) {
   return (
     <header className="vh-panel__head vh-kiswah topbar">
       <div className="vh-panel__where">
@@ -21,12 +21,11 @@ export function TopBar({ siteName, switchLabel, language, onLanguage, rite }: Pr
       </div>
       {rite && (
         <div className="vh-switch topbar__rite" role="group" aria-label={rite.label}>
-          <button type="button" aria-pressed={rite.now === "tawaf"} onClick={() => rite.onRite("tawaf")}>
-            {rite.tawaf}
-          </button>
-          <button type="button" aria-pressed={rite.now === "sai"} onClick={() => rite.onRite("sai")}>
-            {rite.sai}
-          </button>
+          {rite.parts.map((part) => (
+            <button key={part.id} type="button" aria-pressed={rite.now === part.id} onClick={() => rite.onRite(part.id)}>
+              {part.name}
+            </button>
+          ))}
         </div>
       )}
       <div className="vh-switch" role="group" aria-label={switchLabel}>

@@ -76,12 +76,20 @@ html { scroll-padding-bottom: calc(var(--vh-control) + var(--vh-space-8)); }
 
 /* The sa'i walk: the rite switch in the top bar, and the top-view map of the mas'a, a strip three times as wide as it is high. */
 .topbar__rite { margin-left: auto; }
-/* On a phone, the top bar holds the Kaabah mark and the two switches in one row, and the site name shows from 800 px. */
+/* On a phone, the rite switch takes its own row under the mark, the site name and the language switch, with equal buttons. */
 @media (max-width: 799px) {
-  .topbar { gap: var(--vh-space-4); }
-  .topbar__name { display: none; }
+  .topbar { flex-wrap: wrap; gap: var(--vh-space-3) var(--vh-space-4); }
+  .topbar__rite { order: 1; flex-basis: 100%; margin-left: 0; }
+  .topbar__rite button { flex: 1; }
 }
 .map--masa { width: min(100cqw, 300cqh); height: auto; aspect-ratio: 3; }
 .map__hall { fill: var(--vh-cloth); stroke: var(--vh-edge); stroke-width: 0.5; }
 .map__hill { fill: var(--vh-sunken); stroke: var(--vh-edge); stroke-width: 0.5; }
 .map__barrier { stroke: var(--vh-edge); stroke-width: 0.7; }
+
+/* The ihram walk: the top-view map of Bir Ali. */
+.map__court { fill: var(--vh-marble); stroke: var(--vh-edge); stroke-width: 0.5; }
+.map__minaret { fill: var(--vh-kiswah); }
+.map__block { fill: var(--vh-sunken); stroke: var(--vh-edge); stroke-width: 0.5; }
+.map__park { fill: var(--vh-sunken); }
+.map__bay { stroke: var(--vh-cloth); stroke-width: 0.5; }
