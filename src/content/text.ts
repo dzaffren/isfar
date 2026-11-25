@@ -50,6 +50,9 @@ const ms = {
   loadingMasa: "Memuatkan mas'a",
   partSafa: "Bukit Safa",
   partMarwah: "Bukit Marwah",
+  saiCheckProgress: "Semakan sa'i · Soalan {n} daripada {total}",
+  saiCheckDone: "Semakan sa'i · Selesai",
+  saiCheckWhere: "Penanda emas di mas'a. Nama tempat muncul selepas anda menjawab.",
 };
 
 export type Words = Record<keyof typeof ms, string>;
@@ -103,6 +106,9 @@ const en: Words = {
   loadingMasa: "Loading the mas'a",
   partSafa: "Safa",
   partMarwah: "Marwah",
+  saiCheckProgress: "Sa'i check · Question {n} of {total}",
+  saiCheckDone: "Sa'i check · Done",
+  saiCheckWhere: "A gold marker in the mas'a. The name of the place shows after you answer.",
 };
 
 export const TEXT: Record<Language, Words> = { ms, en };

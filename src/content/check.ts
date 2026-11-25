@@ -110,3 +110,111 @@ const en: Question[] = [
 ];
 
 export const CHECK: Record<Language, Question[]> = { ms, en };
+
+// The sa'i check, in the Shafi'i school. The sai-check spec's "Text of the check" table is the source.
+// No question names the side of a lane, because nobody has checked it yet (sai-walk O20).
+const saiMs: Question[] = [
+  {
+    step: 3,
+    ask: "Di mana sa'i bermula?",
+    answers: ["Bukit Marwah", "Bukit Safa", "Lampu hijau pertama"],
+    right: 1,
+    why: "Sa'i bermula di Bukit Safa, dan perjalanan pertama menuju ke Marwah.",
+  },
+  {
+    step: 3,
+    ask: "Apa yang anda buat di Safa sebelum perjalanan pertama?",
+    answers: ["Berniat sa'i, hadap ke arah Kaabah, angkat tangan, bertakbir dan berdoa", "Solat sunat dua rakaat", "Terus berjalan ke Marwah"],
+    right: 0,
+    why: "Di Safa, berniat sa'i, hadap ke arah Kaabah, angkat kedua-dua tangan, bertakbir dan berdoa. Solat dua rakaat datang selepas tawaf, sebelum sa'i.",
+  },
+  {
+    step: 4,
+    ask: "Anda turun dari Safa. Lorong mana yang anda ikut?",
+    answers: ["Mana-mana lorong yang kurang sesak", "Lorong orang yang kembali ke Safa", "Lorong ke Marwah"],
+    right: 2,
+    why: "Mas'a ada satu lorong untuk setiap arah. Ikut lorong ke Marwah, supaya anda tidak berjalan melawan orang yang kembali ke Safa.",
+  },
+  {
+    step: 5,
+    ask: "Apa yang lelaki buat di antara dua lampu hijau?",
+    answers: ["Berjalan cepat dengan langkah pendek", "Berhenti dan berdoa", "Berjalan seperti biasa"],
+    right: 0,
+    why: "Di antara dua lampu hijau, lelaki berjalan cepat dengan langkah pendek. Wanita berjalan seperti biasa.",
+  },
+  {
+    step: 5,
+    ask: "Apa yang anda baca di antara dua lampu hijau?",
+    answers: ["Labbaik Allahumma labbaik", "Rabbighfir warham", "Bismillahi, Allahu Akbar"],
+    right: 1,
+    why: "Di antara dua lampu hijau, baca “Rabbighfir warham, innaka antal a'azzul akram”.",
+  },
+  {
+    step: 7,
+    ask: "Anda berjalan dari Marwah dan sampai di Safa buat kali pertama. Berapa perjalanan sudah selesai?",
+    answers: ["Satu", "Setengah", "Dua"],
+    right: 2,
+    why: "Safa ke Marwah ialah satu perjalanan, dan Marwah kembali ke Safa ialah perjalanan kedua.",
+  },
+  {
+    step: 12,
+    ask: "Di mana sa'i tamat?",
+    answers: ["Di Bukit Marwah, selepas perjalanan ketujuh", "Di Bukit Safa, tempat anda bermula", "Di antara dua lampu hijau"],
+    right: 0,
+    why: "Perjalanan ketujuh bermula di Safa dan tamat di Marwah, jadi sa'i tamat di Bukit Marwah.",
+  },
+];
+
+const saiEn: Question[] = [
+  {
+    step: 3,
+    ask: "Where does sa'i start?",
+    answers: ["Marwah", "Safa", "The first green light"],
+    right: 1,
+    why: "Sa'i starts at Safa, and the first walk goes towards Marwah.",
+  },
+  {
+    step: 3,
+    ask: "What do you do on Safa before the first walk?",
+    answers: ["Make the niat of sa'i, face the Kaabah, raise your hands, say takbir and make doa", "Pray two rakaat", "Walk straight on to Marwah"],
+    right: 0,
+    why: "On Safa, make the niat of sa'i, face the Kaabah, raise both hands, say takbir and make doa. The two rakaat come after tawaf, before sa'i.",
+  },
+  {
+    step: 4,
+    ask: "You come down from Safa. Which lane do you keep to?",
+    answers: ["Any lane that is less crowded", "The lane of the people going back to Safa", "The lane to Marwah"],
+    right: 2,
+    why: "The mas'a has one lane for each way. Keep to the lane to Marwah, so you do not walk against the people going back to Safa.",
+  },
+  {
+    step: 5,
+    ask: "What do men do between the two green lights?",
+    answers: ["Walk quickly with short steps", "Stop and make doa", "Walk at a usual pace"],
+    right: 0,
+    why: "Between the two green lights, men walk quickly with short steps. Women walk at a usual pace.",
+  },
+  {
+    step: 5,
+    ask: "What do you say between the two green lights?",
+    answers: ["Labbaik Allahumma labbaik", "Rabbighfir warham", "Bismillahi, Allahu Akbar"],
+    right: 1,
+    why: "Between the two green lights, say “Rabbighfir warham, innaka antal a'azzul akram”.",
+  },
+  {
+    step: 7,
+    ask: "You walk from Marwah and reach Safa for the first time. How many walks are done?",
+    answers: ["One", "Half of one", "Two"],
+    right: 2,
+    why: "Safa to Marwah is one walk, and Marwah back to Safa is the second walk.",
+  },
+  {
+    step: 12,
+    ask: "Where does sa'i end?",
+    answers: ["At Marwah, after the seventh walk", "At Safa, where you started", "Between the two green lights"],
+    right: 0,
+    why: "The seventh walk goes from Safa to Marwah, so sa'i ends at Marwah.",
+  },
+];
+
+export const SAI_CHECK: Record<Language, Question[]> = { ms: saiMs, en: saiEn };
