@@ -150,6 +150,10 @@ The plan holds the lanes once, `masa.ts` turns them into the path and the spots,
 
 The new words are in bold. The text names no side, so a fix to O20 changes the plan only.
 
+## Review
+
+2026-11-25 · 0 raw findings, 0 survived. Clean.
+
 ## Open items
 
 | ID  | What | Type | Raised at | Owner | Status | Answer |
