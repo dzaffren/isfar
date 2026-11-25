@@ -1,6 +1,6 @@
 # Sa'i walk
 
-**Version:** v2 · **Status:** Built · **Type:** Bug · **Project type:** Web UI
+**Version:** v2 · **Status:** Shipped · **Type:** Bug · **Project type:** Web UI
 
 **Supersedes:** archive/sai-walk-v1.md
 **Shape doc:** docs/specs/virtual-hajj/shape.md
