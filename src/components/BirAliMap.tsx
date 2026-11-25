@@ -11,7 +11,7 @@ export const IHRAM_PART_WORD: Record<IhramPart, keyof Words> = {
 
 // Where each name sits on the map, clear of the marker and the other names.
 const NAME_AT: Record<IhramPart, Point> = {
-  hall: [0, -28],
+  hall: [30, -28],
   minaret: [6, 25],
   washrooms: [-51, 18],
   busPark: [-28, 42],

@@ -18,6 +18,16 @@ async function tapNext(page: Page, times: number) {
   for (let tap = 0; tap < times; tap += 1) await next(page).click();
 }
 
+// On the map, no name covers the gold marker.
+async function expectMarkerClear(page: Page) {
+  const marker = (await page.locator("[data-marker]").boundingBox())!;
+  for (const name of await names(page).all()) {
+    const box = (await name.boundingBox())!;
+    const apart = box.x + box.width <= marker.x || marker.x + marker.width <= box.x || box.y + box.height <= marker.y || marker.y + marker.height <= box.y;
+    expect(apart, `the name "${await name.innerText()}" stays clear of the marker`).toBe(true);
+  }
+}
+
 const inside = ([x, y]: [number, number], [cx, cy]: number[], width: number, depth: number) => Math.abs(x - cx) < width / 2 && Math.abs(y - cy) < depth / 2;
 
 for (const size of SIZES) {
@@ -109,6 +119,7 @@ for (const size of SIZES) {
       const atWashrooms = await markerAt(page);
       expect(inside(atWashrooms, washrooms.at, washrooms.width + 8, washrooms.depth), "the marker is beside the washrooms").toBe(true);
       expect(inside(atWashrooms, washrooms.at, washrooms.width, washrooms.depth), "the marker is outside the block").toBe(false);
+      await expectMarkerClear(page);
       const message = page.getByText(MS.no3d, { exact: true });
       await expect(message).toBeVisible();
       expect((await message.boundingBox())!.y, "the message sits under the step panel").toBeGreaterThan((await page.locator(".vh-panel").boundingBox())!.y);
@@ -118,6 +129,8 @@ for (const size of SIZES) {
       const inHall = await markerAt(page);
       expect(inside(inHall, mosque.at, mosque.size, mosque.size), "the marker is in the mosque").toBe(true);
       expect(inside(inHall, court.at, court.size, court.size), "the marker is out of the courtyard").toBe(false);
+      await expect(names(page)).toHaveText(["Dewan solat"], { useInnerText: true });
+      await expectMarkerClear(page);
       expect(modelAsked).toBe(false);
     });
 
