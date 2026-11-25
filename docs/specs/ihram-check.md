@@ -1,6 +1,6 @@
 # Ihram check
 
-**Version:** v1 · **Status:** Draft · **Type:** Feature · **Project type:** Web UI
+**Version:** v1 · **Status:** Refined · **Type:** Feature · **Project type:** Web UI
 
 **Shape doc:** docs/specs/virtual-hajj/shape.md
 **Depends on:** `ihram`, `sai-check`
@@ -262,6 +262,143 @@ The right answer moves from place to place: 2, 1, 3, 1, 2, 3, 1 (D54).
 | Header | Semakan ihram · Soalan 3 daripada 7. Semakan ihram · Selesai. | Ihram check · Question 3 of 7. Ihram check · Done. |
 | The scene before the pick, for a screen reader | Bir Ali. Nama tempat muncul selepas anda menjawab. | Bir Ali. The name of the place shows after you answer. |
 | Every other word | The words of the tawaf check: Mula semakan, Keluar, Cuba semula, Betul., Belum tepat., the result lines. "Teruskan ke tawaf" and "Mula semula" as on step 8 today. | The same, in English |
+
+## Technical plan
+
+### Approach
+
+`readPlace` reads `#semak-ihram` as ihram step 1, as it reads `#semak-sai` as sa'i step 1 today. So `rite` in `App.tsx` is right in the check: the scene keeps Bir Ali, and the rite switch shows "Ihram".
+The ihram entry of `WALKS` then gets its check, as the tawaf and sa'i entries have, and its `after` becomes `#semak-ihram`. A new `panel` field holds the quiet "Teruskan ke tawaf" button of step 8.
+The check code stays one code path for three rites. No new file downloads, and the models do not change.
+
+Relies on: D30, D31, D40, D47 to D57, D59 to D63, D71, D77, D84, D97, D101, D103, D104, D105
+
+```mermaid
+flowchart TB
+    HASH[("Address: #semak-ihram or #ihram-8")]
+    STEP["lib/step.ts: readPlace, isCheck, CHECK_HASH of three rites"]
+    APP["App.tsx: WALKS.ihram with check, after, panel"]
+    TEXT["content/check.ts: IHRAM_CHECK"]
+    SIDE["CheckSide: ihram header words, questions, result"]
+    SCENE["scene/Scene.tsx: key = rite, names flag"]
+    PLACE["scene/place.ts: birali.glb, setNames"]
+    MAP["BirAliMap: showNames"]
+    HASH -- "hashchange" --> APP
+    APP -- "hash text" --> STEP
+    STEP -- "rite ihram, check true" --> APP
+    APP -- "questions of the rite" --> TEXT
+    APP -- "question, pick, ihram steps, header words" --> SIDE
+    SIDE -- "Keluar: #ihram-8, a missed step: #ihram-2" --> HASH
+    APP -- "ihram walk step of the question, names after the answer" --> SCENE
+    SCENE -- "goTo(step), setNames(on)" --> PLACE
+    SCENE -- "no 3D: step, showNames" --> MAP
+```
+
+The address names the rite and the check, `App.tsx` picks the ihram questions by the rite, and the scene shows the ihram walk step of each question.
+
+```mermaid
+sequenceDiagram
+    participant U as Person
+    participant A as App.tsx
+    participant S as Scene.tsx
+    participant P as place.ts
+    U->>A: Page Down on ihram step 8
+    A->>A: location.hash = "#semak-ihram", hashchange
+    A->>A: readPlace gives ihram, isCheck gives true, at = 1, picks empty
+    A->>S: rite ihram (same key, no reload), step 1, names off
+    S->>P: goTo(1), setNames(false)
+    P-->>U: camera moves to the wide view, no names
+    U->>A: taps "Jemaah yang datang dari Madinah"
+    A-->>U: tick, "Betul." and the line why, Seterusnya on
+    A->>S: names on
+    S->>P: setNames(true), one frame
+    P-->>U: the four names show
+```
+
+From ihram step 8 the rite stays ihram, so Bir Ali does not load again. A tap locks the pick, and the names show.
+
+No data crosses a trust boundary. The address is the only input. `readPlace` and `isCheck` accept only the exact text `#semak-ihram`, and the picks never leave the page.
+
+### Changes
+
+| File | What changes | Why |
+| --- | --- | --- |
+| `src/lib/step.ts:11` | `readPlace` gives ihram step 1 for `#semak-ihram`, as it gives sa'i step 1 for `#semak-sai`. | Scenarios 1 and 3 |
+| `src/lib/step.ts:25-31` | `Checked` goes. `CHECK_HASH` becomes `Record<Rite, string>` with `ihram: "#semak-ihram"`. `isCheck` matches any one of the three exactly. | Scenario 3, D103 |
+| `src/App.tsx:30-37` | `check` is no longer nullable, because each rite has one. `Walk` gains `panel: { hash; label } \| null`, the quiet button beside "Mula semula" on the last step. The comments drop "Ihram has no check yet". | Scenario 1, D103 |
+| `src/App.tsx:41` | The ihram entry: `after: { hash: CHECK_HASH.ihram, label: "checkStart" }`, `panel: { hash: "#tawaf-1", label: "goTawaf" }`, and `check: { questions: IHRAM_CHECK, words: { progress: "ihramCheckProgress", done: "ihramCheckDone", where: "ihramCheckWhere" } }`. Tawaf and sa'i get `panel: null`. | Scenario 1, D103 |
+| `src/App.tsx:97` | The comment on the keys: the last step of each rite opens its check. The key code does not change, because it reads `walk.after`. | Scenario 3 |
+| `src/App.tsx:195-199` | On the last step, the panel shows `walk.panel` as a quiet button before "Mula semula", when it is there. | Scenario 1, D103 |
+| `src/lib/step.test.ts:66-76` | `#semak-ihram` reads as ihram step 1, and as a check. `#SEMAK-IHRAM`, `#semak-ihram-2` and `#ihram-semak` are neither. `CHECK_HASH` holds three addresses. | Scenario 3 |
+| `src/content/check.test.ts` | The tests of the other checks run on `IHRAM_CHECK`: seven questions, three answers, the steps 1 to 7, no right answer in the same place twice in a row, 40 words or fewer. The answers of scenarios 1 and 2. | Rules, D104 |
+| `e2e/ihram.spec.ts:107-114` | Step 8 shows "Mula semakan" in the bar. "Teruskan ke tawaf" in the panel opens `#tawaf-1`. | D103 |
+| `e2e/ihram.spec.ts:188-196` | Page Down on step 8 opens `#semak-ihram`, and the Back button goes to step 8. | D103 |
+| `e2e/ihram-check.spec.ts` (new) | Scenarios 1 to 4, and the rules below, at four sizes. | Scenarios 1 to 4 |
+| `preview/`, `src/preview/` (deleted) | The preview goes when `e2e/ihram-check.spec.ts` passes. | Nothing ships them |
+| `CHANGELOG.md` | One "Added" line for the ihram check. | The repo's rule |
+
+Kept from pause 2: `IHRAM_CHECK` in `src/content/check.ts`, and the three ihram check words in `src/content/text.ts`.
+
+Reusing: `CheckSide`, `CheckQuestion`, `CheckResult`, `AnswerOption`, `score` and `missedSteps` in `src/lib/check.ts`, the `hashchange` and key listeners in `src/App.tsx`, `showNames` on `BirAliMap`, `setNames` in `src/scene/place.ts`, and `SIZES`, `answerTo`, `pickOf`, `expectBeads`, `expectCamera`, `expectNotices`, `markerAt`, `names`, `noWebGL` and `BIRALI_MODEL` in `e2e/helpers.ts`.
+
+### Earn-it
+
+| Added | Triggered by |
+| --- | --- |
+| `panel` on `Walk` | Scenario 1 and D103: ihram step 8 holds a second quiet button, and tawaf and sa'i do not |
+| `e2e/ihram-check.spec.ts` | Scenarios 1 to 4 |
+
+Cut: a second check component for ihram, a route or a state for the rite of the check apart from `readPlace`, the question number in the address (D53), a feature flag (D63), a unit test for two misses on one step, because each ihram question has a step of its own.
+
+### Non-functionals
+
+|                      |     |
+| -------------------- | --- |
+| **Load**             | A few visits a day: the user and a few testers. The site is static files on Cloudflare's network. |
+| **Breaks first**     | Nothing at 10 times the visits: the site has no server. The ihram questions add about 3 KB of script and no new download, so the 500 KB ceiling of D16 does not move. `pnpm size` fails the build over the ceiling. |
+| **Security surface** | Anyone can open the site. Its inputs are the device language, one stored value and the address. `readPlace` and `isCheck` match only the exact text `#semak-ihram`. The picks are numbers in memory, and React escapes the text. No new secret, and the site stores nothing new. |
+| **Proof it works**   | CI runs `e2e/ihram-check.spec.ts` against the build before the deploy. The smoke step prints `smoke: https://isfar-57q.pages.dev ok`. On `#semak-ihram`, Seterusnya on question 1 moves the camera, and the live site prints `[isfar] camera at step 2: …`. No number comes from real visitors (shape O5). |
+| **Rollout**          | No flag (D63). The ihram check ships when the PR merges. Rollback: "Rollback to this deployment" in the Cloudflare dashboard, or `git revert` and a push. |
+
+### Test plan
+
+| Scenario | Test | Command |
+| -------- | ---- | ------- |
+| 1. Aminah finishes the ihram walk and checks what she learned | `e2e/ihram-check.spec.ts`, at four sizes: ihram step 8 to the result, "Mula semakan" in the bar and "Teruskan ke tawaf" in the panel, the rite switch on "Ihram", names hidden then the four names, "Langkah 2 · Sebelum ihram" opens `#ihram-2` | `pnpm e2e --project=firefox` here, `pnpm e2e --project=chromium` in CI |
+| 2. Aminah puts the scent on the cloth | `e2e/ihram-check.spec.ts`: the cross and "Belum tepat." on "Pada kain ihram", the tick on "Pada badan sahaja", the line why, `aria-disabled` on each answer, then "Keluar" to step 8 | `pnpm e2e --project=firefox` |
+| 3. Ustaz Hafiz runs the ihram check on a projector | `e2e/ihram-check.spec.ts` at 1920x1080: Page Down on step 8, Page Down before and after a pick, one `birali.glb` download after "BM", a reload to question 1, and `#semak-sai` to the sa'i check with `masa.glb`. `src/lib/step.test.ts`: the addresses. | `pnpm e2e --project=firefox`, `pnpm test` |
+| 4. The ihram check works with no 3D | `e2e/ihram-check.spec.ts` with `noWebGL`: the map with no marker and no name on question 1, the four names after the pick, the marker of question 2 at the washrooms, all seven questions to the result | `pnpm e2e --project=firefox` |
+| Rule: seven questions, three answers, steps 1 to 7, fixed order, 40 words or fewer | `src/content/check.test.ts` | `pnpm test` |
+| Rule: question 5 shows no name after the answer | `e2e/ihram-check.spec.ts`, in scenario 1 | `pnpm e2e --project=firefox` |
+| Rule: the rite switch in the check opens tawaf step 1 | `e2e/ihram-check.spec.ts`: a tap on "Tawaf" at question 2 gives `#tawaf-1` | `pnpm e2e --project=firefox` |
+| Rule: the tawaf and sa'i checks do not change | `e2e/check.spec.ts` and `e2e/sai-check.spec.ts`, as they are | `pnpm e2e --project=firefox` |
+| Rule: ihram step 8 still opens tawaf, from the panel | `e2e/ihram.spec.ts` | `pnpm e2e --project=firefox` |
+
+**E2E:** `e2e/ihram-check.spec.ts` walks scenarios 1 to 4. The Playwright setup exists, and CI on `main` is green with it.
+
+The other commands: `pnpm typecheck`, `pnpm build && pnpm size`. Stop the `pnpm dev` server on port 5199 before `pnpm e2e` (lesson `stop-preview-before-e2e`). Prove the 3D half in Firefox here (lesson `local-chromium-loses-3d`). Point `readPlace` at tawaf for `#semak-ihram` once, and watch the tests fail (lesson `break-the-guarded-code`). Delete the preview in a commit of its own, just after `git rm` (lesson `commit-the-preview-deletion-alone`).
+
+### Chunks
+
+Single chunk. `step.ts` and `App.tsx` share the rite of the check, and the one browser test needs both.
+
+Order inside the chunk:
+
+1. `step.ts` and the two unit test files.
+2. `App.tsx`: `WALKS.ihram`, `panel` and the step 8 panel. The check works on the map.
+3. The step 8 lines of `e2e/ihram.spec.ts`, then `e2e/ihram-check.spec.ts` in full. Delete the preview.
+
+### Risks
+
+| Risk | Mitigation |
+| ---- | ---------- |
+| Page Down on ihram step 8 now opens the check, not tawaf. An ustaz who taught with the clicker from ihram into tawaf now meets the check. | "Keluar" and the browser's Back button go to step 8 at once, and "Teruskan ke tawaf" sits in the panel. `full-umrah` adds the gold button from the result to tawaf (shape O19). |
+| The question text has a mistake in a ruling. | The "not yet reviewed" notice stays, and the site stays hidden from search engines (shape O22). A qualified person reviews it before a public launch (shape O1). |
+| Question 1 asks who enters ihram at Bir Ali, and nobody has checked which miqat the Malaysian flights pass (`ihram` O3). | The question asks only about pilgrims from Madinah, and its line why says what a pilgrim on a plane to Jeddah does. It names no airline or route. |
+
+### Decisions to record
+
+None. The plan makes no new choice with a rejected option. D103 to D105 cover the choices of this slice.
 
 ## Decisions
 
