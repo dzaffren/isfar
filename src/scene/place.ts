@@ -19,9 +19,10 @@ import {
 } from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import type { Rite } from "../lib/step";
+import { IHRAM_SPOTS, type IhramPart } from "./birali";
 import { SAI_SPOTS, groundAt, laneLine, type SaiPart } from "./masa";
 import { SPOTS, onPath, type Part } from "./mataf";
-import { alongHall, between, nameAnchor, namePlace, saiNameAnchor, saiNamePlace, saiViewOf, viewOf, type V3, type View } from "./views";
+import { alongHall, between, birAliNameAnchor, birAliNamePlace, birAliViewOf, nameAnchor, namePlace, saiNameAnchor, saiNamePlace, saiViewOf, viewOf, type V3, type View } from "./views";
 
 export type Name = { name: HTMLElement; lead: SVGLineElement };
 
@@ -42,7 +43,7 @@ function token(name: string): Color {
   return new Color(getComputedStyle(document.documentElement).getPropertyValue(name).trim());
 }
 
-// Each mesh in mataf.glb and masa.glb takes its colour from its name.
+// Each mesh in mataf.glb, masa.glb and birali.glb takes its colour from its name.
 const COLOURS: Record<string, string> = {
   kiswah: "--vh-kiswah",
   band: "--vh-gold",
@@ -59,8 +60,15 @@ const COLOURS: Record<string, string> = {
   wall: "--vh-sunken",
   rock: "--vh-edge",
   barrier: "--vh-sunken",
+  park: "--vh-sunken",
+  bay: "--vh-cloth",
+  hallFloor: "--vh-cloth",
+  court: "--vh-marble",
+  hall: "--vh-sunken",
+  minaret: "--vh-kiswah",
+  washrooms: "--vh-sunken",
 };
-const FLAT = new Set(["floor", "guide", "lamp"]);
+const FLAT = new Set(["floor", "guide", "lamp", "park", "bay", "hallFloor", "court"]);
 
 const MOVE_MS = 900;
 const easeOut = (t: number) => 1 - (1 - t) ** 3;
@@ -131,7 +139,7 @@ export const laneLines = (towards: "marwah" | "safa") =>
     }
   });
 
-// What differs between the two places: the model, the spots, the camera and the names (D76).
+// What differs between the places: the model, the spots, the camera and the names (D76).
 type Site = {
   model: string;
   joints: boolean;
@@ -146,6 +154,21 @@ type Site = {
 };
 
 const SITES: Record<Rite, Site> = {
+  ihram: {
+    model: "/models/birali.glb",
+    joints: false,
+    paths: () => [],
+    pathAt: () => null,
+    markerAt: (step) => {
+      const { at } = IHRAM_SPOTS[step - 1];
+      return at && [at[0], at[1], 0];
+    },
+    namesAt: (step) => IHRAM_SPOTS[step - 1].names,
+    anchor: (part) => birAliNameAnchor(part as IhramPart),
+    push: (part, step) => birAliNamePlace(part as IhramPart, step),
+    view: birAliViewOf,
+    move: alongHall,
+  },
   tawaf: {
     model: "/models/mataf.glb",
     joints: true,

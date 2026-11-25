@@ -35,8 +35,10 @@ flowchart LR
     S1 -->|the guided walk, reused| S3[3 sai-walk]
     S2 -->|the check, reused| S4[4 sai-check]
     S3 -->|a finished walk to ask about| S4
-    S3 -->|tawaf and sa'i to join| S5[5 full-umrah]
-    S5 -->|each rite, to tailor| S6[6 pilgrim-choice]
+    S3 -->|the rite switch, reused| S5[5 ihram]
+    S5 -->|a finished walk to ask about| S6[6 ihram-check]
+    S5 -->|ihram, tawaf and sa'i to join| S7[7 full-umrah]
+    S7 -->|each rite, to tailor| S8[8 pilgrim-choice]
 ```
 
 Slice 0 proves the rails, slice 1 is the first thing worth using, and slices 2 and 3 each work without the other.
@@ -48,15 +50,17 @@ Slice 0 proves the rails, slice 1 is the first thing worth using, and slices 2 a
 | 2 | tawaf-check | After the tawaf walk, the person answers where each step happens and what to do there. The result shows on screen and is not kept. | It measures "they can explain it back" before we build two more rites. |
 | 3 | sai-walk | The site leads the person through sa'i in 3D, between Safa and Marwah. | Sa'i is the next rite in the real order. It reuses the guided walk from slice 1. |
 | 4 | sai-check | After the sa'i walk, the person answers where each step of sa'i happens and what to do there. The result shows on screen and is not kept. | It checks sa'i before the two walks join, and it reuses the check of slice 2. |
-| 5 | full-umrah | The walk starts with ihram at the miqat and ends with tahallul. A person walks one whole umrah, first step to last. | The first and last steps are the least about a place. They join the two walks into one journey. |
-| 6 | pilgrim-choice | The person chooses a man or a woman at the start. Each step then shows the text for that person. | The steps differ for men and women in each rite. After full-umrah, one slice covers them all at once. |
+| 5 | ihram | The site leads the person through ihram in 8 steps, in a 3D Bir Ali, from the bath and the clothes to the talbiyah on the bus. | Ihram is the first rite of the umrah. A 3D miqat is too big to share a slice with the join of the walks (O17). |
+| 6 | ihram-check | After the ihram walk, the person answers where each step of ihram happens and what to do there. The result shows on screen and is not kept. | The same order as tawaf and sa'i (D69, D92). |
+| 7 | full-umrah | The walk starts with ihram and ends with tahallul. A person walks one whole umrah, first step to last. Each check opens at the end of its rite, and then the walk goes on. | Tahallul is the least about a place. This slice joins the parts into one journey. |
+| 8 | pilgrim-choice | The person chooses a man or a woman at the start. Each step then shows the text for that person. | The steps differ for men and women in each rite. After full-umrah, one slice covers them all at once. |
 
 Each slice must look right at phone size and at projector size.
 Each slice ships its text in Malay and English.
 
 ## Not doing
 
-- **Hajj.** Mina, Arafah, Muzdalifah and the jamarat get their own shape after umrah ships (O7). Umrah alone is seven slices.
+- **Hajj.** Mina, Arafah, Muzdalifah and the jamarat get their own shape after umrah ships (O7). Umrah alone is nine slices.
 - **Free walk in 3D.** The person must find the place of each step alone, and a free walk does not show the order.
 - **360-degree photos.** The person stands at fixed spots, with no path between the steps.
 - **Map and pictures.** It has no look-around.
@@ -85,6 +89,12 @@ Each slice ships its text in Malay and English.
 | O14 | O1 says the user writes the content from course notes. Who drafts it? | question | spec tawaf-walk p1 | user | Resolved | Claude drafts the step text, and the user corrects it against the course notes. The review of O1 stays. 2026-11-23 |
 | O15 | The user asked for a gamified walk: interactive, with the feel of Animal Crossing. | question | spec tawaf-walk p3 | user | Resolved | A /shape pass after `tawaf-walk` plans a pilgrim figure that walks on Next, a softer look, and where `pilgrim-choice` fits. Points, a hand-steered character and Nintendo's own art were rejected (D46). 2026-11-23 |
 | O16 | Does sa'i get a self-check, as tawaf does? | question | spec sai-walk p1 | user | Resolved | Yes, in the new slice `sai-check`, after `sai-walk`. "In sai-walk" and "no sa'i check" were rejected (D69). 2026-11-24 |
+| O17 | `/spec full-umrah` chose a new 3D place for the miqat. A 3D miqat, the join of the walks and tahallul are three areas, and a slice holds two. | flag | spec full-umrah p1 | user | Resolved | Split. The new slice `ihram` comes first, with a 3D Bir Ali, then `ihram-check`, then `full-umrah` (D87, D92). "full-umrah first" and "one slice with a top-view map" were rejected. 2026-11-25 |
+| O18 | In `full-umrah`, which parts does the one walk have? | question | spec full-umrah p1 | user | Resolved | Ihram, tawaf, sa'i, tahallul. Tawaf gains step 16: solat sunat tawaf behind Maqam Ibrahim, and zamzam. This supersedes D22. "Solat and zamzam as a part of its own" and "no new step" were rejected. The `full-umrah` spec drafts the D-entry. 2026-11-25 |
+| O19 | In `full-umrah`, where do the tawaf check and the sa'i check open? | question | spec full-umrah p1 | user | Resolved | At the end of its rite, as D58 and D84 have it. The result gains a gold button to the next part. "Next goes on, and the check is a quiet button" and "both checks at the end" were rejected. The `full-umrah` spec drafts the D-entry. 2026-11-25 |
+| O20 | In `full-umrah`, how many tahallul steps follow sa'i, and where? | question | spec full-umrah p1 | user | Resolved | Two, in the 3D mas'a, with the marker past Marwah: shave or cut, with a note on each school, then umrah is complete. "One" and "three" were rejected. "No scene" and "a top-view map of Makkah" were rejected. The `full-umrah` spec drafts the D-entries. 2026-11-25 |
+| O21 | In `full-umrah`, does the rite switch stay? | question | spec full-umrah p1 | user | Resolved | Yes, with four parts: Ihram, Tawaf, Sa'i, Tahallul (D94). "No switch" and "a list of parts on step 1" were rejected. 2026-11-25 |
+| O22 | D14 hides the site from search engines until `full-umrah`. O1 wants a qualified review before a public launch. | question | spec full-umrah p1 | user | Resolved | The site stays hidden until a qualified person reviews the content, whichever slice that is. A new entry supersedes D14 in the `full-umrah` spec. "List it in full-umrah" and "the review is done" were rejected. 2026-11-25 |
 
 ## Glossary
 

@@ -43,6 +43,25 @@ describe("readPlace", () => {
   });
 });
 
+describe("the address of an ihram step", () => {
+  it("reads #ihram-1 to #ihram-8", () => {
+    for (let step = 1; step <= 8; step += 1) expect(readPlace(`#ihram-${step}`)).toEqual({ rite: "ihram", step });
+    expect(stepHash("ihram", 5)).toBe("#ihram-5");
+  });
+
+  it("gives step 1 of ihram to a step outside its walk", () => {
+    expect(readPlace("#ihram-0")).toEqual({ rite: "ihram", step: 1 });
+    expect(readPlace("#ihram-9")).toEqual({ rite: "ihram", step: 1 });
+    expect(readPlace("#ihram-12")).toEqual({ rite: "ihram", step: 1 });
+  });
+
+  it("gives step 1 of tawaf to an address that only looks like ihram", () => {
+    expect(readPlace("#IHRAM-2")).toEqual({ rite: "tawaf", step: 1 });
+    expect(readPlace("#ihram")).toEqual({ rite: "tawaf", step: 1 });
+    expect(isCheck("#ihram-8")).toBe(false);
+  });
+});
+
 describe("the address of a check", () => {
   it("reads #semak-sai as the sa'i check", () => {
     expect(readPlace("#semak-sai")).toEqual({ rite: "sai", step: 1 });

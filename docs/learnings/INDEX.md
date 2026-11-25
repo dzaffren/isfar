@@ -8,3 +8,5 @@
 - Project the corners of a place at aspect 1 and 1.5 before you fix a camera view or rule. ([fit-the-view-at-the-narrowest-scene](fit-the-view-at-the-narrowest-scene.md))
 - Put back a model that `pnpm model` rebuilt with no change to its script. ([keep-unchanged-models](keep-unchanged-models.md))
 - Commit the deletion of a preview alone, at once after `git rm`. ([commit-the-preview-deletion-alone](commit-the-preview-deletion-alone.md))
+- Screenshot a new camera view after its sight-line test passes. ([look-at-the-view-after-the-sight-test](look-at-the-view-after-the-sight-test.md))
+- Put buttons in the page in the order they show on screen; never move them with CSS `order`. ([no-css-order-on-buttons](no-css-order-on-buttons.md))

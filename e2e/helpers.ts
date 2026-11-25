@@ -15,6 +15,7 @@ export const NOTICE = {
 
 export const MODEL = "**/models/mataf.glb";
 export const MASA_MODEL = "**/models/masa.glb";
+export const BIRALI_MODEL = "**/models/birali.glb";
 
 export const title = (page: Page) => page.getByRole("heading", { level: 1 });
 export const scene = (page: Page) => page.locator("[data-scene]");
@@ -70,7 +71,7 @@ export function expectApart(boxes: { x: number; y: number; width: number; height
 }
 
 // The names of the mesh nodes in a model file, read from the JSON chunk of the .glb.
-export async function modelParts(page: Page, model: "mataf" | "masa"): Promise<string[]> {
+export async function modelParts(page: Page, model: "mataf" | "masa" | "birali"): Promise<string[]> {
   return page.evaluate(async (model) => {
     const bytes = await (await fetch(`/models/${model}.glb`)).arrayBuffer();
     const view = new DataView(bytes);

@@ -53,6 +53,15 @@ const ms = {
   saiCheckProgress: "Semakan sa'i · Soalan {n} daripada {total}",
   saiCheckDone: "Semakan sa'i · Selesai",
   saiCheckWhere: "Penanda emas di mas'a. Nama tempat muncul selepas anda menjawab.",
+  riteIhram: "Ihram",
+  ihramProgress: "Ihram · Langkah {n} daripada {total}",
+  birAliMap: "Peta Bir Ali dari atas",
+  loadingBirAli: "Memuatkan Bir Ali",
+  partHall: "Dewan solat",
+  partMinaret: "Menara",
+  partWashrooms: "Bilik mandi",
+  partBusPark: "Tempat letak bas",
+  goTawaf: "Teruskan ke tawaf",
 };
 
 export type Words = Record<keyof typeof ms, string>;
@@ -109,6 +118,15 @@ const en: Words = {
   saiCheckProgress: "Sa'i check · Question {n} of {total}",
   saiCheckDone: "Sa'i check · Done",
   saiCheckWhere: "A gold marker in the mas'a. The name of the place shows after you answer.",
+  riteIhram: "Ihram",
+  ihramProgress: "Ihram · Step {n} of {total}",
+  birAliMap: "Map of Bir Ali from above",
+  loadingBirAli: "Loading Bir Ali",
+  partHall: "Prayer hall",
+  partMinaret: "Minaret",
+  partWashrooms: "Washrooms",
+  partBusPark: "Bus park",
+  goTawaf: "Go on to tawaf",
 };
 
 export const TEXT: Record<Language, Words> = { ms, en };

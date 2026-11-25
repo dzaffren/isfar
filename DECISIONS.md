@@ -617,7 +617,7 @@ any step, and an ustaz moves between the rites on a projector.
 Rejected: A button on tawaf step 15 (step 15 already has "Mula semakan" and "Mula
 semula"), A link only (a person cannot find sa'i without someone's link).
 Source: specs/sai-walk.md
-Status: active
+Status: superseded by D94
 
 ## D66 · 2026-11-24 · The sa'i place is the mas'a alone
 
@@ -689,7 +689,7 @@ one row. The name shows from 800 px wide, and the step text keeps its place on s
 Rejected: The rite switch on a second row (the top bar grows by about 56 px, and the
 step text starts lower).
 Source: specs/sai-walk.md
-Status: active
+Status: superseded by D96
 
 ## D74 · 2026-11-24 · The switch buttons have padding on their sides
 
@@ -807,4 +807,153 @@ spot in about 1 second (D78), so the person keeps the order of the walk. Under r
 motion, the camera cuts.
 Rejected: Tier 1 (the camera cuts between the spots of the questions).
 Source: specs/sai-check.md
+Status: active
+
+## D87 · 2026-11-25 · Ihram is its own slice, in a 3D Bir Ali, before full-umrah
+
+Why: the person sees the miqat as a place, as tawaf and sa'i have theirs. A 3D miqat,
+the join of the walks and tahallul are three areas, and a slice holds two.
+Rejected: A top-view map of the miqat in full-umrah (no place to look around), Text
+only (no place at all), full-umrah first (the walk then starts at tawaf for a slice).
+Source: specs/ihram.md
+Status: active
+
+## D88 · 2026-11-25 · Bir Ali is the 3D miqat; the plane is a note on the niat step
+
+Why: a pilgrim who goes to Madinah first takes ihram at Bir Ali, and a pilgrim who flies
+straight to Jeddah does the same acts on the plane. One place teaches both, and one note
+covers the plane.
+Rejected: The plane only, Bir Ali only (each leaves out one way of travel), Steps of their
+own for the plane with a map (a second set of steps for the same acts), A 3D plane cabin
+(a second model for one note).
+Source: specs/ihram.md
+Status: active
+
+## D89 · 2026-11-25 · The ihram walk is 8 steps, in the order of the day at Bir Ali
+
+Why: the steps follow the pilgrim from the bus: the parts, the bath, the clothes, the
+solat, the niat, the talbiyah, the rules, and on to Makkah. Each act has its own place.
+Rejected: Six steps, with the bath and the clothes merged, and the rules and the way on
+merged (two steps then hold two acts each).
+Source: specs/ihram.md
+Status: active
+
+## D90 · 2026-11-25 · The ihram walk shows two recitations: the niat and the talbiyah
+
+Why: the niat starts the ihram, and the pilgrim says the talbiyah from Bir Ali until
+tawaf starts. Both are short.
+Rejected: The talbiyah only (the niat then lives only in the step text), Three, with the
+doa after the talbiyah (a third Arabic block for an act that is not required).
+Source: specs/ihram.md
+Status: active
+
+## D91 · 2026-11-25 · The 3D Bir Ali names four parts
+
+Why: the prayer hall, the washrooms and the bus park are the places of an act, and the
+minaret is what a pilgrim sees first from the bus.
+Rejected: Three, with no minaret name (the tallest part of the place carries no label),
+Two, with no bus park (step 6 then has no named place).
+Source: specs/ihram.md
+Status: active
+
+## D92 · 2026-11-25 · The ihram check is its own slice, after ihram
+
+Why: the same order as tawaf and sa'i (D69). The walk ships first, and the check asks
+about a finished walk.
+Rejected: No ihram check (the acts at the miqat go unchecked), In this slice (four
+scenarios become eight, over the limit of a slice).
+Source: specs/ihram.md
+Status: active
+
+## D93 · 2026-11-25 · On ihram step 8, the gold "Teruskan ke tawaf" opens tawaf step 1
+
+Why: tawaf comes next on the day, and an ustaz goes on with the clicker. "Mula semula"
+sits in the panel, as on tawaf step 15 (D58). full-umrah joins the rest of the walks.
+Rejected: "Mula semula" only (the walk stops, and the person must find tawaf in the top
+bar).
+Source: specs/ihram.md
+Status: active
+
+## D94 · 2026-11-25 · The rite switch holds Ihram, Tawaf and Sa'i; full-umrah adds Tahallul
+
+Why: a person reaches each part in one tap from any step, and an ustaz moves between the
+parts on a projector. Each button opens step 1 of its part (D71). The switch stays after
+full-umrah joins the walks, as the way to jump to a part.
+Rejected: No switch (an ustaz cannot jump to a part on a projector), A list of parts on
+step 1 (a person on a later step must go back to reach it), A button on tawaf step 15
+(D65: step 15 already has two acts).
+Supersedes: D65
+Source: specs/ihram.md
+Status: active
+
+## D95 · 2026-11-25 · Each part of the umrah counts its own steps, at its own address
+
+Why: the label says "Ihram · Langkah 5 daripada 8" at #ihram-5, as tawaf and sa'i do
+(D30). Old links as #tawaf-6 keep working, and the checks keep their step numbers.
+Rejected: One count for the whole umrah at #umrah-11 (each old link must move to a new
+number, and a change to one part renumbers the parts after it).
+Source: specs/ihram.md
+Status: active
+
+## D96 · 2026-11-25 · On a phone, the rite switch takes its own row, and the site name shows again
+
+Why: with Ihram, Tawaf and Sa'i, one row is 418 px wide on a 360 px phone. A row of its
+own holds three equal buttons, and Tahallul in full-umrah. Row 1 then has room for
+"Isfar". From 800 px wide, the bar stays one row.
+Rejected: Drop the mark and tighten the padding (358 of 360 px, so a longer word breaks
+it, and Tahallul does not fit), The site name hidden on a phone (D73: only needed while
+the switch shared the row).
+Supersedes: D73
+Source: specs/ihram.md
+Status: active
+
+## D97 · 2026-11-25 · The ihram walk shows no beads
+
+Why: the beads count circuits and walks, and ihram has no count of seven. The label
+already says "Langkah 5 daripada 8".
+Rejected: Eight step beads (a new Beads variant for a count the label already gives).
+Source: specs/ihram.md
+Status: active
+
+## D98 · 2026-11-25 · The line for a pilgrim on the plane is part of the step 5 text
+
+Why: one sentence fits in the 40 words of step 5. The note stays for the other schools,
+as its label says.
+Rejected: A second kind of note with its own label (a new component for one sentence).
+Source: specs/ihram.md
+Status: active
+
+## D99 · 2026-11-25 · The ihram walk uses motion tier 2, as the tawaf and sa'i walks do
+
+Why: the step text fades in over 320 ms, and the camera flies between the spots in Bir
+Ali, so the person keeps the order of the day. Under reduced motion, the camera cuts.
+Rejected: Tier 1 (the camera cuts between the spots).
+Source: specs/ihram.md
+Status: active
+
+## D100 · 2026-11-25 · The 3D mosque at Bir Ali has no roof
+
+Why: step 4 puts the marker in the prayer hall, and a camera above a roof cannot see in.
+The halls show as walls round a sunken floor, with the courtyard in marble, as the mas'a
+shows its hall with no roof (D79).
+Rejected: A roof at 45% opacity (the hall reads less clearly), The camera inside the
+hall on step 4 (hard to fit at 240 px, and the move in passes through a wall).
+Source: specs/ihram.md
+Status: active
+
+## D101 · 2026-11-25 · In Bir Ali, the camera moves on a straight line, clear of the minaret
+
+Why: each view stands south-west of its spot, above the walls, so a straight move stays
+clear of the 40 m minaret at the north-east corner. A unit test walks each move.
+Rejected: An arc round the mosque, as round the Kaabah (D45) (the arc round a 60 m
+square makes the moves long and slow).
+Source: specs/ihram.md
+Status: active
+
+## D102 · 2026-11-25 · The ihram walk ships with no feature flag
+
+Why: the walk adds a rite and changes no old step. Rollback is the Cloudflare dashboard,
+or a git revert and a push.
+Rejected: A flag in the address (one more path to test, for a walk that nobody uses yet).
+Source: specs/ihram.md
 Status: active

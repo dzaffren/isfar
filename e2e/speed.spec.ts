@@ -1,10 +1,11 @@
 import { expect, test } from "@playwright/test";
 
-// Scenario 5 of tawaf-walk and of sai-walk, run by hand against the live site: SPEED_URL=https://isfar-57q.pages.dev pnpm e2e:speed
+// Scenario 5 of tawaf-walk and of sai-walk, and Bir Ali of ihram (D39), run by hand against the live site: SPEED_URL=https://isfar-57q.pages.dev pnpm e2e:speed
 // It drives real Chrome with a window, because CI draws 3D in software and its frame rate means nothing.
 const WALKS = [
   { name: "the mataf", address: "/", steps: 15 },
   { name: "the mas'a", address: "/#sai-1", steps: 13 },
+  { name: "Bir Ali", address: "/#ihram-1", steps: 8 },
 ];
 
 for (const walk of WALKS) test(`${walk.name} runs at old-phone speed`, async ({ page }) => {

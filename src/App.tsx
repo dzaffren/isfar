@@ -8,9 +8,10 @@ import { Notice } from "./components/Notice";
 import { StepActions } from "./components/StepActions";
 import { StepPanel } from "./components/StepPanel";
 import { TopBar } from "./components/TopBar";
-import { CHECK, SAI_CHECK } from "./content/check";
+import { CHECK, SAI_CHECK, type Question } from "./content/check";
+import { IHRAM } from "./content/ihram";
 import { SAI, saiBeadsAt } from "./content/sai";
-import { TAWAF, beadsAt } from "./content/tawaf";
+import { TAWAF, beadsAt, type Step } from "./content/tawaf";
 import { TEXT, type Words } from "./content/text";
 import type { Picks } from "./lib/check";
 import { pickLanguage, readStoredLanguage, storeLanguage, type Language } from "./lib/language";
@@ -25,11 +26,33 @@ const goTo = (rite: Rite, step: number) => {
   location.hash = stepHash(rite, step);
 };
 
-// Each rite has its walk and its check. The check's own words are its header and the scene text before the pick.
+// Each rite has its walk, the label of its progress, and what the gold button opens on its last step.
+// Tawaf and sa'i have a check, with its own words for the header and the scene text before the pick. Ihram has no check yet, and no beads (D92, D97).
 type CheckWords = { progress: keyof Words; done: keyof Words; where: keyof Words };
-const WALKS = {
-  tawaf: { steps: TAWAF, beadsAt, check: CHECK, checkWords: { progress: "checkProgress", done: "checkDone", where: "checkWhere" } as CheckWords },
-  sai: { steps: SAI, beadsAt: saiBeadsAt, check: SAI_CHECK, checkWords: { progress: "saiCheckProgress", done: "saiCheckDone", where: "saiCheckWhere" } as CheckWords },
+type Walk = {
+  steps: Record<Language, Step[]>;
+  beadsAt: ((step: number) => { done: number; now: number | null }) | null;
+  progress: keyof Words;
+  after: { hash: string; label: keyof Words };
+  check: { questions: Record<Language, Question[]>; words: CheckWords } | null;
+};
+const WALKS: Record<Rite, Walk> = {
+  // Step 8 of ihram opens tawaf step 1 (D93).
+  ihram: { steps: IHRAM, beadsAt: null, progress: "ihramProgress", after: { hash: stepHash("tawaf", 1), label: "goTawaf" }, check: null },
+  tawaf: {
+    steps: TAWAF,
+    beadsAt,
+    progress: "progress",
+    after: { hash: CHECK_HASH.tawaf, label: "checkStart" },
+    check: { questions: CHECK, words: { progress: "checkProgress", done: "checkDone", where: "checkWhere" } },
+  },
+  sai: {
+    steps: SAI,
+    beadsAt: saiBeadsAt,
+    progress: "saiProgress",
+    after: { hash: CHECK_HASH.sai, label: "checkStart" },
+    check: { questions: SAI_CHECK, words: { progress: "saiCheckProgress", done: "saiCheckDone", where: "saiCheckWhere" } },
+  },
 };
 
 export function App() {
@@ -47,7 +70,7 @@ export function App() {
   const walk = WALKS[rite];
   const total = TOTAL[rite];
   const now = walk.steps[language][step - 1];
-  const beads = walk.beadsAt(step);
+  const beads = walk.beadsAt?.(step);
   const last = step === total;
   const told = typeof at === "number" && picks[at - 1] !== null;
   document.documentElement.lang = language;
@@ -71,7 +94,7 @@ export function App() {
   }, []);
 
   // The arrow keys and a presenter clicker, which sends Page Up and Page Down (D31).
-  // In the check, Next waits for a pick (D52). On the last step of a walk, Next opens the check of that rite (D58, D84).
+  // In the check, Next waits for a pick (D52). On the last step of a walk, Next opens what comes after it: the check of tawaf or sa'i (D58, D84), or tawaf after ihram (D93).
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
@@ -82,7 +105,7 @@ export function App() {
         if (told) nextQuestion();
       } else if (forward) {
         if (step < total) goTo(rite, step + 1);
-        else location.hash = CHECK_HASH[rite];
+        else location.hash = walk.after.hash;
       } else if (backward) {
         if (step > 1) goTo(rite, step - 1);
       } else return;
@@ -90,7 +113,7 @@ export function App() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [rite, step, total, check, told]);
+  }, [rite, step, total, check, told, walk]);
 
   const chooseLanguage = (next: Language) => {
     storeLanguage(next);
@@ -98,11 +121,13 @@ export function App() {
   };
 
   // The camera of a question is the camera of its walk step, and the result shows the wide view of the last step.
-  const questions = walk.check[language];
-  const sceneStep = !check ? step : at === "result" ? total : questions[at - 1].step;
+  // An address of a check reads as tawaf or sa'i, so the walk of a check always has its questions.
+  const checked = check ? walk.check : null;
+  const questions = checked ? checked.questions[language] : [];
+  const sceneStep = !checked ? step : at === "result" ? total : questions[at - 1].step;
   // Before the pick, the text for a screen reader names no place, as the names hide on screen (D57).
-  const names = !check || at === "result" || told;
-  const where = names ? walk.steps[language][sceneStep - 1].where : words[walk.checkWords.where];
+  const names = !checked || at === "result" || told;
+  const where = names || !checked ? walk.steps[language][sceneStep - 1].where : words[checked.words.where];
   const notices = (
     <>
       {scene === "unsupported" && <MessageCard message={words.no3d} />}
@@ -111,10 +136,9 @@ export function App() {
     </>
   );
 
-  // The address of a check reads as its rite: #semak as tawaf, #semak-sai as sa'i.
-  const sai = rite === "sai";
-  const beadWords = sai ? { one: words.walk, none: words.noWalk, all: words.allWalks } : { one: words.circuit, none: words.noCircuit, all: words.allCircuits };
-  const counted = beads.now ? beadWords.one.replace("{n}", String(beads.now)) : beads.done === 7 ? beadWords.all : beadWords.none;
+  // The beads count the circuits of tawaf and the walks of sa'i.
+  const beadWords = rite === "sai" ? { one: words.walk, none: words.noWalk, all: words.allWalks } : { one: words.circuit, none: words.noCircuit, all: words.allCircuits };
+  const counted = !beads ? "" : beads.now ? beadWords.one.replace("{n}", String(beads.now)) : beads.done === 7 ? beadWords.all : beadWords.none;
   return (
     <div className="app">
       <TopBar
@@ -124,8 +148,11 @@ export function App() {
         onLanguage={chooseLanguage}
         rite={{
           label: words.riteSwitch,
-          tawaf: words.riteTawaf,
-          sai: words.riteSai,
+          parts: [
+            { id: "ihram", name: words.riteIhram },
+            { id: "tawaf", name: words.riteTawaf },
+            { id: "sai", name: words.riteSai },
+          ],
           now: rite,
           // The other rite opens at its step 1 (D71).
           onRite: (other) => (other !== rite ? goTo(other, 1) : undefined),
@@ -135,10 +162,10 @@ export function App() {
         <Scene key={rite} rite={rite} step={sceneStep} names={names} words={words} where={where} state={scene} onState={onScene} />
         <div className="app__side">
           {scene === "failed" && <MessageCard message={words.failed} retry={{ label: words.retry, onRetry: () => location.reload() }} />}
-          {check ? (
+          {checked ? (
             <CheckSide
               words={words}
-              header={{ progress: words[walk.checkWords.progress], done: words[walk.checkWords.done] }}
+              header={{ progress: words[checked.words.progress], done: words[checked.words.done] }}
               questions={questions}
               steps={walk.steps[language]}
               at={at}
@@ -159,8 +186,8 @@ export function App() {
                 text={now.text}
                 step={step}
                 progress={{
-                  label: (sai ? words.saiProgress : words.progress).replace("{n}", String(step)).replace("{total}", String(total)),
-                  beads: <Beads done={beads.done} now={beads.now} label={counted} />,
+                  label: words[walk.progress].replace("{n}", String(step)).replace("{total}", String(total)),
+                  beads: beads && <Beads done={beads.done} now={beads.now} label={counted} />,
                 }}
               >
                 {now.recitation && <ArabicBlock {...now.recitation} />}
@@ -175,7 +202,7 @@ export function App() {
               <StepActions
                 back={step > 1 ? { label: words.back, onAct: () => goTo(rite, step - 1) } : undefined}
                 next={
-                  !last ? { label: words.next, onAct: () => goTo(rite, step + 1) } : { label: words.checkStart, onAct: () => (location.hash = CHECK_HASH[rite]) }
+                  !last ? { label: words.next, onAct: () => goTo(rite, step + 1) } : { label: words[walk.after.label], onAct: () => (location.hash = walk.after.hash) }
                 }
                 focusNext={moved}
               />

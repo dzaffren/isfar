@@ -1,9 +1,11 @@
 import { useEffect, useRef } from "react";
+import { BirAliMap, IHRAM_PART_WORD } from "../components/BirAliMap";
 import { LoadingCard } from "../components/LoadingCard";
 import { MasaMap, SAI_PART_WORD } from "../components/MasaMap";
 import { MatafMap, PART_WORD } from "../components/MatafMap";
 import type { Words } from "../content/text";
 import type { Rite } from "../lib/step";
+import { IHRAM_PARTS } from "./birali";
 import { SAI_PARTS } from "./masa";
 import { PARTS } from "./mataf";
 import type { Name, Place } from "./place";
@@ -13,8 +15,10 @@ export type SceneState = "loading" | "shown" | "unsupported" | "failed";
 type Props = { rite: Rite; step: number; names?: boolean; words: Words; where: string; state: SceneState; onState: (state: SceneState) => void };
 
 // The names of the parts of each place, and the word on screen for each.
-const PART_WORDS: Record<Rite, Record<string, keyof Words>> = { tawaf: PART_WORD, sai: SAI_PART_WORD };
-const PART_LISTS: Record<Rite, string[]> = { tawaf: Object.keys(PARTS), sai: Object.keys(SAI_PARTS) };
+const PART_WORDS: Record<Rite, Record<string, keyof Words>> = { ihram: IHRAM_PART_WORD, tawaf: PART_WORD, sai: SAI_PART_WORD };
+const PART_LISTS: Record<Rite, string[]> = { ihram: Object.keys(IHRAM_PARTS), tawaf: Object.keys(PARTS), sai: Object.keys(SAI_PARTS) };
+
+const LOADING: Record<Rite, keyof Words> = { ihram: "loadingBirAli", tawaf: "loadingTitle", sai: "loadingMasa" };
 
 function canDraw3D(): boolean {
   try {
@@ -92,6 +96,7 @@ export function Scene({ rite, step, names: namesOn = true, words, where, state, 
       <div className="scene__frame vh-marble">
         {still && rite === "tawaf" && <MatafMap step={step} words={words} label={`${words.map}. ${where}`} showNames={namesOn} />}
         {still && rite === "sai" && <MasaMap step={step} words={words} label={`${words.masaMap}. ${where}`} showNames={namesOn} />}
+        {still && rite === "ihram" && <BirAliMap step={step} words={words} label={`${words.birAliMap}. ${where}`} showNames={namesOn} />}
         <canvas ref={canvas} className="scene__view scene__canvas" role="img" aria-label={where} hidden={still} />
         <div className="scene__names" aria-hidden="true" hidden={state !== "shown"}>
           <svg className="scene__view">
@@ -105,7 +110,7 @@ export function Scene({ rite, step, names: namesOn = true, words, where, state, 
             </span>
           ))}
         </div>
-        {state === "loading" && <LoadingCard title={rite === "sai" ? words.loadingMasa : words.loadingTitle} hint={words.loadingHint} />}
+        {state === "loading" && <LoadingCard title={words[LOADING[rite]]} hint={words.loadingHint} />}
       </div>
     </section>
   );
