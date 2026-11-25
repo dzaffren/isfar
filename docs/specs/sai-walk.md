@@ -313,3 +313,4 @@ Recorded as D81 to D83 at pause 1.
 - **Lane** — one side of the mas'a, for one direction of walk. A barrier separates the two lanes.
 - **Walk** — one trip between the two hills. Safa to Marwah is one walk, and Marwah back to Safa is the next.
 - **Path line** — the gold dashed line with arrows on the floor, which shows the walk of the step (D28).
+- **e2e** — end-to-end: one browser test that walks the whole slice as a person would.
