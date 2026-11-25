@@ -180,7 +180,11 @@ test.describe("1920x1080 projector, in English", () => {
     await page.reload();
     await expect(title(page)).toHaveText("The niat of umrah");
 
-    for (let press = 0; press < 3; press += 1) await page.keyboard.press("PageDown");
+    // Each press waits for its step, as a presenter waits for the screen, so no press goes to the step before it.
+    for (const step of [6, 7, 8]) {
+      await page.keyboard.press("PageDown");
+      await expect(page).toHaveURL(new RegExp(`#ihram-${step}$`));
+    }
     await expect(title(page)).toHaveText("On to Makkah");
     await expect(page.locator(".walk__actions").getByRole("button", { name: "Go on to tawaf" })).toBeVisible();
 
