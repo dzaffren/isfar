@@ -218,3 +218,111 @@ const saiEn: Question[] = [
 ];
 
 export const SAI_CHECK: Record<Language, Question[]> = { ms: saiMs, en: saiEn };
+
+// The ihram check, in the Shafi'i school. The ihram-check spec's "Text of the check" table is the source.
+// One question for each of ihram steps 1 to 7. The plane and the end of the talbiyah happen at no place in Bir Ali, so they have no question (D104).
+const ihramMs: Question[] = [
+  {
+    step: 1,
+    ask: "Siapakah yang berihram di Bir Ali?",
+    answers: ["Jemaah yang terbang terus ke Jeddah", "Jemaah yang datang dari Madinah", "Jemaah yang sudah tinggal di Makkah"],
+    right: 1,
+    why: "Bir Ali, atau Zulhulaifah, ialah miqat bagi jemaah yang datang dari Madinah. Jemaah yang terbang terus ke Jeddah berniat dalam kapal terbang sebelum miqat.",
+  },
+  {
+    step: 2,
+    ask: "Selepas mandi sunat ihram, di mana anda sapu wangian?",
+    answers: ["Pada badan sahaja", "Pada kain ihram", "Pada badan dan kain ihram"],
+    right: 0,
+    why: "Sapu wangian pada badan sebelum niat, dan jangan sekali-kali pada kain ihram. Selepas niat, jangan memakai wangian lagi.",
+  },
+  {
+    step: 3,
+    ask: "Apa yang lelaki pakai dalam ihram?",
+    answers: ["Jubah putih yang berjahit dan kopiah", "Pakaian biasa yang menutup aurat", "Dua helai kain putih tidak berjahit, dan kepala tidak ditutup"],
+    right: 2,
+    why: "Lelaki memakai dua helai kain putih tidak berjahit: satu di pinggang, satu di atas bahu, dan kepala tidak ditutup. Wanita memakai pakaian biasa yang menutup aurat.",
+  },
+  {
+    step: 4,
+    ask: "Apa yang anda buat di dewan solat sebelum niat?",
+    answers: ["Solat sunat ihram dua rakaat", "Solat sunat tawaf dua rakaat", "Mula bertalbiyah dengan suara kuat"],
+    right: 0,
+    why: "Solat sunat ihram dua rakaat, kemudian berniat. Solat sunat tawaf datang di Makkah, selepas tawaf. Talbiyah bermula selepas niat.",
+  },
+  {
+    step: 5,
+    ask: "Bilakah ihram anda bermula?",
+    answers: ["Apabila anda memakai kain ihram", "Apabila anda berniat umrah", "Apabila bas bertolak dari Bir Ali"],
+    right: 1,
+    why: "Ihram bermula dengan niat umrah, bukan dengan pakaian. Jadi berniat sebelum bas meninggalkan miqat.",
+  },
+  {
+    step: 6,
+    ask: "Dari sini hingga ke Makkah, apa yang anda baca dengan kerap?",
+    answers: ["Rabbighfir warham", "Bismillahi, Allahu Akbar", "Labbaik Allahumma labbaik"],
+    right: 2,
+    why: "Baca talbiyah, “Labbaik Allahumma labbaik”, dengan kerap. Lelaki membacanya dengan suara kuat, dan wanita dengan suara perlahan.",
+  },
+  {
+    step: 7,
+    ask: "Anda sudah berihram. Yang mana tidak dibenarkan?",
+    answers: ["Memotong rambut atau kuku", "Mandi dengan air biasa", "Memakai selipar"],
+    right: 0,
+    why: "Selagi dalam ihram, jangan memotong rambut atau kuku, dan jangan memakai wangian. Mandi dengan air biasa dan memakai selipar dibenarkan. Larangan ini tamat selepas tahallul.",
+  },
+];
+
+const ihramEn: Question[] = [
+  {
+    step: 1,
+    ask: "Who enters ihram at Bir Ali?",
+    answers: ["Pilgrims who fly straight to Jeddah", "Pilgrims who come from Madinah", "Pilgrims who already stay in Makkah"],
+    right: 1,
+    why: "Bir Ali, or Dhul Hulaifah, is the miqat for pilgrims who come from Madinah. Pilgrims who fly straight to Jeddah make the niat on the plane before the miqat.",
+  },
+  {
+    step: 2,
+    ask: "After the sunnah bath of ihram, where do you put scent?",
+    answers: ["On your body only", "On the ihram cloth", "On your body and the ihram cloth"],
+    right: 0,
+    why: "Put scent on your body before the niat, and never on the ihram cloth. After the niat, use no more scent.",
+  },
+  {
+    step: 3,
+    ask: "What do men wear in ihram?",
+    answers: ["A sewn white robe and a cap", "Their usual clothes that cover the aurat", "Two white cloths with no seams, and the head bare"],
+    right: 2,
+    why: "Men wear two white cloths with no seams: one round the waist, one over the shoulder, and the head stays bare. Women wear their usual clothes that cover the aurat.",
+  },
+  {
+    step: 4,
+    ask: "What do you do in the prayer hall before the niat?",
+    answers: ["Pray two rakaat of solat sunat ihram", "Pray two rakaat of solat sunat tawaf", "Start the talbiyah aloud"],
+    right: 0,
+    why: "Pray two rakaat of solat sunat ihram, then make the niat. Solat sunat tawaf comes in Makkah, after tawaf. The talbiyah starts after the niat.",
+  },
+  {
+    step: 5,
+    ask: "When does your ihram start?",
+    answers: ["When you put on the ihram cloths", "When you make the niat of umrah", "When the bus leaves Bir Ali"],
+    right: 1,
+    why: "Ihram starts with the niat of umrah, not with the clothes. So make the niat before the bus leaves the miqat.",
+  },
+  {
+    step: 6,
+    ask: "From here to Makkah, what do you say often?",
+    answers: ["Rabbighfir warham", "Bismillahi, Allahu Akbar", "Labbaik Allahumma labbaik"],
+    right: 2,
+    why: "Say the talbiyah, “Labbaik Allahumma labbaik”, often. Men say it aloud, and women say it quietly.",
+  },
+  {
+    step: 7,
+    ask: "You are in ihram now. Which act is not allowed?",
+    answers: ["Cut your hair or nails", "Take a bath with plain water", "Wear sandals"],
+    right: 0,
+    why: "While in ihram, do not cut your hair or nails, and do not use scent. A bath with plain water and sandals are allowed. These rules end after tahallul.",
+  },
+];
+
+export const IHRAM_CHECK: Record<Language, Question[]> = { ms: ihramMs, en: ihramEn };

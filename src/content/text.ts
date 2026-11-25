@@ -62,6 +62,9 @@ const ms = {
   partWashrooms: "Bilik mandi",
   partBusPark: "Tempat letak bas",
   goTawaf: "Teruskan ke tawaf",
+  ihramCheckProgress: "Semakan ihram · Soalan {n} daripada {total}",
+  ihramCheckDone: "Semakan ihram · Selesai",
+  ihramCheckWhere: "Bir Ali. Nama tempat muncul selepas anda menjawab.",
 };
 
 export type Words = Record<keyof typeof ms, string>;
@@ -127,6 +130,9 @@ const en: Words = {
   partWashrooms: "Washrooms",
   partBusPark: "Bus park",
   goTawaf: "Go on to tawaf",
+  ihramCheckProgress: "Ihram check · Question {n} of {total}",
+  ihramCheckDone: "Ihram check · Done",
+  ihramCheckWhere: "Bir Ali. The name of the place shows after you answer.",
 };
 
 export const TEXT: Record<Language, Words> = { ms, en };
