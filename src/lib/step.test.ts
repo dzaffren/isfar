@@ -66,7 +66,7 @@ describe("the address of a check", () => {
   it("reads #semak-sai as the sa'i check", () => {
     expect(readPlace("#semak-sai")).toEqual({ rite: "sai", step: 1 });
     expect(isCheck("#semak-sai")).toBe(true);
-    expect(CHECK_HASH).toEqual({ tawaf: "#semak", sai: "#semak-sai" });
+    expect(CHECK_HASH).toEqual({ ihram: "#semak-ihram", tawaf: "#semak", sai: "#semak-sai" });
   });
 
   it("reads no other address as the sa'i check", () => {
@@ -74,6 +74,18 @@ describe("the address of a check", () => {
     expect(isCheck("#semak-sai-2")).toBe(false);
     expect(isCheck("#sai-semak")).toBe(false);
     expect(isCheck("#sai-13")).toBe(false);
+  });
+
+  it("reads #semak-ihram as the ihram check", () => {
+    expect(readPlace("#semak-ihram")).toEqual({ rite: "ihram", step: 1 });
+    expect(isCheck("#semak-ihram")).toBe(true);
+  });
+
+  it("reads no other address as the ihram check", () => {
+    for (const hash of ["#SEMAK-IHRAM", "#semak-ihram-2", "#ihram-semak"]) {
+      expect(readPlace(hash)).toEqual({ rite: "tawaf", step: 1 });
+      expect(isCheck(hash)).toBe(false);
+    }
   });
 });
 

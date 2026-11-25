@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CHECK, SAI_CHECK, type Question } from "./check";
+import { CHECK, IHRAM_CHECK, SAI_CHECK, type Question } from "./check";
 
 const words = (text: string) => text.split(/\s+/).length;
 
@@ -81,5 +81,41 @@ describe("the questions of the sa'i check", () => {
     expect(SAI_CHECK.ms[0].answers[SAI_CHECK.ms[0].right]).toBe("Bukit Safa");
     expect(SAI_CHECK.ms[5].answers[0]).toBe("Satu");
     expect(SAI_CHECK.ms[5].answers[SAI_CHECK.ms[5].right]).toBe("Dua");
+  });
+});
+
+describe("the questions of the ihram check", () => {
+  it("has seven questions in each language, each with three answers", () => {
+    for (const questions of [IHRAM_CHECK.ms, IHRAM_CHECK.en]) {
+      expect(questions).toHaveLength(7);
+      for (const question of questions) expect(question.answers).toHaveLength(3);
+    }
+  });
+
+  it("shows the same walk step and the same right answer in each language", () => {
+    expect(IHRAM_CHECK.en.map((question) => question.step)).toEqual(IHRAM_CHECK.ms.map((question) => question.step));
+    expect(IHRAM_CHECK.en.map((question) => question.right)).toEqual(IHRAM_CHECK.ms.map((question) => question.right));
+  });
+
+  // One question for each of steps 1 to 7 (D104).
+  it("asks one question on each of ihram steps 1 to 7", () => {
+    expect(IHRAM_CHECK.ms.map((question) => question.step)).toEqual([1, 2, 3, 4, 5, 6, 7]);
+  });
+
+  it("never puts the right answer in the same place on two questions in a row", () => {
+    IHRAM_CHECK.ms.slice(1).forEach((question, index) => expect(question.right).not.toBe(IHRAM_CHECK.ms[index].right));
+  });
+
+  it("keeps each question and each line why to 40 words or fewer", () => {
+    for (const question of [...IHRAM_CHECK.ms, ...IHRAM_CHECK.en]) {
+      expect(words(question.ask), question.ask).toBeLessThanOrEqual(40);
+      expect(words(question.why), question.ask).toBeLessThanOrEqual(40);
+    }
+  });
+
+  it("names the answers of the scenarios", () => {
+    expect(IHRAM_CHECK.ms[0].answers[IHRAM_CHECK.ms[0].right]).toBe("Jemaah yang datang dari Madinah");
+    expect(IHRAM_CHECK.ms[1].answers[1]).toBe("Pada kain ihram");
+    expect(IHRAM_CHECK.ms[1].answers[IHRAM_CHECK.ms[1].right]).toBe("Pada badan sahaja");
   });
 });

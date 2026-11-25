@@ -8,7 +8,8 @@ const PLACE = /^#(ihram|tawaf|sai)-(\d+)$/;
 const STEP = /^[1-9]\d*$/;
 
 export function readPlace(hash: string): { rite: Rite; step: number } {
-  if (hash === CHECK_HASH.sai) return { rite: "sai", step: 1 };
+  const checked = RITES.find((rite) => CHECK_HASH[rite] === hash);
+  if (checked) return { rite: checked, step: 1 };
   const match = PLACE.exec(hash);
   if (!match) return { rite: "tawaf", step: 1 };
   const rite = match[1] as Rite;
@@ -20,12 +21,11 @@ export function stepHash(rite: Rite, step: number): string {
   return `#${rite}-${step}`;
 }
 
-// Each rite's check has one address, so a reload starts it again at question 1 (D51, D53, D84).
+// Each rite's check has one address, so a reload starts it again at question 1 (D51, D53, D84, D103).
 // The address of a check reads as step 1 of its rite, so the scene shows the place of that rite.
-// Ihram has no check yet (D92).
-export type Checked = Exclude<Rite, "ihram">;
-export const CHECK_HASH: Record<Checked, string> = { tawaf: "#semak", sai: "#semak-sai" };
+export const CHECK_HASH: Record<Rite, string> = { ihram: "#semak-ihram", tawaf: "#semak", sai: "#semak-sai" };
+const RITES = Object.keys(CHECK_HASH) as Rite[];
 
 export function isCheck(hash: string): boolean {
-  return hash === CHECK_HASH.tawaf || hash === CHECK_HASH.sai;
+  return RITES.some((rite) => CHECK_HASH[rite] === hash);
 }
