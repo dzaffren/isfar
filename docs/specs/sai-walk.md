@@ -1,6 +1,6 @@
 # Sa'i walk
 
-**Version:** v2 · **Status:** Draft · **Type:** Bug · **Project type:** Web UI
+**Version:** v2 · **Status:** Refined · **Type:** Bug · **Project type:** Web UI
 
 **Supersedes:** archive/sai-walk-v1.md
 **Shape doc:** docs/specs/virtual-hajj/shape.md
@@ -178,6 +178,130 @@ The new words are in bold. The text names no side, so a fix to O20 changes the p
 | O22 | Does the step text tell the person to keep to the lane of the walk? | question | spec v2 p1 | user | Resolved | Yes. One line on step 4, to keep to the lane to Marwah, and one line on step 7, to turn at Marwah into the lane to Safa. The user corrects the words at pause 2 (D24). "Keep the text" was rejected (D83). 2026-11-24 |
 
 _Never delete this section or its rows. See references/ledger.md._
+
+## Technical plan
+
+### Approach
+
+The lanes live once in `plan.json`, as pause 2 put them. `tools/masa.py` reads the barrier from there and adds it to `masa.glb`.
+`laneLine` in `masa.ts` gives the path of each walk. The map already draws it, and `place.ts` draws the same points as gold dashes on the 3D floor.
+The camera keeps its v1 views. A unit test proves that each walk step still shows 20 m or more of the lane path.
+
+Relies on: D16, D19, D28, D29, D43, D76, D78, D79, D80, D81, D82, D83
+
+```mermaid
+flowchart TB
+    PLAN[("scene/plan.json: lanes, barrier")]
+    PY["tools/masa.py, in Blender"]
+    GLB[("/models/masa.glb: floor, wall, arch, rock, lamp, barrier")]
+    MASA["scene/masa.ts: laneLine, SAI_SPOTS"]
+    PLACE["scene/place.ts: laneLines, SITES.sai"]
+    MAP["components/MasaMap.tsx"]
+    VIEWS["scene/views.ts: saiViewOf, unchanged"]
+    PLAN -- "barrier ends and height" --> PY
+    PY -- "pnpm model" --> GLB
+    PLAN -- "lane middles" --> MASA
+    MASA -- "path points of each walk" --> PLACE
+    MASA -- "path points, marker spot" --> MAP
+    PLACE -- "GET, colours the barrier" --> GLB
+    VIEWS -- "camera of the step" --> PLACE
+```
+
+The plan feeds the Blender script and `masa.ts`, and the 3D place and the map draw the same lane path from `masa.ts`.
+
+```mermaid
+sequenceDiagram
+    participant U as Person
+    participant A as App.tsx
+    participant S as Scene.tsx
+    participant P as place.ts
+    U->>A: taps "Seterusnya" on sa'i step 6
+    A->>S: step 7
+    S->>P: goTo(7)
+    P->>P: pathAt(7) gives 1, so the lane to Safa shows and the lane to Marwah hides
+    P->>P: camera moves along the hall to saiViewOf(7)
+    P-->>U: path line turns at Marwah into the lane to Safa
+    P-->>U: console: [isfar] camera at step 7: 54 frames in 900 ms
+```
+
+A step change shows the path of that walk's lane, and the camera moves as in v1.
+
+No data crosses a trust boundary. The fix adds no input.
+
+### Changes
+
+| File | What changes | Why |
+| --- | --- | --- |
+| `tools/masa.py:101` | After the lamps, a `barrier` mesh: one box from `barrier.from` to `barrier.to`, 0.4 m wide and `barrier.height` high, on the middle of the hall. It uses the `box` helper at `tools/masa.py:34`. | Scenario 1, D81 |
+| `public/models/masa.glb` | Built again by `pnpm model`. | D19 |
+| `src/scene/place.ts:46-61` | `COLOURS` gains `barrier: "--vh-sunken"`, the colour of the walls. | Scenario 1 |
+| `src/scene/place.ts:107-120` | `hallLine(way)` becomes `laneLines(towards)`. It draws dashes along each segment of `laneLine(towards)`, with the arrows in the lane, as `pathLine` draws them along the circuit at `src/scene/place.ts:85-105`. `SITES.sai.paths` gives the lane to Marwah, then the lane to Safa, so `pathAt` stays as it is. | Scenario 1 |
+| `src/scene/views.test.ts:127-135` | The path test counts the points along `laneLine(spot.towards)`, in place of the middle line. | Scenario 1 |
+| `src/scene/masa.test.ts` | `laneLine("marwah")` starts at the foot of Safa, runs at `LANES.toMarwah` between the barrier ends, and ends at the foot of Marwah. `laneLine("safa")` is the same path in reverse, at `LANES.toSafa`. Steps 4 and 5 stand in the lane to Marwah. | Scenario 1 |
+| `src/scene/place.test.ts` | The winding test reads `laneLines` for both ways. | Scenario 1 |
+| `src/content/sai.test.ts` | Steps 4 and 7 name the lane, in each language. The 40-word test exists. | Scenario 1, D83 |
+| `e2e/sai.spec.ts` | The model has a `barrier` part. With no 3D, the marker of step 4 is below the barrier line, and the path of step 4 runs at `LANES.toMarwah`. The path of step 7 runs at `LANES.toSafa`. The v1 checks stay. | Scenarios 1 and 2 |
+| `preview/`, `src/preview/` (deleted) | The preview goes when the browser test passes. | Nothing ships it |
+| `CHANGELOG.md` | One "Fixed" line. | The repo's rule |
+
+Kept from pause 2: the `lanes` and `barrier` parts of `plan.json`, `LANES`, `BARRIER` and `laneLine` in `masa.ts`, the spots of steps 4 and 5, `MasaMap.tsx`, `.map__barrier` and the text of steps 4 and 7.
+
+Reusing: `floorShapes` in `src/scene/place.ts:71`, the arrow corners of `pathLine`, `box` and `mesh` in `tools/masa.py`, and `markerAt`, `modelParts` and `noWebGL` in `e2e/helpers.ts`. `markerAt` already flips the map's y, as the map now does.
+
+### Earn-it
+
+| Added | Triggered by |
+| --- | --- |
+| `lanes` and `barrier` in `plan.json` | D43: one set of numbers for the model, the map and the path |
+| `laneLine` in `masa.ts` | Scenarios 1 and 2: the map and the 3D place draw the same path |
+| The `barrier` mesh | Scenario 1, D81 |
+
+Cut: a curved turn at each hill, a second camera rule for the lanes, the two narrow lanes (O21).
+
+### Non-functionals
+
+|                      |     |
+| -------------------- | --- |
+| **Load**             | As in v1: a few visits a day, static files on Cloudflare's network. |
+| **Breaks first**     | Nothing new. One box adds about 100 bytes to `masa.glb`, which is 10.3 KB compressed today. The 3D download stays near 176 KB, under the 500 KB of D16. `pnpm size` fails the build over the ceiling. |
+| **Security surface** | No change. No new input, secret or stored value. |
+| **Proof it works**   | On `#sai-7` the live site prints `[isfar] camera at step 7: 54 frames in 900 ms`, and `masa.glb` has a `barrier` part. The path line shows in the lane to Safa. |
+| **Rollout**          | No flag (D80). The lanes show when the PR merges. Rollback: "Rollback to this deployment" in the Cloudflare dashboard, or `git revert` and a push. |
+
+### Test plan
+
+| Scenario | Test | Command |
+| -------- | ---- | ------- |
+| 1. Aminah sees that each walk has its own lane | `e2e/sai.spec.ts` at four sizes: the `barrier` part, and the v1 walk. `src/scene/masa.test.ts`: `laneLine` and the spots. `src/scene/views.test.ts`: 20 m or more of the lane path on each walk step. `src/scene/place.test.ts`: the lane dashes face up. `src/content/sai.test.ts`: the text of steps 4 and 7. | `pnpm e2e --project=firefox` here, `pnpm e2e --project=chromium` in CI. `pnpm test` |
+| 2. The map shows the two lanes | `e2e/sai.spec.ts` with 3D off: the marker and the path of steps 4 and 7 | `pnpm e2e --project=firefox` |
+| Rule: the v1 scenarios stay | `e2e/sai.spec.ts`, `e2e/walk.spec.ts` and `e2e/check.spec.ts`, as they are | `pnpm e2e --project=firefox` |
+| Rule: the 3D download stays under 500 KB | `scripts/check-size.mjs` | `pnpm build && pnpm size` |
+
+**E2E:** `e2e/sai.spec.ts` walks both scenarios with the v1 scenarios.
+
+The other commands: `pnpm typecheck` and `pnpm model`. Stop the `pnpm dev` server on port 5199 before `pnpm e2e` (lesson `stop-preview-before-e2e`). Prove the 3D half in Firefox here (lesson `local-chromium-loses-3d`). Break `laneLine` once and watch the tests fail (lesson `break-the-guarded-code`).
+
+### Chunks
+
+Single chunk. The model, the path line and the tests read the same plan numbers.
+
+Order inside the chunk:
+
+1. `masa.test.ts` and `views.test.ts` for `laneLine`, then `place.ts` with `laneLines` and its winding test.
+2. `tools/masa.py` with the barrier, `pnpm model`, and the colour in `place.ts`.
+3. `e2e/sai.spec.ts`, then delete the preview.
+
+### Risks
+
+| Risk | Mitigation |
+| ---- | ---------- |
+| The lane to Marwah is on the wrong side (O20). | Accepted risk. The side is two numbers in `plan.json`, and the text names no side. A swap and `pnpm model` fix it. |
+| On the hill steps, the camera at y -6 hides part of the lane to Safa. | The views test counts the lane path on each walk step, at aspect 1 and 1.5. If it fails, the walk view looks at the middle of the lane of the walk. |
+| The barrier hides the marker in the 3D place on a phone. | The barrier is 1 m high, and the marker stands in its lane, 5 m from it. The views test keeps the marker on screen. |
+
+### Decisions to record
+
+None. The plan makes no new choice with a rejected option. D81 to D83 cover the choices of this version.
 
 ## Decisions
 
