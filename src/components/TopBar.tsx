@@ -19,6 +19,15 @@ export function TopBar<Part extends string>({ siteName, switchLabel, language, o
         </svg>
         <span className="topbar__name">{siteName}</span>
       </div>
+      <div className="vh-switch topbar__language" role="group" aria-label={switchLabel}>
+        <button type="button" aria-pressed={language === "ms"} onClick={() => onLanguage("ms")}>
+          BM
+        </button>
+        <button type="button" aria-pressed={language === "en"} onClick={() => onLanguage("en")}>
+          EN
+        </button>
+      </div>
+      {/* The rite switch comes after the language switch, as it shows on screen at every width, so Tab follows the screen. */}
       {rite && (
         <div className="vh-switch topbar__rite" role="group" aria-label={rite.label}>
           {rite.parts.map((part) => (
@@ -28,14 +37,6 @@ export function TopBar<Part extends string>({ siteName, switchLabel, language, o
           ))}
         </div>
       )}
-      <div className="vh-switch" role="group" aria-label={switchLabel}>
-        <button type="button" aria-pressed={language === "ms"} onClick={() => onLanguage("ms")}>
-          BM
-        </button>
-        <button type="button" aria-pressed={language === "en"} onClick={() => onLanguage("en")}>
-          EN
-        </button>
-      </div>
     </header>
   );
 }

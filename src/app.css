@@ -75,11 +75,11 @@ html { scroll-padding-bottom: calc(var(--vh-control) + var(--vh-space-8)); }
 .walk__again { justify-self: start; }
 
 /* The sa'i walk: the rite switch in the top bar, and the top-view map of the mas'a, a strip three times as wide as it is high. */
-.topbar__rite { margin-left: auto; }
+.topbar__language { margin-left: auto; }
 /* On a phone, the rite switch takes its own row under the mark, the site name and the language switch, with equal buttons. */
 @media (max-width: 799px) {
   .topbar { flex-wrap: wrap; gap: var(--vh-space-3) var(--vh-space-4); }
-  .topbar__rite { order: 1; flex-basis: 100%; margin-left: 0; }
+  .topbar__rite { flex-basis: 100%; }
   .topbar__rite button { flex: 1; }
 }
 .map--masa { width: min(100cqw, 300cqh); height: auto; aspect-ratio: 3; }
