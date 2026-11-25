@@ -10,3 +10,4 @@
 - Commit the deletion of a preview alone, at once after `git rm`. ([commit-the-preview-deletion-alone](commit-the-preview-deletion-alone.md))
 - Screenshot a new camera view after its sight-line test passes. ([look-at-the-view-after-the-sight-test](look-at-the-view-after-the-sight-test.md))
 - Put buttons in the page in the order they show on screen; never move them with CSS `order`. ([no-css-order-on-buttons](no-css-order-on-buttons.md))
+- Run `git switch -c` alone, and commit in a later Bash call. ([branch-before-commit-in-its-own-call](branch-before-commit-in-its-own-call.md))
