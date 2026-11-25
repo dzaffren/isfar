@@ -14,3 +14,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Walk through tawaf in 15 steps in a 3D mataf, with Next and Back, the arrow keys, a link to each step, and a top-view map when the device cannot show 3D.
 - Check what you learned after the walk: seven questions on where each step happens and what to do there, with right or wrong after each answer and the steps to go over at the end.
 - Walk through sa'i in 13 steps in a 3D mas'a, from Safa to the end of walk 7 at Marwah. A switch in the top bar moves between tawaf and sa'i.
+
+### Fixed
+
+- The mas'a now shows two one-way lanes with a low barrier between them, and each sa'i walk keeps to its own lane, in 3D and on the map.
