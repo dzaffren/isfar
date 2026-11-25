@@ -1,6 +1,6 @@
 # Ihram
 
-**Version:** v1 · **Status:** Draft · **Type:** Feature · **Project type:** Web UI
+**Version:** v1 · **Status:** Refined · **Type:** Feature · **Project type:** Web UI
 
 **Shape doc:** docs/specs/virtual-hajj/shape.md
 **Depends on:** `sai-walk`
@@ -187,6 +187,180 @@ The plan holds Bir Ali once, `birali.ts` turns it into the spots, and the map an
 
 **Checks:** The static drift check passes on 8 files. The rendered drift check passes on steps 1, 5, 6 and 8, in light and dark. `pnpm typecheck` passes, and `pnpm test` passes 71 tests. The `design-taste-frontend` skill is not installed, so its inspector did not run. The screen is the kiswah and marble system of the walks (D3), so a one-line prompt would not land on it.
 
+## Technical plan
+
+### Approach
+
+Ihram becomes a third rite, as sa'i did. `step.ts` reads `#ihram-5`, `App.tsx` gives the rite its walk, and `Scene.tsx` loads `birali.glb` through the `ihram` entry of `SITES` in `place.ts`.
+`tools/birali.py` builds the model from the `birali` part of `plan.json`, so the 3D place, the map and the spots share one set of numbers (D43).
+The mosque has no roof (O19), and the camera moves on a straight line between views that stand south-west of each spot (O21).
+
+Relies on: D16, D19, D24, D29, D30, D40, D43, D44, D71, D76, D77, D87, D88, D89, D90, D91, D93, D94, D95, D96, D97, D98, D99, D100, D101, D102
+
+```mermaid
+flowchart TB
+    PLAN[("scene/plan.json: birali")]
+    PY["tools/birali.py, in Blender"]
+    GLB[("/models/birali.glb: floor, hall, court, minaret, washrooms, park")]
+    STEP["lib/step.ts: #ihram-1 to #ihram-8"]
+    APP["App.tsx: WALKS.ihram, step 8 opens #tawaf-1"]
+    SCENE["scene/Scene.tsx: BirAliMap when no 3D"]
+    PLACE["scene/place.ts: SITES.ihram"]
+    VIEWS["scene/views.ts: birAliViewOf, alongHall"]
+    SPOTS["scene/birali.ts: IHRAM_SPOTS"]
+    PLAN -- "sizes" --> PY
+    PY -- "pnpm model" --> GLB
+    STEP -- "rite and step" --> APP
+    APP -- "rite key and step" --> SCENE
+    SCENE -- "import, showPlace" --> PLACE
+    PLACE -- "GET, colours each mesh" --> GLB
+    PLACE -- "camera of the step" --> VIEWS
+    PLAN -- "sizes" --> SPOTS
+    SPOTS -- "marker and names" --> PLACE
+```
+
+The plan feeds the model and the spots, and `place.ts` draws the model with the marker and the camera of the step.
+
+```mermaid
+sequenceDiagram
+    participant U as Person
+    participant A as App.tsx
+    participant S as Scene.tsx
+    participant P as place.ts
+    U->>A: taps "Ihram" on #tawaf-3
+    A->>A: location.hash = "#ihram-1", readPlace gives ihram, 1
+    A->>S: new Scene, key "ihram" (D77)
+    S->>P: import("./place"), showPlace(rite ihram, step 1)
+    P->>P: GET /models/birali.glb, wide view, four names
+    P-->>U: Bir Ali from above
+    U->>A: Page Down, four times
+    A->>S: step 5
+    S->>P: goTo(5): straight move to birAliViewOf(5)
+    P-->>U: console: [isfar] camera at step 5: 54 frames in 900 ms
+    U->>A: on step 8, taps "Teruskan ke tawaf"
+    A->>A: location.hash = "#tawaf-1", new Scene, key "tawaf"
+```
+
+A tap on the switch starts the scene again with Bir Ali, and step 8 hands over to the mataf in the same way.
+
+No data crosses a trust boundary. The only new input is the address, which `readPlace` matches against a fixed pattern.
+
+### Changes
+
+| File | What changes | Why |
+| --- | --- | --- |
+| `tools/birali.py` (new) | Builds `birali.glb` from `plan.json` `birali`, as `tools/masa.py` builds the mas'a. Meshes: `floor`, `park`, `bay`, `hall` (the outer walls and the walls round the courtyard, no roof), `hallFloor`, `court`, `minaret`, `washrooms`. It copies the `face`, `box` and `mesh` helpers of `tools/masa.py:26-47`, as each Blender script runs alone. | Scenario 1, D87, O19 |
+| `public/models/birali.glb` (new) | Built by `pnpm model`. | D19, D76 |
+| `package.json:19` | The `model` script also runs `blender -b -P tools/birali.py`. | D19 |
+| `src/lib/step.ts:3-29` | `Rite` gains `"ihram"`, `TOTAL.ihram` is 8, and `PLACE` reads `ihram`. `CHECK_HASH` keeps tawaf and sa'i only. | Scenarios 2 and 4, D95 |
+| `src/App.tsx:30-33` | `WALKS.ihram`: the steps of `IHRAM`, no beads (D97), the label `ihramProgress`, no check, and `#tawaf-1` after the last step. Next on step 8 and Page Down open `#tawaf-1` (D93). The switch lists Ihram first (D94). | Scenarios 1 and 2 |
+| `src/scene/Scene.tsx:16-17,93-94,107` | `PART_WORDS` and `PART_LISTS` gain ihram. `BirAliMap` shows when 3D cannot show. The loading card says `loadingBirAli`. | Scenarios 1 and 3 |
+| `src/scene/place.ts:46-62,148-180` | `COLOURS` gains the Bir Ali meshes. `SITES.ihram`: the model, no joints, no path line, the marker from `IHRAM_SPOTS`, the names, `birAliViewOf` and `alongHall`. | Scenario 1, D76 |
+| `src/scene/views.ts` | `birAliViewOf(step)`: a wide view from high in the south-west on steps 1 and 8, else a view south-west of the spot that looks down at it over the walls. `birAliNameAnchor` and `birAliNamePlace`. | Scenario 1, D101 |
+| `src/scene/birali.ts` | `IHRAM_NAME_HEIGHT`, the height of each name above its part. | Scenario 1, D44 |
+| `src/scene/views.test.ts` | For each ihram step: the camera is above the wall tops, the marker is on screen at aspect 1 and 1.5, and the line from the camera to the marker clears each wall. Each move clears the minaret and the wall tops. | Scenario 1, D101 |
+| `src/scene/birali.test.ts` (new) | Each spot stands where its step says: beside the washrooms, in the hall and out of the courtyard, in the courtyard, in the bus park. | Scenarios 1 and 3 |
+| `src/content/ihram.test.ts` (new) | 8 steps in each language, 40 words or fewer each, the niat on step 5 and the talbiyah on step 6 only, notes on steps 2, 3, 6 and 8, and the plane line on step 5. | Rules, D89, D90, D98 |
+| `src/lib/step.test.ts` | `#ihram-1` to `#ihram-8`, and `#ihram-0`, `#ihram-9`, `#ihram-12` and `#IHRAM-2`. | Scenario 4 |
+| `e2e/ihram.spec.ts` (new) | The four scenarios, at the four sizes. | All |
+| `e2e/helpers.ts:16-17,73` | `BIRALI_MODEL`, and `modelParts` takes `"birali"`. | Scenario 1 |
+| `e2e/speed.spec.ts:7` | A third walk: Bir Ali, `/#ihram-1`, 8 steps. | D39 |
+| `preview/`, `src/preview/` (deleted) | The preview goes when the browser test passes, in a commit of its own. | Nothing ships it |
+| `CHANGELOG.md` | One "Added" line. | The repo's rule |
+
+Kept from pause 2: the `birali` part of `plan.json`, `birali.ts`, `BirAliMap.tsx`, the map classes and the two-row top bar in `app.css`, `content/ihram.ts`, the words in `text.ts`, and the list of parts in `TopBar`.
+
+Reusing: `alongHall` in `src/scene/views.ts`, `marker()` and `showPlace` in `src/scene/place.ts`, the `face`, `box` and `mesh` shape of `tools/masa.py`, and `noWebGL`, `markerAt`, `modelParts`, `expectCamera`, `expectNotices`, `names` and `expectApart` in `e2e/helpers.ts`.
+
+### Earn-it
+
+| Added | Triggered by |
+| --- | --- |
+| `tools/birali.py` and `birali.glb` | Scenario 1, D87, D76 |
+| `birali.ts` and the `birali` plan | D43: one set of numbers for the model, the map and the spots |
+| `BirAliMap` | Scenario 3, D13, D29 |
+| `"ihram"` in `Rite` | Scenarios 2 and 4 |
+| `birAliViewOf` | Scenario 1: a camera for each spot |
+
+Cut: rows of columns in the halls, the four short minarets, a second washroom block (O17), a bus, and a path line.
+
+### Non-functionals
+
+|                      |     |
+| -------------------- | --- |
+| **Load**             | As before: a few visits a day, static files on Cloudflare's network. |
+| **Breaks first**     | The 3D download. It is near 176 KB today, and Bir Ali adds about 10 KB compressed, as `masa.glb` does. A person loads one model at a time (D76). `pnpm size` fails the build over 500 KB (D16). |
+| **Security surface** | No change. Anyone with the link. The new input is the address, matched by a fixed pattern. No secret, and nothing stored but the language (D12). |
+| **Proof it works**   | On `#ihram-5`, the live site prints `[isfar] camera at step 5: 54 frames in 900 ms`, and `birali.glb` has a `minaret` part. |
+| **Rollout**          | No flag (D102). Ihram shows when the PR merges. Rollback: "Rollback to this deployment" in the Cloudflare dashboard, or `git revert` and a push. |
+
+### Test plan
+
+| Scenario | Test | Command |
+| -------- | ---- | ------- |
+| 1. Aminah walks through ihram in Bir Ali | `e2e/ihram.spec.ts` at four sizes: the switch, the label, the four names, the marker spots in the model, the Arabic blocks, the note, and "Teruskan ke tawaf". `views.test.ts`, `birali.test.ts`, `ihram.test.ts`. | `pnpm e2e --project=firefox` here, `pnpm e2e --project=chromium` in CI. `pnpm test` |
+| 2. Ustaz Hafiz teaches with a clicker | `e2e/ihram.spec.ts` at 1920x1080: the link, Page Down, a reload, step 8 to `#tawaf-1`, and the Back button | `pnpm e2e --project=firefox` |
+| 3. The top-view map | `e2e/ihram.spec.ts` with `noWebGL`: the map, the four names, the marker on steps 2 and 4 | `pnpm e2e --project=firefox` |
+| 4. An address outside the walk | `step.test.ts`, and `e2e/ihram.spec.ts` for `#ihram-12` | `pnpm test`, `pnpm e2e --project=firefox` |
+| Rule: the tawaf and sa'i walks and checks stay | `e2e/walk.spec.ts`, `e2e/sai.spec.ts`, `e2e/check.spec.ts`, `e2e/sai-check.spec.ts`, with the switch now on its own row under 800 px | `pnpm e2e --project=firefox` |
+| Rule: the 3D download stays under 500 KB | `scripts/check-size.mjs` | `pnpm build && pnpm size` |
+
+**E2E:** `e2e/ihram.spec.ts` walks the four scenarios.
+
+The other commands: `pnpm typecheck` and `pnpm model`. Put back `mataf.glb` and `masa.glb` if `pnpm model` rebuilt them with no change (lesson `keep-unchanged-models`). Stop the `pnpm dev` server on port 5199 before `pnpm e2e` (lesson `stop-preview-before-e2e`). Prove the 3D half in Firefox here (lesson `local-chromium-loses-3d`). Fit each view at aspect 1 and 1.5 (lesson `fit-the-view-at-the-narrowest-scene`). Break `birAliViewOf` once and watch the tests fail (lesson `break-the-guarded-code`).
+
+### Chunks
+
+Single chunk. The model, the camera and the browser test read the same plan numbers, and `App.tsx` joins them.
+
+Order inside the chunk:
+
+1. `step.ts` and its test, `ihram.test.ts`, `birali.test.ts`.
+2. `tools/birali.py`, `pnpm model`, then `views.ts` with its tests, then `SITES.ihram` and `COLOURS`.
+3. `Scene.tsx` and `App.tsx`, then `e2e/ihram.spec.ts`, the speed walk, and a run of the four old browser tests.
+4. Delete the preview, in a commit of its own (lesson `commit-the-preview-deletion-alone`).
+
+### Risks
+
+| Risk | Mitigation |
+| ---- | ---------- |
+| The south wall of the hall hides the marker on step 4 from a camera south-west of it. | The views test checks the line from the camera to the marker against each wall. If it fails, the view stands higher or nearer, or the walls go down from 10 m. |
+| The 3D Bir Ali drops under 30 frames a second on a phone (O20). | Accepted risk. The cuts stay ready: no antialias on a phone, pixel ratio 1.5. |
+| The washroom block stands in the wrong place (O17). | Accepted risk. Four numbers in `plan.json` and `pnpm model` move it. |
+| The two-row top bar pushes the 3D place down on a phone, so less of the panel shows. | The old browser tests run at 360x800, and Back and Next stay at the bottom edge. |
+| The text has a mistake in a ruling (O18). | Accepted risk. The "not yet reviewed" notice stays, and the user corrects the text. |
+
+### Decisions to record
+
+```
+## D100 · 2026-11-25 · The 3D mosque at Bir Ali has no roof
+
+Why: step 4 puts the marker in the prayer hall, and a camera above a roof cannot see in.
+The halls show as walls round a sunken floor, with the courtyard in marble, as the mas'a
+shows its hall with no roof (D79).
+Rejected: A roof at 45% opacity (the hall reads less clearly), The camera inside the
+hall on step 4 (hard to fit at 240 px, and the move in passes through a wall).
+Source: specs/ihram.md
+Status: active
+
+## D101 · 2026-11-25 · In Bir Ali, the camera moves on a straight line, clear of the minaret
+
+Why: each view stands south-west of its spot, above the walls, so a straight move stays
+clear of the 40 m minaret at the north-east corner. A unit test walks each move.
+Rejected: An arc round the mosque, as round the Kaabah (D45) (the arc round a 60 m
+square makes the moves long and slow).
+Source: specs/ihram.md
+Status: active
+
+## D102 · 2026-11-25 · The ihram walk ships with no feature flag
+
+Why: the walk adds a rite and changes no old step. Rollback is the Cloudflare dashboard,
+or a git revert and a push.
+Rejected: A flag in the address (one more path to test, for a walk that nobody uses yet).
+Source: specs/ihram.md
+Status: active
+```
+
 ## Open items
 
 | ID  | What | Type | Raised at | Owner | Status | Answer |
@@ -209,6 +383,10 @@ The plan holds Bir Ali once, `birali.ts` turns it into the spots, and the map an
 | O16 | Which words of the niat show in Arabic? | question | spec ihram p2 | user | Resolved | "Nawaitul 'umrata wa ahramtu biha lillahi ta'ala". "Labbaika Allahumma 'umratan" was rejected. The user checks it against the course notes with the rest of the text. 2026-11-25 |
 | O17 | Nothing found shows where the washrooms stand at Bir Ali. The plan puts one block west of the mosque. | assumption | spec ihram p2 | user | Accepted risk | Stylised place. The user checks it against a photo or the course notes. A move is four numbers in `plan.json` and `pnpm model`. "Two blocks, east and west" was rejected. 2026-11-25 |
 | O18 | The step text, the notes on the other schools and the meanings are Claude's draft. Nobody has checked the school notes against a source. | flag | spec ihram p2 | user | Accepted risk | Ship the draft, as for tawaf and sa'i (D24). The "not yet reviewed" notice stays, and the user corrects `src/content/ihram.ts` against the course notes. "Correct it before approval" was rejected. 2026-11-25 |
+| O19 | Step 4 puts the marker inside the prayer hall, and a camera above a roofed hall cannot see in. | question | spec ihram p3 | user | Resolved | No roof, as the mas'a (D100). "A roof at 45% opacity" and "the camera inside the hall" were rejected. 2026-11-25 |
+| O20 | The 3D Bir Ali holds 30 frames a second at phone speed. The dev machine has no graphics chip, so nothing here can measure it. | unproven | spec ihram p3 | user | Accepted risk | As for the mas'a (sai-walk O14). `/poc` was rejected, because the last spike stopped on the software renderer. The cuts stay ready: no antialias on a phone, a pixel ratio of 1.5. The proof comes on a real phone at /ship (D39). 2026-11-25 |
+| O21 | How does the camera move between the spots, with a 40 m minaret at the north-east corner? | question | spec ihram p3 | user | Resolved | On a straight line, with each view south-west of its spot and above the walls. A unit test walks each move (D101). "An arc round the mosque" was rejected. 2026-11-25 |
+| O22 | Does the ihram walk ship behind a feature flag? | question | spec ihram p3 | user | Resolved | No flag (D102). "A flag in the address" was rejected. 2026-11-25 |
 
 _Never delete this section or its rows. See references/ledger.md._
 
