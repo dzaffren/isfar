@@ -332,34 +332,7 @@ Order inside the chunk:
 
 ### Decisions to record
 
-```
-## D100 · 2026-11-25 · The 3D mosque at Bir Ali has no roof
-
-Why: step 4 puts the marker in the prayer hall, and a camera above a roof cannot see in.
-The halls show as walls round a sunken floor, with the courtyard in marble, as the mas'a
-shows its hall with no roof (D79).
-Rejected: A roof at 45% opacity (the hall reads less clearly), The camera inside the
-hall on step 4 (hard to fit at 240 px, and the move in passes through a wall).
-Source: specs/ihram.md
-Status: active
-
-## D101 · 2026-11-25 · In Bir Ali, the camera moves on a straight line, clear of the minaret
-
-Why: each view stands south-west of its spot, above the walls, so a straight move stays
-clear of the 40 m minaret at the north-east corner. A unit test walks each move.
-Rejected: An arc round the mosque, as round the Kaabah (D45) (the arc round a 60 m
-square makes the moves long and slow).
-Source: specs/ihram.md
-Status: active
-
-## D102 · 2026-11-25 · The ihram walk ships with no feature flag
-
-Why: the walk adds a rite and changes no old step. Rollback is the Cloudflare dashboard,
-or a git revert and a push.
-Rejected: A flag in the address (one more path to test, for a walk that nobody uses yet).
-Source: specs/ihram.md
-Status: active
-```
+Recorded as D100, D101, D102.
 
 ## Open items
 
@@ -392,7 +365,7 @@ _Never delete this section or its rows. See references/ledger.md._
 
 ## Decisions
 
-Recorded as D87 to D95 at pause 1, and D96 to D99 at pause 2.
+Recorded as D87 to D95 at pause 1, D96 to D99 at pause 2, and D100 to D102 at /build.
 
 ## Glossary
 
