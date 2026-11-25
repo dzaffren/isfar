@@ -325,9 +325,9 @@ No data crosses a trust boundary. The address is the only input. `readPlace` and
 | `src/App.tsx:28` | `WALKS` gains the check of each rite: `check: CHECK` for tawaf, `check: SAI_CHECK` for sa'i, and the header and scene words of each. | Scenario 1 |
 | `src/App.tsx:80` | On the last step of either rite, the Right arrow key and Page Down set `CHECK_HASH[rite]`. | D84, rule on Page Down |
 | `src/App.tsx:96-100` | The questions come from `walk.check`. The result shows the wide view of `TOTAL[rite]`. Before the pick, the scene text is the words of the rite. | Scenarios 1 and 4 |
-| `src/App.tsx:135-144` | `CheckSide` gets the walk steps of the rite and the header words of the rite. "Keluar" goes to `#sai-13`, and a missed step to `#sai-{n}`. | Scenario 1, D59 |
+| `src/App.tsx:135-144` | `CheckSide` gets the walk steps of the rite and the header words of the rite. "Keluar" goes to `#sai-13`, and a missed step to the `#sai-` address of its step, such as `#sai-7`. | Scenario 1, D59 |
 | `src/App.tsx:162-176` | On the last step of either rite, "Mula semakan" takes the Next place, and the quiet "Mula semula" sits in the panel. The sa'i branch goes. | D84 |
-| `src/scene/Scene.tsx:94` | Passes `showNames={namesOn}` to `MasaMap`. | Scenario 4, D57 |
+| `src/scene/Scene.tsx:94` | Passes `namesOn` to `MasaMap` as `showNames`. | Scenario 4, D57 |
 | `src/components/CheckSide.tsx:28-71` | Takes the header words, `progress` and `done`, as props, in place of `words.checkProgress` and `words.checkDone`. | Scenario 1 |
 | `e2e/helpers.ts` | `pickOf` and `answerTo` move here from `e2e/check.spec.ts:24-36`, and take the list of questions. | Two browser test files need them |
 | `e2e/check.spec.ts:24-36` | Uses the two helpers. The tawaf checks stay as they are. | The rule that the tawaf check does not change |
