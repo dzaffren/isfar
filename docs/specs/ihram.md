@@ -178,7 +178,7 @@ The plan holds Bir Ali once, `birali.ts` turns it into the spots, and the map an
 
 **Motion tier:** 2, as the tawaf and sa'i walks (O15). The step text fades in over 320 ms, and the camera flies between the spots. Under reduced motion, the camera cuts.
 
-**Components used:** `TopBar`, `StepPanel`, `StepActions`, `ArabicBlock`, `Note`, `Notice`, `MessageCard`, `LoadingCard`, and the new `BirAliMap`, which uses the map classes of `MasaMap`. No new token. The new map classes in `src/app.css` use `--vh-marble`, `--vh-kiswah`, `--vh-sunken`, `--vh-cloth` and `--vh-edge`.
+**Components used:** `TopBar`, `StepPanel`, `StepActions`, `ArabicBlock`, `Note`, `Notice`, `MessageCard`, `LoadingCard`, and the new `BirAliMap`, which uses the map classes of `MasaMap`. No new token. The new map classes in `src/app.css` use `--vh-marble`, `--vh-ink`, `--vh-sunken`, `--vh-cloth` and `--vh-edge`.
 
 **Preview:** `http://localhost:5199/preview/ihram.html`, after `pnpm dev --port 5199`. It has 15 frames, and each frame is a working ihram screen. The top-view map stands in for the 3D Bir Ali.
 
