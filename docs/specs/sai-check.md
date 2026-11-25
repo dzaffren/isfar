@@ -1,6 +1,6 @@
 # Sa'i check
 
-**Version:** v1 · **Status:** Draft · **Type:** Feature · **Project type:** Web UI
+**Version:** v1 · **Status:** Refined · **Type:** Feature · **Project type:** Web UI
 
 **Shape doc:** docs/specs/virtual-hajj/shape.md
 **Depends on:** `sai-walk`, `tawaf-check`
@@ -260,6 +260,151 @@ The right answer moves from place to place: 2, 1, 3, 1, 2, 3, 1 (D54).
 | Header | Semakan sa'i · Soalan 3 daripada 7. Semakan sa'i · Selesai. | Sa'i check · Question 3 of 7. Sa'i check · Done. |
 | The scene before the pick, for a screen reader | Penanda emas di mas'a. Nama tempat muncul selepas anda menjawab. | A gold marker in the mas'a. The name of the place shows after you answer. |
 | Every other word | The words of the tawaf check: Mula semakan, Keluar, Cuba semula, Betul., Belum tepat., the result lines | The same, in English |
+
+## Technical plan
+
+### Approach
+
+`readPlace` reads `#semak-sai` as the sa'i rite, as it reads `#semak` as tawaf today. So `rite` in `App.tsx` is right in the check: the scene loads the mas'a, and the rite switch shows "Sa'i".
+`App.tsx` then picks the questions, the walk steps and the header words of the check by `rite`, in the same way that `WALKS` picks the walk today. The check code of `tawaf-check` stays one code path for both rites.
+No new file downloads, and the models do not change.
+
+Relies on: D30, D31, D40, D47 to D63, D65, D71, D77, D78, D84, D85, D86
+
+```mermaid
+flowchart TB
+    HASH[("Address: #semak-sai or #sai-13")]
+    STEP["lib/step.ts: readPlace, isCheck, CHECK_HASH by rite"]
+    APP["App.tsx: rite, check, at, picks, keys"]
+    TEXT["content/check.ts: CHECK, SAI_CHECK"]
+    SIDE["CheckSide: header words of the rite, questions, result"]
+    SCENE["scene/Scene.tsx: key = rite, names flag"]
+    PLACE["scene/place.ts: masa.glb, setNames"]
+    MAP["MasaMap: showNames"]
+    HASH -- "hashchange" --> APP
+    APP -- "hash text" --> STEP
+    STEP -- "rite sai, check true" --> APP
+    APP -- "questions of the rite" --> TEXT
+    APP -- "question, pick, sa'i steps, header words" --> SIDE
+    SIDE -- "Keluar: #sai-13, a missed step: #sai-7" --> HASH
+    APP -- "sa'i walk step of the question, names after the answer" --> SCENE
+    SCENE -- "goTo(step), setNames(on)" --> PLACE
+    SCENE -- "no 3D: step, showNames" --> MAP
+```
+
+The address names the rite and the check, `App.tsx` picks the sa'i questions by the rite, and the scene shows the sa'i walk step of each question.
+
+```mermaid
+sequenceDiagram
+    participant U as Person
+    participant A as App.tsx
+    participant S as Scene.tsx
+    participant P as place.ts
+    U->>A: Page Down on sa'i step 13
+    A->>A: location.hash = "#semak-sai", hashchange
+    A->>A: readPlace gives sai, isCheck gives true, at = 1, picks empty
+    A->>S: rite sai (same key, no reload), step 3, names off
+    S->>P: goTo(3), setNames(false)
+    P-->>U: camera moves to the slope of Safa, no names
+    U->>A: taps "Bukit Safa"
+    A-->>U: tick, "Betul." and the line why, Seterusnya on
+    A->>S: names on
+    S->>P: setNames(true), one frame
+    P-->>U: "Bukit Safa" shows
+```
+
+From sa'i step 13 the rite stays sa'i, so the mas'a does not load again. A tap locks the pick, and the names show.
+
+No data crosses a trust boundary. The address is the only input. `readPlace` and `isCheck` accept only the exact text `#semak-sai`, and the picks never leave the page.
+
+### Changes
+
+| File | What changes | Why |
+| --- | --- | --- |
+| `src/lib/step.ts:22-27` | `CHECK_HASH` becomes `Record<Rite, string>`: `#semak` and `#semak-sai`. `isCheck` matches either one exactly. `readPlace` gives sa'i step 1 for `#semak-sai`, as it gives tawaf step 1 for `#semak`. | Scenarios 1 and 3, D84 |
+| `src/App.tsx:28` | `WALKS` gains the check of each rite: `check: CHECK` for tawaf, `check: SAI_CHECK` for sa'i, and the header and scene words of each. | Scenario 1 |
+| `src/App.tsx:80` | On the last step of either rite, the Right arrow key and Page Down set `CHECK_HASH[rite]`. | D84, rule on Page Down |
+| `src/App.tsx:96-100` | The questions come from `walk.check`. The result shows the wide view of `TOTAL[rite]`. Before the pick, the scene text is the words of the rite. | Scenarios 1 and 4 |
+| `src/App.tsx:135-144` | `CheckSide` gets the walk steps of the rite and the header words of the rite. "Keluar" goes to `#sai-13`, and a missed step to `#sai-{n}`. | Scenario 1, D59 |
+| `src/App.tsx:162-176` | On the last step of either rite, "Mula semakan" takes the Next place, and the quiet "Mula semula" sits in the panel. The sa'i branch goes. | D84 |
+| `src/scene/Scene.tsx:94` | Passes `showNames={namesOn}` to `MasaMap`. | Scenario 4, D57 |
+| `src/components/CheckSide.tsx:28-71` | Takes the header words, `progress` and `done`, as props, in place of `words.checkProgress` and `words.checkDone`. | Scenario 1 |
+| `e2e/helpers.ts` | `pickOf` and `answerTo` move here from `e2e/check.spec.ts:24-36`, and take the list of questions. | Two browser test files need them |
+| `e2e/check.spec.ts:24-36` | Uses the two helpers. The tawaf checks stay as they are. | The rule that the tawaf check does not change |
+| `e2e/sai.spec.ts:110-116`, `:269-275` | Step 13 shows "Mula semakan" in the bar, the quiet "Mula semula" restarts the walk, and Page Down opens `#semak-sai`. | D84 |
+| `e2e/sai-check.spec.ts` (new) | Scenarios 1 to 4, and the rules below, at four sizes. | Scenarios 1 to 4 |
+| `src/lib/step.test.ts:23-58` | `#semak-sai` reads as sa'i step 1, and as a check. `#SEMAK-SAI`, `#semak-sai-2` and `#sai-semak` are neither. | Scenario 3 |
+| `src/content/check.test.ts` | The tests of the tawaf questions run on `SAI_CHECK` too, with the steps 3, 3, 4, 5, 5, 7, 12. No question or line why names "kanan", "kiri", "right side" or "left side". | Rules, O2, `sai-walk` O20 |
+| `src/lib/check.test.ts` | A miss on sa'i questions 4 and 5 gives one step 5. | Rule on two misses on one step |
+| `preview/`, `src/preview/` (deleted) | The preview goes when `e2e/sai-check.spec.ts` passes. | Nothing ships them |
+| `CHANGELOG.md` | One "Added" line for the sa'i check. | The repo's rule |
+
+Kept from pause 2: `SAI_CHECK` in `src/content/check.ts`, the three sa'i check words in `src/content/text.ts`, and `showNames` on `MasaMap`.
+
+Reusing: `CheckSide`, `CheckQuestion`, `CheckResult`, `AnswerOption`, `score` and `missedSteps` in `src/lib/check.ts`, the `hashchange` and key listeners in `src/App.tsx:56-87`, `setNames` in `src/scene/place.ts:372`, which already serves the mas'a names, and `SIZES`, `expectBeads`, `expectCamera`, `markerAt`, `names` and `noWebGL` in `e2e/helpers.ts`.
+
+### Earn-it
+
+| Added | Triggered by |
+| --- | --- |
+| `check` and its words in `WALKS` | Scenario 1: the check must pick its questions and words by the rite, as the walk does |
+| `progress` and `done` props on `CheckSide` | Scenario 1: the sa'i header names its rite, and the tawaf header stays the same |
+| `pickOf` and `answerTo` in `e2e/helpers.ts` | Two browser test files answer the questions of a check |
+| `e2e/sai-check.spec.ts` | Scenarios 1 to 4 |
+
+Cut: a second check component for sa'i, a route or a state for the rite of the check apart from `readPlace`, the question number in the address (D53), a feature flag (D63).
+
+### Non-functionals
+
+|                      |     |
+| -------------------- | --- |
+| **Load**             | A few visits a day: the user and a few testers. The site is static files on Cloudflare's network. |
+| **Breaks first**     | Nothing at 10 times the visits: the site has no server. The sa'i questions add about 3 KB of script and no new download, so the 500 KB ceiling of D16 does not move. `pnpm size` fails the build over the ceiling. |
+| **Security surface** | Anyone can open the site. Its inputs are the device language, one stored value and the address. `readPlace` and `isCheck` match only the exact text `#semak-sai`. The picks are numbers in memory, and React escapes the text. No new secret, and the site stores nothing new. |
+| **Proof it works**   | CI runs `e2e/sai-check.spec.ts` against the build before the deploy. The smoke step prints `smoke: https://isfar-57q.pages.dev ok`. On `#semak-sai`, Seterusnya on question 2 moves the camera, and the live site prints `[isfar] camera at step 4: …`. No number comes from real visitors (shape O5). |
+| **Rollout**          | No flag (D63). The sa'i check ships when the PR merges. Rollback: "Rollback to this deployment" in the Cloudflare dashboard, or `git revert` and a push. |
+
+### Test plan
+
+| Scenario | Test | Command |
+| -------- | ---- | ------- |
+| 1. Aminah finishes the sa'i walk and checks what she learned | `e2e/sai-check.spec.ts`, at four sizes: sa'i step 13 to the result, the rite switch on "Sa'i", names hidden then "Bukit Safa" shown, "Langkah 7 · Perjalanan 2" opens `#sai-7` | `pnpm e2e --project=firefox` here, `pnpm e2e --project=chromium` in CI |
+| 2. Aminah counts a walk wrong | `e2e/sai-check.spec.ts`: the cross and "Belum tepat." on "Satu", the tick on "Dua", `aria-disabled` on each answer | `pnpm e2e --project=firefox` |
+| 3. Ustaz Hafiz runs the sa'i check on a projector | `e2e/sai-check.spec.ts` at 1920x1080: Page Down before and after a pick, a reload to question 1, and `#semak` to the tawaf check with `mataf.glb`. `src/lib/step.test.ts`: the addresses. | `pnpm e2e --project=firefox`, `pnpm test` |
+| 4. The sa'i check works with no 3D | `e2e/sai-check.spec.ts` with `noWebGL`: the map, no name before the pick, the marker of question 3 in the lane to Marwah, all seven questions to the result | `pnpm e2e --project=firefox` |
+| Rule: seven questions, three answers, fixed order, no side of a lane, 40 words or fewer | `src/content/check.test.ts` | `pnpm test` |
+| Rule: two misses on one step give one button | `src/lib/check.test.ts` | `pnpm test` |
+| Rule: the rite switch in the check opens tawaf step 1 | `e2e/sai-check.spec.ts`: a tap on "Tawaf" at question 2 gives `#tawaf-1` | `pnpm e2e --project=firefox` |
+| Rule: a language change keeps the answer and does not load the mas'a again | `e2e/sai-check.spec.ts`: one `masa.glb` download after "EN" | `pnpm e2e --project=firefox` |
+| Rule: the tawaf check does not change | `e2e/check.spec.ts` and `e2e/walk.spec.ts`, as they are | `pnpm e2e --project=firefox` |
+| Rule: sa'i step 13 restarts the walk from the panel | `e2e/sai.spec.ts` | `pnpm e2e --project=firefox` |
+
+**E2E:** `e2e/sai-check.spec.ts` walks scenarios 1 to 4. The Playwright setup exists, and CI on `main` is green with it.
+
+The other commands: `pnpm typecheck`, `pnpm build && pnpm size`. Stop the `pnpm dev` server on port 5199 before `pnpm e2e` (lesson `stop-preview-before-e2e`). Prove the 3D half in Firefox here (lesson `local-chromium-loses-3d`). Point `readPlace` at tawaf for `#semak-sai` once, and watch the tests fail (lesson `break-the-guarded-code`).
+
+### Chunks
+
+Single chunk. `step.ts`, `App.tsx` and `CheckSide.tsx` share the rite of the check, and the one browser test needs all three.
+
+Order inside the chunk:
+
+1. `step.ts` and the three unit test files.
+2. `CheckSide` with the header props, then `App.tsx` with `WALKS`, the keys and step 13. `Scene.tsx` with `showNames`. The check works on the map.
+3. `e2e/helpers.ts`, then `e2e/sai-check.spec.ts` in full, then the step 13 lines of `e2e/sai.spec.ts`. Delete the preview.
+
+### Risks
+
+| Risk | Mitigation |
+| ---- | ---------- |
+| Page Down on sa'i step 13 now opens the check, and an ustaz presses it by mistake. | "Keluar" and the browser's Back button go to step 13 at once. The check loses nothing, as on tawaf step 15 (D58). |
+| A move between `#semak` and `#semak-sai` changes the rite, so the scene loads the other place, with a short loading card. | Accepted in D77. The browser test of scenario 3 waits for `mataf.glb` after the move. |
+| The question text has a mistake in a ruling. | The "not yet reviewed" notice stays, and the site stays hidden from search engines (D14). A qualified person reviews it before a public launch (shape O1). |
+| The lane to Marwah is on the wrong side (`sai-walk` O20). | No question names a side, and a unit test holds that rule. A fix to the side changes `plan.json` only. |
+
+### Decisions to record
+
+None. The plan makes no new choice with a rejected option. D84 to D86 cover the choices of this slice.
 
 ## Decisions
 
