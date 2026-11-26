@@ -163,98 +163,83 @@ Rules that hold for each scenario:
 | A 3D place of its own for zamzam or for the barbers | No slice. Zamzam is a line of step 16, and the barbers are a spot past Marwah. |
 | Hajj | Its own shape, after umrah ships (shape O7) |
 
-## Decisions to record
+## Interface
 
-Drafted at pause 1. They go into `DECISIONS.md` when pause 2 is approved.
+The walk and check screens of the other parts, built only from the kiswah and marble design system in `docs/design/design-system/`. Tahallul uses the mas'a and its map, with an exit past Marwah.
 
-```markdown
-## D106 · 2026-11-26 · The umrah has four parts, and tawaf gains step 16 for the solat sunat tawaf and zamzam
-
-Why: the walk follows the order of the day: ihram, tawaf, sa'i, tahallul. The two
-rakaat behind Maqam Ibrahim and the zamzam come between tawaf and sa'i, and the mataf
-already has Maqam Ibrahim, so step 16 needs no new model. The seven beads stay done on
-step 16. The rest of D22 stands: three steps before, circuit 1 in full, one step for
-each later circuit, and one to close at step 15.
-Rejected: Solat and zamzam as a part of its own (a fifth button in the rite switch for
-one step), No new step (the walk skips an act of the day between tawaf and sa'i).
-Supersedes: D22
-Source: specs/full-umrah.md
-Status: active
-
-## D107 · 2026-11-26 · The gold button on a check result opens the next part, and "Cuba semula" moves into the panel
-
-Why: each check opens at the end of its rite (D58, D84, D103), and its result then goes
-on to step 1 of the next part, so the person walks one umrah. One gold act on each
-screen (D3), as on step 15 (D58). Page Down on the result opens the next part, so an
-ustaz goes on with the clicker. "Keluar" stays on the left of the bar.
-Rejected: Next goes on, and the check is a quiet button (a person skips each check),
-Both checks at the end of the umrah (the questions come long after the walk),
-"Cuba semula" in the place of "Keluar" (two ways out of the check change at once).
-Source: specs/full-umrah.md
-Status: active
-
-## D108 · 2026-11-26 · Tahallul is two steps in the 3D mas'a, with the marker at an exit past Marwah
-
-Why: tahallul comes straight after sa'i ends at Marwah (D68), and the barbers stand
-outside the Marwah end. Step 1 is the shave or the cut, with a note on each school.
-Step 2 says the umrah is complete. The mas'a model gains a gap in the Marwah end wall
-and a strip of floor past it.
-Rejected: One step (the end of the umrah has no step of its own), Three steps (the
-third repeats the rules of ihram), No scene (the only part with no place), A top-view
-map of Makkah (a new place for one spot), The marker on top of Marwah (it shows nothing
-of where to go after sa'i).
-Source: specs/full-umrah.md
-Status: active
-
-## D109 · 2026-11-26 · The site stays hidden from search engines until a qualified person reviews the content
-
-Why: the step text and the check text are Claude's draft (D24, D55), and no qualified
-person has reviewed them (shape O1). A whole umrah on the site does not make the text
-right. The noindex tag and the X-Robots-Tag header stay until that review, whichever
-slice it comes in.
-Rejected: List it in full-umrah (search engines list text that nobody has reviewed),
-The review is done (it is not).
-Supersedes: D14
-Source: specs/full-umrah.md
-Status: active
-
-## D110 · 2026-11-26 · On tahallul step 2, the gold "Mula semula umrah" opens ihram step 1
-
-Why: tahallul has no check, so step 2 has no check to open. A start at ihram lets an
-ustaz begin the next class with the clicker, and Page Down does the same.
-Rejected: "Mula semula" to tahallul step 1 (two steps to walk again, not the umrah), No
-gold button (the walk stops, and the screen has no main act).
-Source: specs/full-umrah.md
-Status: active
-
-## D111 · 2026-11-26 · The last step of ihram, tawaf and sa'i has a quiet button to the next part
-
-Why: an ustaz in a short class skips a check, as "Teruskan ke tawaf" lets him on ihram
-step 8 (D103). Tawaf step 16 gets "Teruskan ke sa'i", and sa'i step 13 gets "Teruskan
-ke tahallul", beside "Mula semula".
-Rejected: No skip, and ihram step 8 drops its button (the only way on is through each
-check).
-Source: specs/full-umrah.md
-Status: active
-
-## D112 · 2026-11-26 · Tahallul and the whole umrah get no check
-
-Why: tahallul is two steps, and the checks of ihram, tawaf and sa'i cover each place of
-the umrah. The slice stays at two areas.
-Rejected: One check for the whole umrah in a later slice (it asks again what the three
-checks ask), A tahallul check in a later slice (seven questions on two steps).
-Source: specs/full-umrah.md
-Status: active
-
-## D113 · 2026-11-26 · The tawaf check keeps its seven questions, and opens from step 16
-
-Why: the seven questions cover the places of the circuit (D48), and the seven beads fit
-seven. Step 16 is the last step, so "Mula semakan" and Page Down move there from step
-15.
-Rejected: Swap one question for step 16 (a place of the circuit goes unchecked).
-Source: specs/full-umrah.md
-Status: active
+```mermaid
+flowchart TB
+    LAST["Last step of ihram, tawaf, sa'i: Mula semakan in gold, Teruskan ke ... and Mula semula in the panel"] -- "opens the check" --> CHECK["CheckSide: seven questions"]
+    LAST -- "quiet Teruskan ke ...: skips the check" --> NEXT["Step 1 of the next part"]
+    CHECK -- "after question 7" --> RESULT["Result: count, missed steps, Cuba semula in the panel"]
+    RESULT -- "gold Teruskan ke ..., or Page Down" --> NEXT
+    NEXT -- "after sa'i" --> T1["Tahallul 1: MasaMap with TAHALLUL_SPOTS, marker past the Marwah exit"]
+    T1 -- "Seterusnya" --> T2["Tahallul 2: Umrah selesai"]
+    T2 -- "gold Mula semula umrah" --> I1["#ihram-1"]
 ```
+
+Each check result hands on to the next part, the last step of each part can skip its check, and tahallul ends on a button back to ihram step 1.
+
+**Screens**
+
+| Screen | Header | Body | Actions bar |
+| --- | --- | --- | --- |
+| Tawaf step 15 | "Langkah 15 daripada 16", seven beads done | The new last line: the two rakaat and zamzam come next | "Kembali", "Seterusnya" |
+| Tawaf step 16 | "Langkah 16 daripada 16", seven beads done | Title, text, the note on the schools, then two quiet buttons: "Teruskan ke sa'i", then "Mula semula" | "Kembali", and "Mula semakan" in gold |
+| Sa'i step 13 | "Sa'i · Langkah 13 daripada 13", seven beads done | The new last line: leave by the Marwah exit, then "Teruskan ke tahallul" and "Mula semula" | "Kembali", and "Mula semakan" in gold |
+| Check result, each rite | "Semakan · Selesai", seven beads done | The count, the missed steps, then "Cuba semula" as a quiet button | "Keluar", and "Teruskan ke tawaf", "Teruskan ke sa'i" or "Teruskan ke tahallul" in gold |
+| Tahallul step 1 | "Tahallul · Langkah 1 daripada 2", no beads | Title, text, the note on the schools | "Seterusnya" in gold |
+| Tahallul step 2 | "Tahallul · Langkah 2 daripada 2", no beads | Title, text, then "Mula semula" as a quiet button | "Kembali", and "Mula semula umrah" in gold |
+| Top bar, under 800 px | Row 2 holds four equal buttons: Ihram, Tawaf, Sa'i, Tahallul. Each is 76 px wide at 360 px, and the page does not scroll sideways. | | |
+
+**States of the scene**
+
+| State | Tawaf step 16 | Tahallul |
+| --- | --- | --- |
+| Loading | "Memuatkan Kaabah" | "Memuatkan mas'a" |
+| Shown | The 3D mataf, from behind the marker, looking at the Kaabah, with the name of Maqam Ibrahim | The 3D mas'a, with the marker past the Marwah exit. Step 1 names Marwah. Step 2 is the wide view with the three names. |
+| Unsupported | `MatafMap` with the marker behind Maqam Ibrahim, and the no-3D card | `MasaMap` with `TAHALLUL_SPOTS`, and the no-3D card |
+| Failed | The same map, and "Cuba lagi" | The same map, and "Cuba lagi" |
+
+The mas'a map now reaches 14 m past the Marwah end, so the exit and its marker fit. It keeps its 3 to 1 shape, so each map of sa'i draws a little smaller.
+
+**Motion tier:** 2, as in the other walks and checks (O12). The step text fades in over 320 ms, and the camera moves to the next spot. Under reduced motion, the camera cuts.
+
+**Components used:** `TopBar`, `StepPanel`, `StepActions`, `Beads`, `Note`, `Notice`, `MessageCard`, `LoadingCard`, `CheckSide`, `CheckResult`, `MatafMap`, `MasaMap`, `BirAliMap`. No new component and no new token. `CheckSide` gains an `onward` prop. `MasaMap` gains a `spots` prop, and draws the exit with the `map__hall` and `map__bay` classes it has.
+
+**Preview:** `http://localhost:5199/preview/full-umrah.html`, after `pnpm dev --port 5199`. It lists 15 frames from the real components, with the top-view maps in place of the 3D places. The link "Open tawaf step 16 with the real 3D mataf" shows the real place. Open it in Firefox on this machine.
+
+**Built in this pause, for /build to keep:** tawaf step 16 and the new step 15 line in `src/content/tawaf.ts`, the new step 13 line in `src/content/sai.ts`, `src/content/tahallul.ts`, the five new words in `src/content/text.ts`, `exit` in `src/scene/plan.json`, `EXIT` and `TAHALLUL_SPOTS` in `src/scene/masa.ts`, spot 16 in `src/scene/mataf.ts`, the exit and `spots` in `MasaMap`, `onward` in `CheckSide`, and the tests in `src/content/tawaf.test.ts` and `src/content/tahallul.test.ts`.
+**For the preview only:** `preview/full-umrah.html` and `src/preview/`. No build ships them.
+
+**Checks:** The static drift check passes on 10 files. The rendered drift check passes on 5 screens (tawaf step 16, the tawaf result, sa'i step 13, tahallul steps 1 and 2), in light and dark. `pnpm typecheck` passes, and `pnpm test` passes 102 tests. The `design-taste-frontend` skill is not installed, so its inspector did not run.
+Named reference: Duolingo, as for the checks: after the result, one clear button goes on to the next lesson. Generic-model test: the screens come from the kiswah and marble system and the real maps, so a one-line prompt would not land here.
+
+### Text of the new steps
+
+This is a draft in the Shafi'i school (D24). The user corrects it here.
+
+| Step | Malay | English |
+| --- | --- | --- |
+| Tawaf 15, new last line | Selepas ini ialah solat sunat tawaf dua rakaat di belakang Maqam Ibrahim, dan minum air zamzam. | Next come the two rakaat of solat sunat tawaf behind Maqam Ibrahim, and a drink of zamzam. |
+| Tawaf 16, Solat sunat tawaf dan zamzam | Solat sunat tawaf dua rakaat di belakang Maqam Ibrahim. Jika di situ penuh, solat di mana-mana dalam masjid. Kemudian minum air zamzam dan berdoa. Selepas ini ialah sa'i. *Note:* Syafi'i dan Hanbali: dua rakaat ini sunat. Hanafi: wajib. Maliki: wajib selepas tawaf yang wajib, seperti tawaf umrah. | Pray two rakaat of solat sunat tawaf behind Maqam Ibrahim. When it is full there, pray anywhere in the mosque. Then drink zamzam and make doa. Next comes sa'i. *Note:* Shafi'i and Hanbali: the two rakaat are sunat. Hanafi: they are wajib. Maliki: they are wajib after a tawaf that is wajib, as the tawaf of umrah. |
+| Sa'i 13, new last line | Selepas ini ialah tahallul: keluar melalui pintu Marwah, kemudian bercukur atau menggunting rambut. | Next comes tahallul: leave by the Marwah exit, then shave or cut the hair. |
+| Tahallul 1, Bercukur atau bergunting | Selepas keluar melalui pintu Marwah, lelaki mencukur seluruh kepala, dan ini yang terbaik, atau menggunting rambut. Wanita menggunting rambut sepanjang satu ruas jari dari hujungnya. *Note:* Syafi'i: sekurang-kurangnya tiga helai rambut. Hanafi: suku kepala. Maliki dan Hanbali: seluruh kepala, atau sebahagian besarnya. | Past the Marwah exit, men shave the whole head, which is best, or cut the hair. Women cut the length of a fingertip from the ends of the hair. *Note:* Shafi'i: at least three hairs. Hanafi: a quarter of the head. Maliki and Hanbali: the whole head, or most of it. |
+| Tahallul 2, Umrah selesai | Dengan tahallul, larangan ihram tamat, dan anda boleh memakai pakaian biasa semula. Umrah anda selesai. Semoga Allah menerimanya. | With tahallul, the rules of ihram end, and you may wear your usual clothes again. Your umrah is complete. May Allah accept it. |
+
+**New words**
+
+| Key | Malay | English |
+| --- | --- | --- |
+| `riteTahallul` | Tahallul | Tahallul |
+| `tahallulProgress` | Tahallul · Langkah {n} daripada {total} | Tahallul · Step {n} of {total} |
+| `goSai` | Teruskan ke sa'i | Go on to sa'i |
+| `goTahallul` | Teruskan ke tahallul | Go on to tahallul |
+| `umrahAgain` | Mula semula umrah | Start the umrah again |
+
+## Decisions
+
+Recorded as D106 to D115 at pause 2.
 
 ## Open items
 
@@ -271,6 +256,9 @@ Status: active
 | O9  | `ihram-check` gave "a check for the whole umrah" to this slice. Does tahallul or the whole umrah get a check? | question | spec p1 | user | Resolved | Neither. Tahallul is two steps, and the three checks cover the places. "A whole-umrah check in a later slice" and "a tahallul check in a later slice" were rejected. 2026-11-26 |
 | O10 | Shape O20 puts the tahallul marker past Marwah. The mas'a model ends at a wall behind Marwah, so no floor lies past it. | question | spec p1 | user | Resolved | An exit past Marwah: a gap in the Marwah end wall and a strip of open floor outside it, with the marker there. `tools/masa.py` changes. "The marker on top of Marwah, with no model change" was rejected. 2026-11-26 |
 | O11 | Does the tawaf check gain a question on step 16? | question | spec p1 | user | Resolved | No. The tawaf check keeps its seven questions (D48), and opens from step 16. "Swap one question for step 16" was rejected. 2026-11-26 |
+| O12 | Which motion tier do tawaf step 16, tahallul and the result buttons use? | question | spec p2 | user | Resolved | Tier 2, as the other walks and checks (D114). Tier 1 was rejected. 2026-11-26 |
+| O13 | The tawaf check result shows the camera of the last tawaf step. That is now step 16: the marker behind Maqam Ibrahim, not the wide view of step 15. | question | spec p2 | user | Resolved | The step 16 view. The result shows the camera of the last step of its rite, as today (D115). "The wide view of step 15" was rejected. 2026-11-26 |
+| O14 | Is the draft text of tawaf step 16, tahallul and the two new last lines right? It is Claude's draft (D24), and nobody has checked the school notes against a source. | flag | spec p2 | user | Accepted risk | Ship the draft, as for tawaf, sa'i and ihram (D24). The "not yet reviewed" notice stays, and the user corrects the content files against the course notes. "Correct it before approval" was rejected. 2026-11-26 |
 
 _Never delete this section or its rows. See references/ledger.md._
 

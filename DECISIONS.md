@@ -147,7 +147,7 @@ Rejected: Public and listed (search engines list the placeholder text), Behind a
 (the CI test needs a way through the login), tawaf-walk lists it (the review must then
 happen for tawaf alone), A new launch slice (a sixth slice in the shape for one mark).
 Source: specs/walking-skeleton.md
-Status: active
+Status: superseded by D109
 
 ## D15 · 2026-11-21 · The site name is Isfar
 
@@ -226,7 +226,7 @@ the Hajar Aswad corner with no step before it (the walk assumes that the person 
 ready), End after the two rakaat or after the zamzam (more steps, and more of the
 mosque to model).
 Source: specs/tawaf-walk.md
-Status: active
+Status: superseded by D106
 
 ## D23 · 2026-11-23 · One walk for men and women; a later slice lets the person choose
 
@@ -989,4 +989,110 @@ way. The question fades in over 320 ms, and the camera moves on the straight lin
 D101. Under reduced motion, the camera cuts.
 Rejected: Tier 1 (the camera cuts between the spots, unlike the tawaf and sa'i checks).
 Source: specs/ihram-check.md
+Status: active
+
+## D106 · 2026-11-26 · The umrah has four parts, and tawaf gains step 16 for the solat sunat tawaf and zamzam
+
+Why: the walk follows the order of the day: ihram, tawaf, sa'i, tahallul. The two
+rakaat behind Maqam Ibrahim and the zamzam come between tawaf and sa'i, and the mataf
+already has Maqam Ibrahim, so step 16 needs no new model. The seven beads stay done on
+step 16. The rest of D22 stands: three steps before, circuit 1 in full, one step for
+each later circuit, and one to close at step 15.
+Rejected: Solat and zamzam as a part of its own (a fifth button in the rite switch for
+one step), No new step (the walk skips an act of the day between tawaf and sa'i).
+Supersedes: D22
+Source: specs/full-umrah.md
+Status: active
+
+## D107 · 2026-11-26 · The gold button on a check result opens the next part, and "Cuba semula" moves into the panel
+
+Why: each check opens at the end of its rite (D58, D84, D103), and its result then goes
+on to step 1 of the next part, so the person walks one umrah. One gold act on each
+screen (D3), as on step 15 (D58). Page Down on the result opens the next part, so an
+ustaz goes on with the clicker. "Keluar" stays on the left of the bar.
+Rejected: Next goes on, and the check is a quiet button (a person skips each check),
+Both checks at the end of the umrah (the questions come long after the walk),
+"Cuba semula" in the place of "Keluar" (two ways out of the check change at once).
+Source: specs/full-umrah.md
+Status: active
+
+## D108 · 2026-11-26 · Tahallul is two steps in the 3D mas'a, with the marker at an exit past Marwah
+
+Why: tahallul comes straight after sa'i ends at Marwah (D68), and the barbers stand
+outside the Marwah end. Step 1 is the shave or the cut, with a note on each school.
+Step 2 says the umrah is complete. The mas'a model gains a gap in the Marwah end wall
+and a strip of floor past it.
+Rejected: One step (the end of the umrah has no step of its own), Three steps (the
+third repeats the rules of ihram), No scene (the only part with no place), A top-view
+map of Makkah (a new place for one spot), The marker on top of Marwah (it shows nothing
+of where to go after sa'i).
+Source: specs/full-umrah.md
+Status: active
+
+## D109 · 2026-11-26 · The site stays hidden from search engines until a qualified person reviews the content
+
+Why: the step text and the check text are Claude's draft (D24, D55), and no qualified
+person has reviewed them (shape O1). A whole umrah on the site does not make the text
+right. The noindex tag and the X-Robots-Tag header stay until that review, whichever
+slice it comes in.
+Rejected: List it in full-umrah (search engines list text that nobody has reviewed),
+The review is done (it is not).
+Supersedes: D14
+Source: specs/full-umrah.md
+Status: active
+
+## D110 · 2026-11-26 · On tahallul step 2, the gold "Mula semula umrah" opens ihram step 1
+
+Why: tahallul has no check, so step 2 has no check to open. A start at ihram lets an
+ustaz begin the next class with the clicker, and Page Down does the same.
+Rejected: "Mula semula" to tahallul step 1 (two steps to walk again, not the umrah), No
+gold button (the walk stops, and the screen has no main act).
+Source: specs/full-umrah.md
+Status: active
+
+## D111 · 2026-11-26 · The last step of ihram, tawaf and sa'i has a quiet button to the next part
+
+Why: an ustaz in a short class skips a check, as "Teruskan ke tawaf" lets him on ihram
+step 8 (D103). Tawaf step 16 gets "Teruskan ke sa'i", and sa'i step 13 gets "Teruskan
+ke tahallul", beside "Mula semula".
+Rejected: No skip, and ihram step 8 drops its button (the only way on is through each
+check).
+Source: specs/full-umrah.md
+Status: active
+
+## D112 · 2026-11-26 · Tahallul and the whole umrah get no check
+
+Why: tahallul is two steps, and the checks of ihram, tawaf and sa'i cover each place of
+the umrah. The slice stays at two areas.
+Rejected: One check for the whole umrah in a later slice (it asks again what the three
+checks ask), A tahallul check in a later slice (seven questions on two steps).
+Source: specs/full-umrah.md
+Status: active
+
+## D113 · 2026-11-26 · The tawaf check keeps its seven questions, and opens from step 16
+
+Why: the seven questions cover the places of the circuit (D48), and the seven beads fit
+seven. Step 16 is the last step, so "Mula semakan" and Page Down move there from step
+15.
+Rejected: Swap one question for step 16 (a place of the circuit goes unchecked).
+Source: specs/full-umrah.md
+Status: active
+
+## D114 · 2026-11-26 · Tawaf step 16, tahallul and the result buttons use motion tier 2
+
+Why: the person walks one umrah through every part, and each part moves in the same
+way. The step text fades in over 320 ms, and the camera moves to the next spot. Under
+reduced motion, the camera cuts.
+Rejected: Tier 1 (the camera cuts between the spots, unlike the rest of the site).
+Source: specs/full-umrah.md
+Status: active
+
+## D115 · 2026-11-26 · A check result shows the camera of the last step of its rite
+
+Why: one rule for each check, with no new field. The tawaf result now shows step 16,
+the marker behind Maqam Ibrahim. The scene sits behind the result text and gives no
+answer away.
+Rejected: The wide view of tawaf step 15 (each walk needs a field that names its result
+step, for one rite).
+Source: specs/full-umrah.md
 Status: active
