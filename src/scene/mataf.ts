@@ -87,4 +87,6 @@ export const SPOTS: Spot[] = [
   AT_THE_LINE,
   AT_THE_LINE,
   { at: null, names: [], path: false, view: "wide" },
+  // Behind Maqam Ibrahim, on the line from the Kaabah through it, facing the Kaabah for the two rakaat.
+  { at: [MAQAM[0] - 4.5, MAQAM[1] + 0.6], names: ["maqam"], path: false, view: "approach" },
 ];

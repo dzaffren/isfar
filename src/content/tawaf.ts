@@ -91,8 +91,14 @@ const ms: Step[] = [
   },
   {
     title: "Tawaf selesai",
-    text: "Anda telah melengkapkan tujuh pusingan. Selepas ini ialah solat sunat tawaf dua rakaat di belakang Maqam Ibrahim. Bahagian itu akan datang kemudian.",
+    text: "Anda telah melengkapkan tujuh pusingan. Selepas ini ialah solat sunat tawaf dua rakaat di belakang Maqam Ibrahim, dan minum air zamzam.",
     where: "Kaabah dan mataf dari atas",
+  },
+  {
+    title: "Solat sunat tawaf dan zamzam",
+    text: "Solat sunat tawaf dua rakaat di belakang Maqam Ibrahim. Jika di situ penuh, solat di mana-mana dalam masjid. Kemudian minum air zamzam dan berdoa. Selepas ini ialah sa'i.",
+    where: "Penanda di belakang Maqam Ibrahim",
+    note: "Syafi'i dan Hanbali: dua rakaat ini sunat. Hanafi: wajib. Maliki: wajib selepas tawaf yang wajib, seperti tawaf umrah.",
   },
 ];
 
@@ -178,14 +184,20 @@ const en: Step[] = [
   },
   {
     title: "Tawaf is complete",
-    text: "You have completed seven circuits. Next come the two rakaat of solat sunat tawaf behind Maqam Ibrahim. That part of the site comes later.",
+    text: "You have completed seven circuits. Next come the two rakaat of solat sunat tawaf behind Maqam Ibrahim, and a drink of zamzam.",
     where: "The Kaabah and the mataf from above",
+  },
+  {
+    title: "Solat sunat tawaf and zamzam",
+    text: "Pray two rakaat of solat sunat tawaf behind Maqam Ibrahim. When it is full there, pray anywhere in the mosque. Then drink zamzam and make doa. Next comes sa'i.",
+    where: "The marker behind Maqam Ibrahim",
+    note: "Shafi'i and Hanbali: the two rakaat are sunat. Hanafi: they are wajib. Maliki: they are wajib after a tawaf that is wajib, as the tawaf of umrah.",
   },
 ];
 
 export const TAWAF: Record<Language, Step[]> = { ms, en };
 
-// The seven beads count the circuits. Steps 1 to 3 come before circuit 1, and step 15 comes after circuit 7.
+// The seven beads count the circuits. Steps 1 to 3 come before circuit 1, and steps 15 and 16 come after circuit 7.
 export function beadsAt(step: number): { done: number; now: number | null } {
   if (step <= 3) return { done: 0, now: null };
   if (step >= 15) return { done: 7, now: null };

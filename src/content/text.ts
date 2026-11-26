@@ -65,6 +65,11 @@ const ms = {
   ihramCheckProgress: "Semakan ihram · Soalan {n} daripada {total}",
   ihramCheckDone: "Semakan ihram · Selesai",
   ihramCheckWhere: "Bir Ali. Nama tempat muncul selepas anda menjawab.",
+  riteTahallul: "Tahallul",
+  tahallulProgress: "Tahallul · Langkah {n} daripada {total}",
+  goSai: "Teruskan ke sa'i",
+  goTahallul: "Teruskan ke tahallul",
+  umrahAgain: "Mula semula umrah",
 };
 
 export type Words = Record<keyof typeof ms, string>;
@@ -133,6 +138,11 @@ const en: Words = {
   ihramCheckProgress: "Ihram check · Question {n} of {total}",
   ihramCheckDone: "Ihram check · Done",
   ihramCheckWhere: "Bir Ali. The name of the place shows after you answer.",
+  riteTahallul: "Tahallul",
+  tahallulProgress: "Tahallul · Step {n} of {total}",
+  goSai: "Go on to sa'i",
+  goTahallul: "Go on to tahallul",
+  umrahAgain: "Start the umrah again",
 };
 
 export const TEXT: Record<Language, Words> = { ms, en };

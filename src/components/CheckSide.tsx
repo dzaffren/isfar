@@ -22,12 +22,14 @@ type Props = {
   onLeave: () => void;
   onAgain: () => void;
   onStep: (step: number) => void;
+  // The next part of the umrah. When it is there, it takes the gold place on the result, and "Cuba semula" moves into the panel (D107).
+  onward?: { label: string; onAct: () => void };
   focusFirst: boolean;
   children: ReactNode;
 };
 
 // The step panel and the bar of the check. The children sit between them: the message card and the notices.
-export function CheckSide({ words, header, questions, steps, at, picks, onPick, onNext, onLeave, onAgain, onStep, focusFirst, children }: Props) {
+export function CheckSide({ words, header, questions, steps, at, picks, onPick, onNext, onLeave, onAgain, onStep, onward, focusFirst, children }: Props) {
   const total = questions.length;
   const leave = { label: words.checkLeave, onAct: onLeave };
 
@@ -46,9 +48,14 @@ export function CheckSide({ words, header, questions, steps, at, picks, onPick, 
             missed={missed}
             onStep={onStep}
           />
+          {onward && (
+            <button type="button" className="vh-button vh-button--quiet walk__again" onClick={onAgain}>
+              {words.checkAgain}
+            </button>
+          )}
         </StepPanel>
         {children}
-        <StepActions back={leave} next={{ label: words.checkAgain, onAct: onAgain }} />
+        <StepActions back={leave} next={onward ?? { label: words.checkAgain, onAct: onAgain }} />
       </>
     );
   }
