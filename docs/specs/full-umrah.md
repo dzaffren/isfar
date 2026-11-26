@@ -385,47 +385,11 @@ Order inside the chunk:
 
 ### Decisions to record
 
-```markdown
-## D116 · 2026-11-26 · Tahallul is two steps in the 3D mas'a, with the marker on flat floor past the Marwah rock
-
-Why: tahallul comes straight after sa'i ends at Marwah (D68), and the barbers stand
-outside the Marwah end. Step 1 is the shave or the cut, with a note on each school.
-Step 2 says the umrah is complete. The 3D mas'a has no end wall, and its floor ran only
-10 m past each hill, 3 m past the rock. `tools/masa.py` now runs the floor and walls
-16 m past each hill, and the marker stands at x = 71. The map draws the exit as a strip
-past the Marwah end.
-Rejected: One step (the end of the umrah has no step of its own), Three steps (the
-third repeats the rules of ihram), No scene (the only part with no place), A top-view
-map of Makkah (a new place for one spot), The marker on top of Marwah (it shows nothing
-of where to go after sa'i), A wall with a gap at the Marwah end (the most model work,
-for a wall the mas'a never had), No model change (the marker on the last 1.5 m of
-floor).
-Supersedes: D108
-Source: specs/full-umrah.md
-Status: active
-
-## D117 · 2026-11-26 · Tahallul is its own rite on masa.glb, and a rite change still starts the scene again
-
-Why: tahallul has its own address, label and spots, so it is a fourth rite, as ihram
-is. The scene stays keyed by the rite (D77), so the sa'i result to tahallul loads
-masa.glb again from the browser cache, with a short loading card.
-Rejected: Key the scene by its model file (sa'i and tahallul share one scene, and Scene
-and App gain a rule from rite to model for one short load).
-Source: specs/full-umrah.md
-Status: active
-
-## D118 · 2026-11-26 · Full umrah ships with no feature flag
-
-Why: the site is hidden from search engines (D109), so the people who see it are the
-user and a few testers. A rollback in Cloudflare or a git revert undoes it.
-Rejected: A flag in the address (one more path to test, for a site nobody finds).
-Source: specs/full-umrah.md
-Status: active
-```
+Recorded as D116, D117, D118.
 
 ## Decisions
 
-Recorded as D106 to D115 at pause 2. D116 to D118 are drafted above, for /build to record.
+Recorded as D106 to D115 at pause 2. D116 to D118 at /build.
 
 ## Open items
 
