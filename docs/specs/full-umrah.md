@@ -1,6 +1,6 @@
 # Full umrah
 
-**Version:** v1 · **Status:** Draft · **Type:** Feature · **Project type:** Web UI
+**Version:** v1 · **Status:** Refined · **Type:** Feature · **Project type:** Web UI
 
 **Shape doc:** docs/specs/virtual-hajj/shape.md
 **Depends on:** `ihram-check`, `sai-check`, `tawaf-check`
@@ -237,9 +237,195 @@ This is a draft in the Shafi'i school (D24). The user corrects it here.
 | `goTahallul` | Teruskan ke tahallul | Go on to tahallul |
 | `umrahAgain` | Mula semula umrah | Start the umrah again |
 
+## Technical plan
+
+### Approach
+
+Tahallul becomes a fourth rite, as ihram did. `step.ts` reads `#tahallul-2`, `App.tsx` gives it a walk with no check, and `place.ts` shows it on `masa.glb` with its own spots (D117).
+Each walk's `panel` already names the next part, so the check result reuses it as its gold button, and Page Down on the result follows it (D107). Tawaf gains step 16 by growing `TOTAL.tawaf` to 16, as the content and spot are already built.
+`tools/masa.py` runs the floor and side walls 16 m past each hill, so the tahallul marker stands on flat floor past the Marwah rock (D116). An empty or unknown address now opens ihram step 1.
+
+Relies on: D16, D19, D24, D30, D31, D40, D43, D53, D58, D71, D76, D77, D78, D84, D94, D95, D97, D103, D106, D107, D109, D110, D111, D112, D113, D114, D115, D116, D117, D118
+
+```mermaid
+flowchart TB
+    HASH[("Address: #tahallul-1, #tawaf-16, empty")]
+    STEP["lib/step.ts: Rite + tahallul, TOTAL, unknown opens ihram 1"]
+    APP["App.tsx: WALKS.tahallul, panel of each part, onward on the result"]
+    SIDE["CheckSide: onward in gold, Cuba semula in the panel"]
+    SCENE["scene/Scene.tsx: tahallul uses MasaMap with TAHALLUL_SPOTS"]
+    PLACE["scene/place.ts: SITES.tahallul on masa.glb"]
+    VIEWS["scene/views.ts: masaViewOf(spot)"]
+    PY["tools/masa.py: floor and walls 16 m past each hill"]
+    GLB[("/models/masa.glb")]
+    HASH -- "hashchange" --> STEP
+    STEP -- "rite, step" --> APP
+    APP -- "result: walk.panel as onward" --> SIDE
+    APP -- "rite key, step" --> SCENE
+    SCENE -- "showPlace(rite tahallul)" --> PLACE
+    PLACE -- "camera of TAHALLUL_SPOTS[step]" --> VIEWS
+    PY -- "pnpm model" --> GLB
+    PLACE -- "GET" --> GLB
+```
+
+The address picks the rite, `App.tsx` picks its walk and the next part, and the scene draws tahallul on the same mas'a model as sa'i.
+
+```mermaid
+sequenceDiagram
+    participant U as Person
+    participant A as App.tsx
+    participant C as CheckSide
+    participant S as Scene.tsx
+    participant P as place.ts
+    U->>A: on the sa'i result, Page Down
+    A->>A: walk.panel is #tahallul-1, location.hash = it
+    A->>A: hashchange: readPlace gives tahallul, 1, check off
+    A->>S: new Scene, key "tahallul" (D77, D117)
+    S->>P: showPlace(rite tahallul, step 1), GET masa.glb from cache
+    P-->>U: camera in the hall, looking at the marker past Marwah
+    U->>A: Seterusnya
+    A->>S: step 2, straight move to the wide view (D78)
+    U->>A: on step 2, taps Mula semula umrah
+    A->>A: location.hash = "#ihram-1", new Scene, key "ihram"
+```
+
+The sa'i result hands over to tahallul through the address, the scene starts again on the mas'a, and step 2 hands back to ihram.
+
+No data crosses a trust boundary. The only new input is the address, which `readPlace` matches against a fixed pattern.
+
+### Changes
+
+| File | What changes | Why |
+| --- | --- | --- |
+| `src/lib/step.ts:3-19` | `Rite` gains `"tahallul"`. `TOTAL` is `{ ihram: 8, tawaf: 16, sai: 13, tahallul: 2 }`. `PLACE` reads `tahallul`. An address that does not match opens `ihram` step 1, not tawaf. The top comment says so. | Scenarios 1 and 5, D106 |
+| `src/lib/step.ts:25-31` | `CHECK_HASH` keeps three rites: its type becomes `Record<Exclude<Rite, "tahallul">, string>`. `RITES` and `isCheck` read its keys, as today. | D112 |
+| `src/App.tsx:32-66` | `check` is nullable again. `WALKS.tawaf.panel` is `#sai-1` with `goSai`, `WALKS.sai.panel` is `#tahallul-1` with `goTahallul` (D111). `WALKS.tahallul`: `TAHALLUL`, no beads, `tahallulProgress`, `after` is `#ihram-1` with `umrahAgain` (D110), no panel, no check. | Scenarios 1 and 3 |
+| `src/App.tsx:108-126` | In the check, on the result, a forward key opens `walk.panel.hash` when it is there (D107). | Scenario 2 |
+| `src/App.tsx:158-188` | The rite switch lists Tahallul fourth. `CheckSide` gets `onward` from `walk.panel`. | Scenarios 1 and 3, D94 |
+| `src/scene/Scene.tsx:16-19,93-95` | `PART_WORDS`, `PART_LISTS` and `LOADING` gain tahallul, from the sa'i ones. With no 3D, tahallul shows `MasaMap` with `spots={TAHALLUL_SPOTS}`. | Scenarios 3 and 4 |
+| `src/scene/place.ts:156-201` | `SITES.tahallul`: `masa.glb`, no path line, the marker, names and push from `TAHALLUL_SPOTS`, the view `masaViewOf`, and `alongHall`. `SITES.sai` reads its view through `masaViewOf` too. | Scenario 3, D117 |
+| `src/scene/views.ts:79-89` | `saiViewOf(step)` becomes `masaViewOf(spot)`, which takes the spot and not the step, so sa'i and tahallul share it. | Scenario 3 |
+| `src/scene/masa.ts` | `PAST_MARWAH` moves to `[LENGTH/2 + EXIT.depth - 1, 0]`, x = 71, on flat floor past the rock. Tahallul step 1 takes the view `"marwah"`, so the camera stands in the hall and looks at the marker. | Scenario 3, D116 |
+| `tools/masa.py:22` | `END` goes from `LENGTH / 2 + 10` to `LENGTH / 2 + 16`. The floor, the side walls and the arches follow it. | D116 |
+| `public/models/masa.glb` | Built by `pnpm model`. Put back `mataf.glb` and `birali.glb` if they come out with no change. | D19 |
+| `src/lib/step.test.ts` | `#tahallul-1`, `#tahallul-2`, `#tahallul-0`, `#tahallul-5`, `#tawaf-16`, `#tawaf-17`, an empty address and `#umrah` read as the scenarios say. `#semak-tahallul` is not a check. | Scenario 5 |
+| `src/scene/views.test.ts` | For tawaf step 16 and the two tahallul steps: the marker is on screen at aspect 1 and 1.5, and the camera clears the walls. The move from tahallul step 1 to step 2 stays above the walls. | Scenario 3 |
+| `src/scene/masa.test.ts` | `PAST_MARWAH` stands past the rock, where `groundAt` gives 0, and inside the floor that `masa.py` builds. | D116 |
+| `e2e/umrah.spec.ts` (new) | The five scenarios, at the four sizes. | All |
+| `e2e/walk.spec.ts:31,166,226,240,280` | `page.goto("/")` becomes `page.goto("/#tawaf-1")`. Step 15 is "Langkah 15 daripada 16". The last step is 16. | Scenario 5 |
+| `e2e/check.spec.ts:31,102,116,141` | The check opens from `#tawaf-16`, and "Keluar" goes to `#tawaf-16`. "Cuba semula" is a quiet button in the result panel. | D107, D113 |
+| `e2e/sai-check.spec.ts`, `e2e/ihram-check.spec.ts` | On the result, "Cuba semula" sits in the panel, and the gold button opens the next part. | D107 |
+| `e2e/sai.spec.ts` | Sa'i step 13 shows "Teruskan ke tahallul" in the panel. | D111 |
+| `preview/`, `src/preview/` (deleted) | The preview goes when `e2e/umrah.spec.ts` passes, in a commit of its own. | Nothing ships them |
+| `CHANGELOG.md` | One "Added" line. | The repo's rule |
+
+Kept from pause 2: tawaf step 16 and the new last lines, `content/tahallul.ts`, the new words, `exit` in `plan.json`, `EXIT` and `TAHALLUL_SPOTS`, spot 16 in `mataf.ts`, the exit and `spots` in `MasaMap`, and `onward` in `CheckSide`.
+
+Not changed: `index.html` and `public/_headers` keep `noindex` (D109).
+
+Reusing: `alongHall`, `viewOf` with its `"approach"` view for step 16, `groundAt`, `CheckSide`, `missedSteps`, the `hashchange` and key listeners in `App.tsx`, and `SIZES`, `answerTo`, `expectCamera`, `expectNotices`, `markerAt`, `modelParts`, `names`, `noWebGL`, `MODEL` and `MASA_MODEL` in `e2e/helpers.ts`.
+
+### Earn-it
+
+| Added | Triggered by |
+| --- | --- |
+| `"tahallul"` in `Rite` | Scenarios 3 and 5: its own address and label |
+| `SITES.tahallul` and `masaViewOf` | Scenario 3: the tahallul spots on the mas'a, with one camera rule for both rites |
+| 6 m more floor in `masa.py` | Scenario 3 and D116: a marker on flat floor past the Marwah rock |
+| `e2e/umrah.spec.ts` | Scenarios 1 to 5 |
+
+Cut: a scene keyed by model file (O16), a whole-umrah check (D112), a feature flag (D118), and a wall with a gap at the Marwah end (O15).
+
+### Non-functionals
+
+|                      |     |
+| -------------------- | --- |
+| **Load**             | As before: a few visits a day, static files on Cloudflare's network. |
+| **Breaks first**     | The 3D download. `masa.glb` grows by a few hundred bytes for 12 m more floor and walls. The tahallul text adds about 2 KB of script. `pnpm size` fails the build over 500 KB (D16). |
+| **Security surface** | No change. Anyone with the link. The new input is the address, matched by a fixed pattern. No secret, and nothing stored but the language (D12). The site stays out of search engines (D109). |
+| **Proof it works**   | CI runs `e2e/umrah.spec.ts` against the build before the deploy, and the smoke step prints `smoke: https://isfar-57q.pages.dev ok`. On `#tahallul-1`, Seterusnya prints `[isfar] camera at step 2: …` on the live site. |
+| **Rollout**          | No flag (D118). Full umrah shows when the PR merges. Rollback: "Rollback to this deployment" in the Cloudflare dashboard, or `git revert` and a push. |
+
+### Test plan
+
+| Scenario | Test | Command |
+| -------- | ---- | ------- |
+| 1. Aminah walks one whole umrah | `e2e/umrah.spec.ts` at four sizes: empty address to `#ihram-1`, each check to its result, each gold button to the next part, tawaf step 16 with the marker behind Maqam Ibrahim, tahallul to "Umrah selesai" and back to `#ihram-1` | `pnpm e2e --project=firefox` here, `pnpm e2e --project=chromium` in CI |
+| 2. Ustaz Hafiz with a clicker | `e2e/umrah.spec.ts` at 1920x1080: Page Down on the tawaf result, `#tawaf-15` to `#tawaf-16`, a reload, Page Down to the check | `pnpm e2e --project=firefox` |
+| 3. Tahallul past Marwah | `e2e/umrah.spec.ts`: the title, the note, the marker in `masa.glb` past x = 67, four switch buttons with no sideways scroll at 360 px, Page Down on step 2. `views.test.ts`, `masa.test.ts`, `tahallul.test.ts` | `pnpm e2e --project=firefox`, `pnpm test` |
+| 4. The top-view maps | `e2e/umrah.spec.ts` with `noWebGL`: the marker behind Maqam Ibrahim on `#tawaf-16`, and past Marwah on tahallul | `pnpm e2e --project=firefox` |
+| 5. Old and wrong addresses | `step.test.ts`, and `e2e/umrah.spec.ts` for `#tahallul-5`, `#tawaf-17`, `#semak` and `#umrah` | `pnpm test`, `pnpm e2e --project=firefox` |
+| Rule: the three checks keep their questions | `src/content/check.test.ts`, `e2e/check.spec.ts`, `e2e/sai-check.spec.ts`, `e2e/ihram-check.spec.ts` | `pnpm test`, `pnpm e2e --project=firefox` |
+| Rule: the 3D download stays under 500 KB | `scripts/check-size.mjs` | `pnpm build && pnpm size` |
+
+**E2E:** `e2e/umrah.spec.ts` walks the five scenarios. The Playwright setup exists, and CI on `main` is green with it.
+
+The other commands: `pnpm typecheck` and `pnpm model`. Put back `mataf.glb` and `birali.glb` if `pnpm model` rebuilt them with no change (lesson `keep-unchanged-models`). Stop the `pnpm dev` server on port 5199 before `pnpm e2e` (lesson `stop-preview-before-e2e`). Prove the 3D half in Firefox here (lesson `local-chromium-loses-3d`). Fit the tahallul views at aspect 1 and 1.5, and screenshot them after the sight test passes (lessons `fit-the-view-at-the-narrowest-scene`, `look-at-the-view-after-the-sight-test`). Point unknown addresses back at tawaf once, and watch the tests fail (lesson `break-the-guarded-code`).
+
+### Chunks
+
+Single chunk. `step.ts`, `App.tsx` and the browser tests all read the new rite, and the old browser tests change with it.
+
+Order inside the chunk:
+
+1. `step.ts` and its test.
+2. `tools/masa.py`, `pnpm model`, `masa.ts`, `masaViewOf` with its tests, then `SITES.tahallul`.
+3. `Scene.tsx` and `App.tsx`. Then the old browser tests, then `e2e/umrah.spec.ts`.
+4. Delete the preview, in a commit of its own (lesson `commit-the-preview-deletion-alone`).
+
+### Risks
+
+| Risk | Mitigation |
+| ---- | ---------- |
+| The empty address now opens ihram. Old links to the bare site land on ihram, and five tests in `walk.spec.ts` expect tawaf. | The tests move to `/#tawaf-1`. Shared links with `#tawaf-…` keep working (D95). |
+| Page Down on a check result now leaves the check. An ustaz who pressed it there to no effect now moves on. | That is the point of D107. "Keluar" and the Back button still return. |
+| The sa'i to tahallul change shows the loading card for a moment (O16). | Accepted. The model comes from the browser cache. |
+| The text has a mistake in a ruling (O14). | Accepted risk. The "not yet reviewed" notice stays, and the site stays hidden from search engines (D109). |
+| The 3D views of tahallul hide the marker behind the Marwah rock. | The views test checks the line from the camera to the marker. The camera stands in the hall, above the rock. |
+
+### Decisions to record
+
+```markdown
+## D116 · 2026-11-26 · Tahallul is two steps in the 3D mas'a, with the marker on flat floor past the Marwah rock
+
+Why: tahallul comes straight after sa'i ends at Marwah (D68), and the barbers stand
+outside the Marwah end. Step 1 is the shave or the cut, with a note on each school.
+Step 2 says the umrah is complete. The 3D mas'a has no end wall, and its floor ran only
+10 m past each hill, 3 m past the rock. `tools/masa.py` now runs the floor and walls
+16 m past each hill, and the marker stands at x = 71. The map draws the exit as a strip
+past the Marwah end.
+Rejected: One step (the end of the umrah has no step of its own), Three steps (the
+third repeats the rules of ihram), No scene (the only part with no place), A top-view
+map of Makkah (a new place for one spot), The marker on top of Marwah (it shows nothing
+of where to go after sa'i), A wall with a gap at the Marwah end (the most model work,
+for a wall the mas'a never had), No model change (the marker on the last 1.5 m of
+floor).
+Supersedes: D108
+Source: specs/full-umrah.md
+Status: active
+
+## D117 · 2026-11-26 · Tahallul is its own rite on masa.glb, and a rite change still starts the scene again
+
+Why: tahallul has its own address, label and spots, so it is a fourth rite, as ihram
+is. The scene stays keyed by the rite (D77), so the sa'i result to tahallul loads
+masa.glb again from the browser cache, with a short loading card.
+Rejected: Key the scene by its model file (sa'i and tahallul share one scene, and Scene
+and App gain a rule from rite to model for one short load).
+Source: specs/full-umrah.md
+Status: active
+
+## D118 · 2026-11-26 · Full umrah ships with no feature flag
+
+Why: the site is hidden from search engines (D109), so the people who see it are the
+user and a few testers. A rollback in Cloudflare or a git revert undoes it.
+Rejected: A flag in the address (one more path to test, for a site nobody finds).
+Source: specs/full-umrah.md
+Status: active
+```
+
 ## Decisions
 
-Recorded as D106 to D115 at pause 2.
+Recorded as D106 to D115 at pause 2. D116 to D118 are drafted above, for /build to record.
 
 ## Open items
 
@@ -259,6 +445,9 @@ Recorded as D106 to D115 at pause 2.
 | O12 | Which motion tier do tawaf step 16, tahallul and the result buttons use? | question | spec p2 | user | Resolved | Tier 2, as the other walks and checks (D114). Tier 1 was rejected. 2026-11-26 |
 | O13 | The tawaf check result shows the camera of the last tawaf step. That is now step 16: the marker behind Maqam Ibrahim, not the wide view of step 15. | question | spec p2 | user | Resolved | The step 16 view. The result shows the camera of the last step of its rite, as today (D115). "The wide view of step 15" was rejected. 2026-11-26 |
 | O14 | Is the draft text of tawaf step 16, tahallul and the two new last lines right? It is Claude's draft (D24), and nobody has checked the school notes against a source. | flag | spec p2 | user | Accepted risk | Ship the draft, as for tawaf, sa'i and ihram (D24). The "not yet reviewed" notice stays, and the user corrects the content files against the course notes. "Correct it before approval" was rejected. 2026-11-26 |
+| O15 | O10 assumed an end wall behind Marwah. The 3D mas'a has none: its floor and side walls run 10 m past each hill, and the Marwah rock covers 7 m of that. | flag | spec p3 | user | Resolved | `tools/masa.py` runs the floor and walls 16 m past each hill, and the marker stands at x = 71 on flat floor (D116, supersedes D108). "No model change, marker at x = 68.5" and "a wall with a gap" were rejected. 2026-11-26 |
+| O16 | D77 starts the scene again on a rite change, so the sa'i result to tahallul loads `masa.glb` again from the cache. | question | spec p3 | user | Resolved | Accept the reload (D117). "Key the scene by its model file" was rejected. 2026-11-26 |
+| O17 | Does full-umrah ship behind a feature flag? | question | spec p3 | user | Resolved | No flag (D118). "A flag in the address" was rejected. 2026-11-26 |
 
 _Never delete this section or its rows. See references/ledger.md._
 
