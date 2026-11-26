@@ -28,7 +28,7 @@ for (const size of SIZES) {
       test.use({ locale: "ms-MY" });
 
       test("Aminah walks tawaf from the first step to the last", async ({ page }) => {
-        await page.goto("/");
+        await page.goto("/#tawaf-1");
         await expect(title(page)).toHaveText("Kaabah dan bahagiannya");
         await expectNotices(page);
         await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", "noindex");
@@ -65,9 +65,17 @@ for (const size of SIZES) {
         await tapNext(page, 6);
         await expect(title(page)).toHaveText("Tawaf selesai");
         await expectBeads(page, 7, null);
+        await expectCamera(page, 15);
+
+        await tapNext(page, 1);
+        await expect(page).toHaveURL(/#tawaf-16$/);
+        await expect(title(page)).toHaveText("Solat sunat tawaf dan zamzam");
+        await expectBeads(page, 7, null);
         await expect(next(page)).toHaveCount(0);
         await expect(page.locator(".walk__actions").getByRole("button", { name: MS.checkStart })).toBeVisible();
-        await expectCamera(page, 15);
+        await expect(page.locator(".vh-panel").getByRole("button", { name: "Teruskan ke sa'i" })).toBeVisible();
+        await expectCamera(page, 16);
+        await expect(names(page)).toHaveText(["Maqam Ibrahim"], { useInnerText: true });
 
         await page.getByRole("button", { name: MS.startAgain }).click();
         await expect(title(page)).toHaveText("Kaabah dan bahagiannya");
@@ -163,7 +171,7 @@ for (const size of SIZES) {
           await route.continue();
         });
         const asked = page.waitForRequest((request) => request.url().endsWith("/models/mataf.glb"));
-        await page.goto("/");
+        await page.goto("/#tawaf-1");
         await asked;
         await page.locator("[data-scene] canvas").evaluate((canvas: HTMLCanvasElement) => {
           canvas.getContext("webgl2")!.getExtension("WEBGL_lose_context")!.loseContext();
@@ -219,11 +227,11 @@ for (const size of SIZES) {
         await expect(title(page)).toHaveText("Kaabah dan bahagiannya");
         await page.goto("/#tawaf-6");
         await page.goto("/#abc");
-        await expect(title(page)).toHaveText("Kaabah dan bahagiannya");
+        await expect(title(page)).toHaveText("Bir Ali dan bahagiannya");
 
         const other = await browser.newContext({ locale: "id-ID", viewport: size });
         const fresh = await other.newPage();
-        await fresh.goto("/");
+        await fresh.goto("/#tawaf-1");
         await expect(title(fresh)).toHaveText("Kaabah dan bahagiannya");
         await other.close();
       });
@@ -237,7 +245,7 @@ test.describe("reduced motion", () => {
   test("the camera cuts and does not fly", async ({ page }) => {
     const lines: string[] = [];
     page.on("console", (message) => lines.push(message.text()));
-    await page.goto("/");
+    await page.goto("/#tawaf-1");
     await expectCamera(page, 1);
     await next(page).click();
     await expectCamera(page, 2);
@@ -277,7 +285,7 @@ test.describe("a resize", () => {
   test.use({ viewport: { width: 1280, height: 720 }, locale: "ms-MY" });
 
   test("draws the place again at the new size", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/#tawaf-1");
     await expectCamera(page, 1);
     await kaabahIsDrawn(page);
     const width = () => page.locator("[data-scene] canvas").evaluate((canvas: HTMLCanvasElement) => canvas.width);

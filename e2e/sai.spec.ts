@@ -268,6 +268,7 @@ for (const size of SIZES) {
 
         await page.goto("/#sai-13");
         await expect(title(page)).toHaveText("Sa'i selesai");
+        await expect(page.locator(".vh-panel").getByRole("button", { name: "Teruskan ke tahallul" })).toBeVisible();
         await expectCamera(page, 13);
         await page.keyboard.press("PageDown");
         await expect(page).toHaveURL(/#semak-sai$/);
@@ -278,7 +279,7 @@ for (const size of SIZES) {
         await page.goto("/#sai-99");
         await expect(title(page)).toHaveText("Mas'a dan bahagiannya");
         await page.goto("/#abc");
-        await expect(title(page)).toHaveText("Kaabah dan bahagiannya");
+        await expect(title(page)).toHaveText("Bir Ali dan bahagiannya");
 
         await page.goto("/#semak");
         await expect(rite(page, "Tawaf")).toHaveAttribute("aria-pressed", "true");

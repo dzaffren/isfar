@@ -54,7 +54,7 @@ for (const size of SIZES) {
       const bar = page.locator(".topbar");
       expect(await bar.evaluate((node) => node.scrollWidth <= node.clientWidth), "the top bar fits the screen").toBe(true);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), "the page does not scroll sideways").toBe(true);
-      await expect(page.getByRole("group", { name: "Ibadah" }).getByRole("button")).toHaveText(["Ihram", "Tawaf", "Sa'i"]);
+      await expect(page.getByRole("group", { name: "Ibadah" }).getByRole("button")).toHaveText(["Ihram", "Tawaf", "Sa'i", "Tahallul"]);
       // Tab follows the page order, so each button of the bar comes after the one before it: on the same row to its right, or on a lower row.
       const order = await Promise.all((await bar.getByRole("button").all()).map(async (button) => (await button.boundingBox())!));
       for (let index = 1; index < order.length; index += 1) {

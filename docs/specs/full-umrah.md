@@ -54,14 +54,14 @@ On the last step of ihram, tawaf and sa'i, a quiet button in the panel skips the
 Scenario: Aminah walks one whole umrah on her phone
   Given Aminah's phone is set to Malay, and the screen is 360x800, upright
   When she opens "https://isfar-57q.pages.dev/" with no address after it
-  Then the address ends with "#ihram-1", and the label says "Ihram · Langkah 1 daripada 8"
+  Then the label says "Ihram · Langkah 1 daripada 8"
   When she walks to ihram step 8, taps "Mula semakan" and answers the seven questions
   Then the result shows, and the gold button says "Teruskan ke tawaf"
   And "Cuba semula" sits in the result panel, and "Keluar" stays on the left of the bar
   When she taps "Teruskan ke tawaf"
   Then the address ends with "#tawaf-1", and the mataf loads
   When she walks to tawaf step 15 and taps "Seterusnya"
-  Then the label says "Langkah 16 daripada 16", and the title is "Solat sunat tawaf dan zamzam"
+  Then the label says "Tawaf · Langkah 16 daripada 16", and the title is "Solat sunat tawaf dan zamzam"
   And the gold marker stands behind Maqam Ibrahim, and its name shows
   And "Teruskan ke sa'i" and "Mula semula" sit in the panel as quiet buttons
   When she takes the tawaf check from step 16
