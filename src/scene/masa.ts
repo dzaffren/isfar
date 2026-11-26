@@ -76,10 +76,10 @@ export const SAI_SPOTS: SaiSpot[] = [
   { at: ON_MARWAH, names: ["safa", "marwah", "green"], towards: null, view: "wide" },
 ];
 
-// Tahallul: the marker on the open floor past the Marwah exit, then the wide view with the marker still there.
-const PAST_MARWAH: Point = [MASA.length / 2 + EXIT.depth / 2, 0];
+// Tahallul: the marker on flat floor past the Marwah rock, seen from the hall, then the wide view with the marker still there (D116).
+const PAST_MARWAH: Point = [MASA.length / 2 + EXIT.depth - 1, 0];
 
 export const TAHALLUL_SPOTS: SaiSpot[] = [
-  { at: PAST_MARWAH, names: ["marwah"], towards: null, view: "safa" },
+  { at: PAST_MARWAH, names: ["marwah"], towards: null, view: "marwah" },
   { at: PAST_MARWAH, names: ["safa", "marwah", "green"], towards: null, view: "wide" },
 ];

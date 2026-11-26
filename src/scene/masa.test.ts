@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { BARRIER, LANES, MASA, SAI_SPOTS, WALK, groundAt, laneLine } from "./masa";
+import { BARRIER, LANES, MASA, SAI_SPOTS, TAHALLUL_SPOTS, WALK, groundAt, laneLine } from "./masa";
 
 describe("groundAt", () => {
   const { safa, marwah } = MASA;
@@ -59,5 +59,21 @@ describe("the spots of the sa'i walk", () => {
   it("stands steps 4 and 5 in the lane to Marwah", () => {
     expect(SAI_SPOTS[3].at![1]).toBe(LANES.toMarwah);
     expect(SAI_SPOTS[4].at![1]).toBe(LANES.toMarwah);
+  });
+});
+
+describe("the spot of tahallul", () => {
+  // tools/masa.py runs the floor 16 m past each end of the hall (D116).
+  const FLOOR_END = MASA.length / 2 + 16;
+  const [x, y] = TAHALLUL_SPOTS[0].at!;
+
+  it("stands past the Marwah rock, with the whole marker disc on flat floor", () => {
+    for (const dx of [-1.5, 0, 1.5]) expect(groundAt([x + dx, y])).toBe(0);
+    expect(x - 1.5).toBeGreaterThan(MASA.marwah.at[0] + MASA.marwah.radius);
+    expect(x + 1.5).toBeLessThan(FLOOR_END);
+  });
+
+  it("keeps the same spot on both steps", () => {
+    expect(TAHALLUL_SPOTS[1].at).toEqual(TAHALLUL_SPOTS[0].at);
   });
 });

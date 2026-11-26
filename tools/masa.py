@@ -18,8 +18,8 @@ with open(os.path.join(HERE, "..", "src", "scene", "plan.json")) as file:
     MASA = json.load(file)["masa"]
 
 LENGTH, WIDTH, HEIGHT = MASA["length"], MASA["width"], MASA["height"]
-# The floor and the walls run on past each hill.
-END = LENGTH / 2 + 10
+# The floor and the walls run on past each hill, far enough for the tahallul marker past the Marwah rock (D116).
+END = LENGTH / 2 + 16
 UP = Vector((0, 0, 1))
 
 

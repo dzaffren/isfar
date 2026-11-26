@@ -8,38 +8,39 @@ describe("readPlace", () => {
     expect(readPlace("#tawaf-1")).toEqual({ rite: "tawaf", step: 1 });
     expect(readPlace("#sai-5")).toEqual({ rite: "sai", step: 5 });
     expect(readPlace("#sai-13")).toEqual({ rite: "sai", step: 13 });
+    expect(readPlace("#tawaf-16")).toEqual({ rite: "tawaf", step: 16 });
   });
 
   it("gives step 1 of the same rite to a step outside its walk", () => {
     expect(readPlace("#tawaf-0")).toEqual({ rite: "tawaf", step: 1 });
     expect(readPlace("#tawaf-99")).toEqual({ rite: "tawaf", step: 1 });
-    expect(readPlace("#tawaf-16")).toEqual({ rite: "tawaf", step: 1 });
+    expect(readPlace("#tawaf-17")).toEqual({ rite: "tawaf", step: 1 });
     expect(readPlace("#sai-0")).toEqual({ rite: "sai", step: 1 });
     expect(readPlace("#sai-14")).toEqual({ rite: "sai", step: 1 });
     expect(readPlace("#sai-99")).toEqual({ rite: "sai", step: 1 });
   });
 
-  it("gives step 1 of tawaf to any other address", () => {
-    expect(readPlace("#abc")).toEqual({ rite: "tawaf", step: 1 });
-    expect(readPlace("")).toEqual({ rite: "tawaf", step: 1 });
+  it("gives step 1 of ihram to any other address", () => {
+    expect(readPlace("#abc")).toEqual({ rite: "ihram", step: 1 });
+    expect(readPlace("")).toEqual({ rite: "ihram", step: 1 });
     expect(readPlace("#semak")).toEqual({ rite: "tawaf", step: 1 });
-    expect(readPlace("#SEMAK-SAI")).toEqual({ rite: "tawaf", step: 1 });
-    expect(readPlace("#semak-sai-2")).toEqual({ rite: "tawaf", step: 1 });
-    expect(readPlace("#sai-semak")).toEqual({ rite: "tawaf", step: 1 });
-    expect(readPlace("#SAI-5")).toEqual({ rite: "tawaf", step: 1 });
-    expect(readPlace("#sai-abc")).toEqual({ rite: "tawaf", step: 1 });
-    expect(readPlace("#sai-")).toEqual({ rite: "tawaf", step: 1 });
-    expect(readPlace("#sai-5/x")).toEqual({ rite: "tawaf", step: 1 });
-    expect(readPlace("#tawaf-abc")).toEqual({ rite: "tawaf", step: 1 });
+    expect(readPlace("#SEMAK-SAI")).toEqual({ rite: "ihram", step: 1 });
+    expect(readPlace("#semak-sai-2")).toEqual({ rite: "ihram", step: 1 });
+    expect(readPlace("#sai-semak")).toEqual({ rite: "ihram", step: 1 });
+    expect(readPlace("#SAI-5")).toEqual({ rite: "ihram", step: 1 });
+    expect(readPlace("#sai-abc")).toEqual({ rite: "ihram", step: 1 });
+    expect(readPlace("#sai-")).toEqual({ rite: "ihram", step: 1 });
+    expect(readPlace("#sai-5/x")).toEqual({ rite: "ihram", step: 1 });
+    expect(readPlace("#tawaf-abc")).toEqual({ rite: "ihram", step: 1 });
   });
 
   it("gives step 1 to an address that only looks like a step", () => {
     expect(readPlace("#tawaf-06")).toEqual({ rite: "tawaf", step: 1 });
-    expect(readPlace("#tawaf-6x")).toEqual({ rite: "tawaf", step: 1 });
-    expect(readPlace("#tawaf-1e1")).toEqual({ rite: "tawaf", step: 1 });
-    expect(readPlace("#tawaf- 6")).toEqual({ rite: "tawaf", step: 1 });
+    expect(readPlace("#tawaf-6x")).toEqual({ rite: "ihram", step: 1 });
+    expect(readPlace("#tawaf-1e1")).toEqual({ rite: "ihram", step: 1 });
+    expect(readPlace("#tawaf- 6")).toEqual({ rite: "ihram", step: 1 });
     expect(readPlace("#sai-05")).toEqual({ rite: "sai", step: 1 });
-    expect(readPlace("#sai-6x")).toEqual({ rite: "tawaf", step: 1 });
+    expect(readPlace("#sai-6x")).toEqual({ rite: "ihram", step: 1 });
   });
 });
 
@@ -55,9 +56,9 @@ describe("the address of an ihram step", () => {
     expect(readPlace("#ihram-12")).toEqual({ rite: "ihram", step: 1 });
   });
 
-  it("gives step 1 of tawaf to an address that only looks like ihram", () => {
-    expect(readPlace("#IHRAM-2")).toEqual({ rite: "tawaf", step: 1 });
-    expect(readPlace("#ihram")).toEqual({ rite: "tawaf", step: 1 });
+  it("gives step 1 of ihram to an address that only looks like ihram", () => {
+    expect(readPlace("#IHRAM-2")).toEqual({ rite: "ihram", step: 1 });
+    expect(readPlace("#ihram")).toEqual({ rite: "ihram", step: 1 });
     expect(isCheck("#ihram-8")).toBe(false);
   });
 });
@@ -83,9 +84,28 @@ describe("the address of a check", () => {
 
   it("reads no other address as the ihram check", () => {
     for (const hash of ["#SEMAK-IHRAM", "#semak-ihram-2", "#ihram-semak"]) {
-      expect(readPlace(hash)).toEqual({ rite: "tawaf", step: 1 });
+      expect(readPlace(hash)).toEqual({ rite: "ihram", step: 1 });
       expect(isCheck(hash)).toBe(false);
     }
+  });
+});
+
+describe("the address of a tahallul step", () => {
+  it("reads #tahallul-1 and #tahallul-2", () => {
+    expect(readPlace("#tahallul-1")).toEqual({ rite: "tahallul", step: 1 });
+    expect(readPlace("#tahallul-2")).toEqual({ rite: "tahallul", step: 2 });
+    expect(stepHash("tahallul", 2)).toBe("#tahallul-2");
+  });
+
+  it("gives step 1 of tahallul to a step outside its walk", () => {
+    expect(readPlace("#tahallul-0")).toEqual({ rite: "tahallul", step: 1 });
+    expect(readPlace("#tahallul-5")).toEqual({ rite: "tahallul", step: 1 });
+  });
+
+  it("has no check", () => {
+    expect(isCheck("#semak-tahallul")).toBe(false);
+    expect(readPlace("#semak-tahallul")).toEqual({ rite: "ihram", step: 1 });
+    expect(readPlace("#umrah")).toEqual({ rite: "ihram", step: 1 });
   });
 });
 
