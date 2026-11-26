@@ -1,6 +1,6 @@
 # Full umrah
 
-**Version:** v1 · **Status:** Refined · **Type:** Feature · **Project type:** Web UI
+**Version:** v1 · **Status:** Built · **Type:** Feature · **Project type:** Web UI
 
 **Shape doc:** docs/specs/virtual-hajj/shape.md
 **Depends on:** `ihram-check`, `sai-check`, `tawaf-check`
@@ -412,6 +412,8 @@ Recorded as D106 to D115 at pause 2. D116 to D118 at /build.
 | O15 | O10 assumed an end wall behind Marwah. The 3D mas'a has none: its floor and side walls run 10 m past each hill, and the Marwah rock covers 7 m of that. | flag | spec p3 | user | Resolved | `tools/masa.py` runs the floor and walls 16 m past each hill, and the marker stands at x = 71 on flat floor (D116, supersedes D108). "No model change, marker at x = 68.5" and "a wall with a gap" were rejected. 2026-11-26 |
 | O16 | D77 starts the scene again on a rite change, so the sa'i result to tahallul loads `masa.glb` again from the cache. | question | spec p3 | user | Resolved | Accept the reload (D117). "Key the scene by its model file" was rejected. 2026-11-26 |
 | O17 | Does full-umrah ship behind a feature flag? | question | spec p3 | user | Resolved | No flag (D118). "A flag in the address" was rejected. 2026-11-26 |
+| O18 | Scenario 1 said "Then the address ends with "#ihram-1"" for an empty address. The site reads an empty address as ihram step 1 but leaves the address bar empty, as it did for tawaf. | flag | build | user | Decided alone | Chose: the scenario checks the label "Ihram · Langkah 1 daripada 8" and not the address. Other: write `#ihram-1` into the address on load with `history.replaceState`. Undo: add that call in `App.tsx`, and put back the address line in scenario 1. 2026-11-26 |
+| O19 | On tahallul step 1, the camera stood 18 m behind the marker, as in sa'i, and the name of Marwah fell under the view. The plan did not name this change. | flag | build | user | Decided alone | Chose: past the end of the hall, the walk camera and the wide camera stand 30 m further back (`src/scene/views.ts`). A views test checks the names. Other: show no name on tahallul step 1. Undo: `git revert 820e95f`, and set the names of tahallul step 1 to `[]`. 2026-11-26 |
 
 _Never delete this section or its rows. See references/ledger.md._
 
