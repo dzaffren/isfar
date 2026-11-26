@@ -8,6 +8,7 @@ const MS = {
   back: "Kembali",
   startAgain: "Mula semula",
   goTawaf: "Teruskan ke tawaf",
+  checkStart: "Mula semakan",
 };
 
 const next = (page: Page) => page.getByRole("button", { name: MS.next, exact: true });
@@ -108,8 +109,10 @@ for (const size of SIZES) {
       await expect(title(page)).toHaveText("Ke Makkah");
       await expectCamera(page, 8);
       await expect(next(page)).toHaveCount(0);
+      // The check takes the gold place, and tawaf moves into the panel (D103).
+      await expect(page.locator(".walk__actions").getByRole("button", { name: MS.checkStart })).toBeVisible();
       await expect(page.locator(".vh-panel").getByRole("button", { name: MS.startAgain })).toBeVisible();
-      await page.locator(".walk__actions").getByRole("button", { name: MS.goTawaf }).click();
+      await page.locator(".vh-panel").getByRole("button", { name: MS.goTawaf }).click();
       await expect(page).toHaveURL(/#tawaf-1$/);
       await expect(title(page)).toHaveText("Kaabah dan bahagiannya");
       await expect(rite(page, "Tawaf")).toHaveAttribute("aria-pressed", "true");
@@ -186,11 +189,12 @@ test.describe("1920x1080 projector, in English", () => {
       await expect(page).toHaveURL(new RegExp(`#ihram-${step}$`));
     }
     await expect(title(page)).toHaveText("On to Makkah");
-    await expect(page.locator(".walk__actions").getByRole("button", { name: "Go on to tawaf" })).toBeVisible();
+    await expect(page.locator(".walk__actions").getByRole("button", { name: "Start the check" })).toBeVisible();
+    await expect(page.locator(".vh-panel").getByRole("button", { name: "Go on to tawaf" })).toBeVisible();
 
     await page.keyboard.press("PageDown");
-    await expect(page).toHaveURL(/#tawaf-1$/);
-    await expect(title(page)).toHaveText("The Kaabah and its parts");
+    await expect(page).toHaveURL(/#semak-ihram$/);
+    await expect(title(page)).toHaveText("Who enters ihram at Bir Ali?");
 
     await page.goBack();
     await expect(page).toHaveURL(/#ihram-8$/);

@@ -16,6 +16,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Walk through sa'i in 13 steps in a 3D mas'a, from Safa to the end of walk 7 at Marwah. A switch in the top bar moves between tawaf and sa'i.
 - Check what you learned after the sa'i walk: seven questions on where each step of sa'i happens and what to do there, from step 13 or the link `#semak-sai`.
 - Walk through ihram in 8 steps in a 3D Bir Ali, from the bath and the clothes to the talbiyah on the bus, with the niat and the talbiyah in Arabic. The switch in the top bar now holds Ihram, Tawaf and Sa'i, after BM and EN, and takes its own row on a phone.
+- Check what you learned after the ihram walk: seven questions on what to do at each place of Bir Ali, from step 8 or the link `#semak-ihram`. On step 8, "Teruskan ke tawaf" now sits in the step panel.
 
 ### Fixed
 

@@ -872,7 +872,7 @@ sits in the panel, as on tawaf step 15 (D58). full-umrah joins the rest of the w
 Rejected: "Mula semula" only (the walk stops, and the person must find tawaf in the top
 bar).
 Source: specs/ihram.md
-Status: active
+Status: superseded by D103
 
 ## D94 · 2026-11-25 · The rite switch holds Ihram, Tawaf and Sa'i; full-umrah adds Tahallul
 
@@ -956,4 +956,37 @@ Why: the walk adds a rite and changes no old step. Rollback is the Cloudflare da
 or a git revert and a push.
 Rejected: A flag in the address (one more path to test, for a walk that nobody uses yet).
 Source: specs/ihram.md
+Status: active
+
+## D103 · 2026-11-25 · On ihram step 8, the gold "Mula semakan" opens the ihram check, and "Teruskan ke tawaf" moves into the panel
+
+Why: one gold act on each screen (D3), and the same entry as the tawaf and sa'i checks
+(D58, D84). Page Down on step 8 opens #semak-ihram, so an ustaz goes on with the
+clicker. "Teruskan ke tawaf" and "Mula semula" sit in the panel as quiet buttons, and
+"Teruskan ke tawaf" still opens tawaf step 1. full-umrah joins the rest of the walks.
+Rejected: "Teruskan ke tawaf" stays gold, with a quiet "Mula semakan" (the ihram check
+breaks the pattern of the other checks, and shape O19 puts each check at the end of its
+rite), The address only (a person who finishes the walk does not find the check).
+Supersedes: D93
+Source: specs/ihram-check.md
+Status: active
+
+## D104 · 2026-11-25 · The ihram check has seven questions, one for each of steps 1 to 7
+
+Why: seven beads fit seven questions (D56). The seven cover the miqat, the scent, the
+clothes of men, the solat sunat, the niat that starts ihram, the talbiyah and the rules
+(shape O12). The plane line of step 5 and the end of the talbiyah on step 8 drop,
+because neither happens at a place in Bir Ali, as the lower count dropped from sa'i (D85).
+Rejected: The plane in place of the miqat (the miqat goes unchecked), The plane and the
+end of the talbiyah in place of the miqat and the solat sunat (two places go unchecked).
+Source: specs/ihram-check.md
+Status: active
+
+## D105 · 2026-11-25 · The ihram check uses motion tier 2, as the other checks do
+
+Why: the person moves between the checks of three rites, and each one moves in the same
+way. The question fades in over 320 ms, and the camera moves on the straight line of
+D101. Under reduced motion, the camera cuts.
+Rejected: Tier 1 (the camera cuts between the spots, unlike the tawaf and sa'i checks).
+Source: specs/ihram-check.md
 Status: active

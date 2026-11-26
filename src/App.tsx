@@ -8,7 +8,7 @@ import { Notice } from "./components/Notice";
 import { StepActions } from "./components/StepActions";
 import { StepPanel } from "./components/StepPanel";
 import { TopBar } from "./components/TopBar";
-import { CHECK, SAI_CHECK, type Question } from "./content/check";
+import { CHECK, IHRAM_CHECK, SAI_CHECK, type Question } from "./content/check";
 import { IHRAM } from "./content/ihram";
 import { SAI, saiBeadsAt } from "./content/sai";
 import { TAWAF, beadsAt, type Step } from "./content/tawaf";
@@ -26,24 +26,33 @@ const goTo = (rite: Rite, step: number) => {
   location.hash = stepHash(rite, step);
 };
 
-// Each rite has its walk, the label of its progress, and what the gold button opens on its last step.
-// Tawaf and sa'i have a check, with its own words for the header and the scene text before the pick. Ihram has no check yet, and no beads (D92, D97).
+// Each rite has its walk, the label of its progress, and what the gold button opens on its last step: its check (D58, D84, D103).
+// Each check has its own words for the header and the scene text before the pick. Ihram has no beads in its walk (D97).
+// On the last step of ihram, a quiet button in the panel opens tawaf step 1, beside "Mula semula" (D103).
 type CheckWords = { progress: keyof Words; done: keyof Words; where: keyof Words };
 type Walk = {
   steps: Record<Language, Step[]>;
   beadsAt: ((step: number) => { done: number; now: number | null }) | null;
   progress: keyof Words;
   after: { hash: string; label: keyof Words };
-  check: { questions: Record<Language, Question[]>; words: CheckWords } | null;
+  panel: { hash: string; label: keyof Words } | null;
+  check: { questions: Record<Language, Question[]>; words: CheckWords };
 };
 const WALKS: Record<Rite, Walk> = {
-  // Step 8 of ihram opens tawaf step 1 (D93).
-  ihram: { steps: IHRAM, beadsAt: null, progress: "ihramProgress", after: { hash: stepHash("tawaf", 1), label: "goTawaf" }, check: null },
+  ihram: {
+    steps: IHRAM,
+    beadsAt: null,
+    progress: "ihramProgress",
+    after: { hash: CHECK_HASH.ihram, label: "checkStart" },
+    panel: { hash: stepHash("tawaf", 1), label: "goTawaf" },
+    check: { questions: IHRAM_CHECK, words: { progress: "ihramCheckProgress", done: "ihramCheckDone", where: "ihramCheckWhere" } },
+  },
   tawaf: {
     steps: TAWAF,
     beadsAt,
     progress: "progress",
     after: { hash: CHECK_HASH.tawaf, label: "checkStart" },
+    panel: null,
     check: { questions: CHECK, words: { progress: "checkProgress", done: "checkDone", where: "checkWhere" } },
   },
   sai: {
@@ -51,6 +60,7 @@ const WALKS: Record<Rite, Walk> = {
     beadsAt: saiBeadsAt,
     progress: "saiProgress",
     after: { hash: CHECK_HASH.sai, label: "checkStart" },
+    panel: null,
     check: { questions: SAI_CHECK, words: { progress: "saiCheckProgress", done: "saiCheckDone", where: "saiCheckWhere" } },
   },
 };
@@ -94,7 +104,7 @@ export function App() {
   }, []);
 
   // The arrow keys and a presenter clicker, which sends Page Up and Page Down (D31).
-  // In the check, Next waits for a pick (D52). On the last step of a walk, Next opens what comes after it: the check of tawaf or sa'i (D58, D84), or tawaf after ihram (D93).
+  // In the check, Next waits for a pick (D52). On the last step of a walk, Next opens the check of its rite (D58, D84, D103).
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
@@ -121,7 +131,6 @@ export function App() {
   };
 
   // The camera of a question is the camera of its walk step, and the result shows the wide view of the last step.
-  // An address of a check reads as tawaf or sa'i, so the walk of a check always has its questions.
   const checked = check ? walk.check : null;
   const questions = checked ? checked.questions[language] : [];
   const sceneStep = !checked ? step : at === "result" ? total : questions[at - 1].step;
@@ -192,6 +201,11 @@ export function App() {
               >
                 {now.recitation && <ArabicBlock {...now.recitation} />}
                 {now.note && <Note label={words.noteLabel} text={now.note} />}
+                {last && walk.panel && (
+                  <button type="button" className="vh-button vh-button--quiet walk__again" onClick={() => (location.hash = walk.panel!.hash)}>
+                    {words[walk.panel.label]}
+                  </button>
+                )}
                 {last && (
                   <button type="button" className="vh-button vh-button--quiet walk__again" onClick={() => goTo(rite, 1)}>
                     {words.startAgain}
