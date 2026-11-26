@@ -4,7 +4,7 @@ import { IHRAM_SPOTS } from "./birali";
 import { SAI_SPOTS, TAHALLUL_SPOTS, groundAt, laneLine } from "./masa";
 import { SPOTS } from "./mataf";
 import plan from "./plan.json" with { type: "json" };
-import { alongHall, between, birAliNameAnchor, birAliViewOf, masaViewOf, viewOf, type V3, type View } from "./views";
+import { alongHall, between, birAliNameAnchor, birAliViewOf, masaViewOf, saiNameAnchor, viewOf, type V3, type View } from "./views";
 
 // The scene is about square on a projector at 960x540, and 1.5 times as wide as it is high on a phone.
 const onScreen = (view: View, aspect: number, [x, y, z]: V3) => {
@@ -166,6 +166,17 @@ describe("the camera of tahallul in the mas'a", () => {
     TAHALLUL_SPOTS.forEach((spot, index) => {
       for (const aspect of [1, 1.5]) {
         expect(onScreen(tahallulViewOf(index + 1), aspect, [spot.at![0], spot.at![1], 0]), `step ${index + 1}, aspect ${aspect}`).toBe(true);
+      }
+    });
+  });
+
+  it("shows the name of each part of the step, on a projector and on a phone", () => {
+    TAHALLUL_SPOTS.forEach((spot, index) => {
+      if (spot.view === "wide") return;
+      for (const part of spot.names) {
+        for (const aspect of [1, 1.5]) {
+          expect(onScreen(tahallulViewOf(index + 1), aspect, saiNameAnchor(part)), `step ${index + 1}, ${part}, aspect ${aspect}`).toBe(true);
+        }
       }
     });
   });

@@ -85,7 +85,9 @@ export function masaViewOf(spot: SaiSpot): View {
   }
   const [x] = spot.at!;
   const way = spot.view === "marwah" ? 1 : -1;
-  const back = Math.min(Math.max(x - way * 18, -HALL_END), HALL_END);
+  // Past the end of the hall, the camera stands further behind the marker, so the name of the hill beside it shows too.
+  const behind = Math.abs(x) > MASA.length / 2 ? 30 : 18;
+  const back = Math.min(Math.max(x - way * behind, -HALL_END), HALL_END);
   return { from: [back, -6, 22], to: [x + way * 14, 0, 1] };
 }
 
