@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { BARRIER, LANES, MASA, SAI_SPOTS, TAHALLUL_SPOTS, WALK, groundAt, laneLine } from "./masa";
 
@@ -75,5 +76,23 @@ describe("the spot of tahallul", () => {
 
   it("keeps the same spot on both steps", () => {
     expect(TAHALLUL_SPOTS[1].at).toEqual(TAHALLUL_SPOTS[0].at);
+  });
+});
+
+describe("the model of the mas'a", () => {
+  // The x bounds of a mesh, from the JSON chunk of public/models/masa.glb.
+  function along(name: string): [number, number] {
+    const file = readFileSync(new URL("../../public/models/masa.glb", import.meta.url));
+    const json = JSON.parse(file.subarray(20, 20 + file.readUInt32LE(12)).toString());
+    const mesh = json.meshes.find((each: { name: string }) => each.name === name);
+    const accessor = json.accessors[mesh.primitives[0].attributes.POSITION];
+    return [accessor.min[0], accessor.max[0]];
+  }
+
+  it("runs the arches along the whole hall, the same at each end", () => {
+    const [floorFrom, floorTo] = along("floor");
+    const [archFrom, archTo] = along("arch");
+    expect(archFrom - floorFrom).toBeCloseTo(floorTo - archTo);
+    expect(floorTo - archTo).toBeLessThan(6);
   });
 });

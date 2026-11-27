@@ -61,12 +61,15 @@ def walls(bm):
 mesh("wall", walls)
 
 
-# A plain arch on the inner face of each wall, every 6 m.
+# A plain arch on the inner face of each wall, every 6 m, in a row centred on the hall and 5 m short of each end.
+ARCHES = int((2 * END - 8) / 6)
+
+
 def arches(bm):
     for side in (-1, 1):
         y = side * (WIDTH / 2 - 0.05)
-        for index in range(22):
-            left = -END + 4 + index * 6
+        for index in range(ARCHES):
+            left = -3 * ARCHES + index * 6
             shape = [(left + 1, y, 0), (left + 1, y, 4)]
             for degrees in range(150, 29, -30):
                 angle = math.radians(degrees)
