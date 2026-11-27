@@ -142,7 +142,7 @@ export function App() {
     setLanguage(next);
   };
 
-  // The camera of a question is the camera of its walk step, and the result shows the wide view of the last step.
+  // The camera of a question is the camera of its walk step, and the result shows the camera of the last step (D115).
   const checked = check ? walk.check : null;
   const questions = checked ? checked.questions[language] : [];
   const sceneStep = !checked ? step : at === "result" ? total : questions[at - 1].step;
