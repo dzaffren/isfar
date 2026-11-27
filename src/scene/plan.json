@@ -19,7 +19,8 @@
     "green": { "at": [-30, -10], "depth": 1.5 },
     "walk": { "from": -52, "to": 53 },
     "lanes": { "toMarwah": -5, "toSafa": 5 },
-    "barrier": { "from": -46, "to": 47, "height": 1 }
+    "barrier": { "from": -46, "to": 47, "height": 1 },
+    "exit": { "width": 8, "depth": 12 }
   },
   "birali": {
     "mosque": { "at": [0, -10], "size": 60, "height": 10 },

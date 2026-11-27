@@ -1,6 +1,6 @@
 # Virtual Hajj
 
-**Status:** Active · **Updated:** 2026-11-26 by /ship ihram-check
+**Status:** Active · **Updated:** 2026-11-27 by /ship full-umrah
 
 A learning website that works as a virtual hajj and umrah.
 People who prepare to go for hajj or umrah use it.
@@ -34,6 +34,7 @@ People who prepare to go for hajj or umrah use it.
 | sai-check        | Shipped | After the sa'i walk, the person answers seven questions on where each step of sa'i happens and what to do there, and the result shows on screen. | docs/specs/sai-check.md |
 | ihram            | Shipped | The site leads a person through ihram in 8 steps, in a 3D Bir Ali, from the bath and the clothes to the talbiyah on the bus to Makkah. | docs/specs/ihram.md |
 | ihram-check      | Shipped | After the ihram walk, the person answers seven questions on where each step of ihram happens at Bir Ali and what to do there, and the result shows on screen. | docs/specs/ihram-check.md |
+| full-umrah       | Shipped | The walk starts with ihram and ends with tahallul, so a person walks one whole umrah from the first step to the last. Each check opens at the end of its rite, and its result then goes on to the next part. | docs/specs/full-umrah.md |
 
 ## More
 

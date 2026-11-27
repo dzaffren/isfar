@@ -1,5 +1,5 @@
 import { IHRAM_NAME_HEIGHT, IHRAM_PARTS, IHRAM_SPOTS, type IhramPart } from "./birali";
-import { MASA, SAI_NAME_HEIGHT, SAI_PARTS, SAI_SPOTS, type SaiPart, type SaiSpot } from "./masa";
+import { MASA, SAI_NAME_HEIGHT, SAI_PARTS, type SaiPart, type SaiSpot } from "./masa";
 import { GREEN_LIGHT, HAJAR_ASWAD, PARTS, SPOTS, type Part, type Spot } from "./mataf";
 
 // The camera of each step, in the plan's metres: x and y on the floor, z up. three.js is y up, and place.ts turns it.
@@ -71,20 +71,23 @@ export function namePlace(part: Part, view: Spot["view"]): readonly [number, num
   return view === "wide" ? WIDE_PUSH[part] : [0, -38];
 }
 
-// The camera of a sa'i step. A wide view stands high behind one hill and looks along the whole hall.
+// The camera of a spot in the mas'a, for sa'i and tahallul. A wide view stands high behind one hill and looks along the whole hall.
 // A walk view stands behind and above the marker, inside the hall, and looks the way of the view.
 const WIDE_BACK = MASA.length / 2 + 50;
 const HALL_END = MASA.length / 2 + 10;
 
-export function saiViewOf(step: number): View {
-  const spot = SAI_SPOTS[step - 1];
+export function masaViewOf(spot: SaiSpot): View {
   if (spot.view === "wide") {
     const end = spot.at && spot.at[0] > 0 ? 1 : -1;
-    return { from: [end * WIDE_BACK, 0, 40], to: [end * 20, 0, 0] };
+    // A marker past the end of the hall, as for tahallul, stands under a camera at WIDE_BACK, so the camera stands further back.
+    const back = spot.at && Math.abs(spot.at[0]) > MASA.length / 2 ? WIDE_BACK + 30 : WIDE_BACK;
+    return { from: [end * back, 0, 40], to: [end * 20, 0, 0] };
   }
   const [x] = spot.at!;
   const way = spot.view === "marwah" ? 1 : -1;
-  const back = Math.min(Math.max(x - way * 18, -HALL_END), HALL_END);
+  // Past the end of the hall, the camera stands further behind the marker, so the name of the hill beside it shows too.
+  const behind = Math.abs(x) > MASA.length / 2 ? 30 : 18;
+  const back = Math.min(Math.max(x - way * behind, -HALL_END), HALL_END);
   return { from: [back, -6, 22], to: [x + way * 14, 0, 1] };
 }
 

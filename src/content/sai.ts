@@ -78,7 +78,7 @@ const ms: Step[] = [
   },
   {
     title: "Sa'i selesai",
-    text: "Anda telah melengkapkan tujuh perjalanan, dan sa'i tamat di Marwah. Selepas ini ialah tahallul: bercukur atau menggunting rambut. Bahagian itu akan datang kemudian.",
+    text: "Anda telah melengkapkan tujuh perjalanan, dan sa'i tamat di Marwah. Selepas ini ialah tahallul: keluar melalui pintu Marwah, kemudian bercukur atau menggunting rambut.",
     where: "Mas'a dari atas, dengan penanda di Bukit Marwah",
   },
 ];
@@ -149,7 +149,7 @@ const en: Step[] = [
   },
   {
     title: "Sa'i is complete",
-    text: "You have completed seven walks, and sa'i ends at Marwah. Next comes tahallul: a shave or a cut of the hair. That part of the site comes later.",
+    text: "You have completed seven walks, and sa'i ends at Marwah. Next comes tahallul: leave by the Marwah exit, then shave or cut the hair.",
     where: "The mas'a from above, with the marker at Marwah",
   },
 ];

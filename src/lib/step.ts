@@ -1,17 +1,17 @@
-// The rite and the step of the walk live in the address, as #ihram-2, #tawaf-6 or #sai-5 (D30, D95).
-// A number outside the walk, as #sai-0 or #sai-99, opens step 1 of that rite. Any other address opens step 1 of tawaf.
-export type Rite = "ihram" | "tawaf" | "sai";
+// The rite and the step of the walk live in the address, as #ihram-2, #tawaf-6, #sai-5 or #tahallul-1 (D30, D95).
+// A number outside the walk, as #sai-0 or #sai-99, opens step 1 of that rite. Any other address opens step 1 of ihram, where the umrah starts.
+export type Rite = "ihram" | "tawaf" | "sai" | "tahallul";
 
-export const TOTAL: Record<Rite, number> = { ihram: 8, tawaf: 15, sai: 13 };
+export const TOTAL: Record<Rite, number> = { ihram: 8, tawaf: 16, sai: 13, tahallul: 2 };
 
-const PLACE = /^#(ihram|tawaf|sai)-(\d+)$/;
+const PLACE = /^#(ihram|tawaf|sai|tahallul)-(\d+)$/;
 const STEP = /^[1-9]\d*$/;
 
 export function readPlace(hash: string): { rite: Rite; step: number } {
   const checked = RITES.find((rite) => CHECK_HASH[rite] === hash);
   if (checked) return { rite: checked, step: 1 };
   const match = PLACE.exec(hash);
-  if (!match) return { rite: "tawaf", step: 1 };
+  if (!match) return { rite: "ihram", step: 1 };
   const rite = match[1] as Rite;
   const step = STEP.test(match[2]) ? Number(match[2]) : 1;
   return { rite, step: step <= TOTAL[rite] ? step : 1 };
@@ -22,9 +22,9 @@ export function stepHash(rite: Rite, step: number): string {
 }
 
 // Each rite's check has one address, so a reload starts it again at question 1 (D51, D53, D84, D103).
-// The address of a check reads as step 1 of its rite, so the scene shows the place of that rite.
-export const CHECK_HASH: Record<Rite, string> = { ihram: "#semak-ihram", tawaf: "#semak", sai: "#semak-sai" };
-const RITES = Object.keys(CHECK_HASH) as Rite[];
+// The address of a check reads as step 1 of its rite, so the scene shows the place of that rite. Tahallul has no check (D112).
+export const CHECK_HASH: Record<Exclude<Rite, "tahallul">, string> = { ihram: "#semak-ihram", tawaf: "#semak", sai: "#semak-sai" };
+const RITES = Object.keys(CHECK_HASH) as (keyof typeof CHECK_HASH)[];
 
 export function isCheck(hash: string): boolean {
   return RITES.some((rite) => CHECK_HASH[rite] === hash);

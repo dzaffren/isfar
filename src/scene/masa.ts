@@ -15,6 +15,8 @@ export const WALK = plan.masa.walk;
 // y is the middle of each lane. The lane to Marwah is on the right of a person at Safa who faces Marwah (D82).
 export const LANES = plan.masa.lanes;
 export const BARRIER = plan.masa.barrier;
+// The open floor past the Marwah rock, where the pilgrim goes for tahallul. The hall has no end wall (D116).
+export const EXIT = plan.masa.exit;
 
 // The path of one walk: off the hill, into its lane, along the barrier, and up onto the other hill.
 export function laneLine(towards: "marwah" | "safa"): Point[] {
@@ -72,4 +74,12 @@ export const SAI_SPOTS: SaiSpot[] = [
   { at: ON_SAFA, names: ["safa"], towards: "safa", view: "marwah" },
   { at: ON_MARWAH, names: ["marwah"], towards: "marwah", view: "safa" },
   { at: ON_MARWAH, names: ["safa", "marwah", "green"], towards: null, view: "wide" },
+];
+
+// Tahallul: the marker on flat floor past the Marwah rock, seen from the hall, then the wide view with the marker still there (D116).
+const PAST_MARWAH: Point = [MASA.length / 2 + EXIT.depth - 1, 0];
+
+export const TAHALLUL_SPOTS: SaiSpot[] = [
+  { at: PAST_MARWAH, names: ["marwah"], towards: null, view: "marwah" },
+  { at: PAST_MARWAH, names: ["safa", "marwah", "green"], towards: null, view: "wide" },
 ];

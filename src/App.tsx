@@ -11,6 +11,7 @@ import { TopBar } from "./components/TopBar";
 import { CHECK, IHRAM_CHECK, SAI_CHECK, type Question } from "./content/check";
 import { IHRAM } from "./content/ihram";
 import { SAI, saiBeadsAt } from "./content/sai";
+import { TAHALLUL } from "./content/tahallul";
 import { TAWAF, beadsAt, type Step } from "./content/tawaf";
 import { TEXT, type Words } from "./content/text";
 import type { Picks } from "./lib/check";
@@ -27,8 +28,9 @@ const goTo = (rite: Rite, step: number) => {
 };
 
 // Each rite has its walk, the label of its progress, and what the gold button opens on its last step: its check (D58, D84, D103).
-// Each check has its own words for the header and the scene text before the pick. Ihram has no beads in its walk (D97).
-// On the last step of ihram, a quiet button in the panel opens tawaf step 1, beside "Mula semula" (D103).
+// Tahallul has no check, and its last step opens ihram step 1 again (D110, D112).
+// Each check has its own words for the header and the scene text before the pick. Ihram and tahallul have no beads (D97).
+// The panel names the next part: a quiet button on the last step, and the gold button on the result of the check (D107, D111).
 type CheckWords = { progress: keyof Words; done: keyof Words; where: keyof Words };
 type Walk = {
   steps: Record<Language, Step[]>;
@@ -36,7 +38,7 @@ type Walk = {
   progress: keyof Words;
   after: { hash: string; label: keyof Words };
   panel: { hash: string; label: keyof Words } | null;
-  check: { questions: Record<Language, Question[]>; words: CheckWords };
+  check: { questions: Record<Language, Question[]>; words: CheckWords } | null;
 };
 const WALKS: Record<Rite, Walk> = {
   ihram: {
@@ -52,7 +54,7 @@ const WALKS: Record<Rite, Walk> = {
     beadsAt,
     progress: "progress",
     after: { hash: CHECK_HASH.tawaf, label: "checkStart" },
-    panel: null,
+    panel: { hash: stepHash("sai", 1), label: "goSai" },
     check: { questions: CHECK, words: { progress: "checkProgress", done: "checkDone", where: "checkWhere" } },
   },
   sai: {
@@ -60,8 +62,16 @@ const WALKS: Record<Rite, Walk> = {
     beadsAt: saiBeadsAt,
     progress: "saiProgress",
     after: { hash: CHECK_HASH.sai, label: "checkStart" },
-    panel: null,
+    panel: { hash: stepHash("tahallul", 1), label: "goTahallul" },
     check: { questions: SAI_CHECK, words: { progress: "saiCheckProgress", done: "saiCheckDone", where: "saiCheckWhere" } },
+  },
+  tahallul: {
+    steps: TAHALLUL,
+    beadsAt: null,
+    progress: "tahallulProgress",
+    after: { hash: stepHash("ihram", 1), label: "umrahAgain" },
+    panel: null,
+    check: null,
   },
 };
 
@@ -104,7 +114,8 @@ export function App() {
   }, []);
 
   // The arrow keys and a presenter clicker, which sends Page Up and Page Down (D31).
-  // In the check, Next waits for a pick (D52). On the last step of a walk, Next opens the check of its rite (D58, D84, D103).
+  // In the check, Next waits for a pick (D52), and on the result it opens the next part (D107).
+  // On the last step of a walk, Next opens the check of its rite (D58, D84, D103).
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
@@ -113,6 +124,7 @@ export function App() {
       if (check) {
         if (!forward) return;
         if (told) nextQuestion();
+        else if (at === "result" && walk.panel) location.hash = walk.panel.hash;
       } else if (forward) {
         if (step < total) goTo(rite, step + 1);
         else location.hash = walk.after.hash;
@@ -123,14 +135,14 @@ export function App() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [rite, step, total, check, told, walk]);
+  }, [rite, step, total, check, told, at, walk]);
 
   const chooseLanguage = (next: Language) => {
     storeLanguage(next);
     setLanguage(next);
   };
 
-  // The camera of a question is the camera of its walk step, and the result shows the wide view of the last step.
+  // The camera of a question is the camera of its walk step, and the result shows the camera of the last step (D115).
   const checked = check ? walk.check : null;
   const questions = checked ? checked.questions[language] : [];
   const sceneStep = !checked ? step : at === "result" ? total : questions[at - 1].step;
@@ -161,6 +173,7 @@ export function App() {
             { id: "ihram", name: words.riteIhram },
             { id: "tawaf", name: words.riteTawaf },
             { id: "sai", name: words.riteSai },
+            { id: "tahallul", name: words.riteTahallul },
           ],
           now: rite,
           // The other rite opens at its step 1 (D71).
@@ -182,8 +195,13 @@ export function App() {
               onPick={(answer) => setPicks((before) => before.map((pick, index) => (index === (at as number) - 1 ? answer : pick)))}
               onNext={nextQuestion}
               onLeave={() => goTo(rite, total)}
-              onAgain={restart}
+              // "Cuba semula" in the panel goes away with the result, so the first answer takes the focus.
+              onAgain={() => {
+                restart();
+                setMoved(true);
+              }}
               onStep={(question) => goTo(rite, question)}
+              onward={walk.panel ? { label: words[walk.panel.label], onAct: () => (location.hash = walk.panel!.hash) } : undefined}
               focusFirst={moved}
             >
               {notices}

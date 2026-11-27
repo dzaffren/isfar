@@ -20,9 +20,9 @@ import {
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import type { Rite } from "../lib/step";
 import { IHRAM_SPOTS, type IhramPart } from "./birali";
-import { SAI_SPOTS, groundAt, laneLine, type SaiPart } from "./masa";
+import { SAI_SPOTS, TAHALLUL_SPOTS, groundAt, laneLine, type SaiPart, type SaiSpot } from "./masa";
 import { SPOTS, onPath, type Part } from "./mataf";
-import { alongHall, between, birAliNameAnchor, birAliNamePlace, birAliViewOf, nameAnchor, namePlace, saiNameAnchor, saiNamePlace, saiViewOf, viewOf, type V3, type View } from "./views";
+import { alongHall, between, birAliNameAnchor, birAliNamePlace, birAliViewOf, nameAnchor, namePlace, masaViewOf, saiNameAnchor, saiNamePlace, viewOf, type V3, type View } from "./views";
 
 export type Name = { name: HTMLElement; lead: SVGLineElement };
 
@@ -153,6 +153,26 @@ type Site = {
   move: (one: View, two: View, t: number) => View;
 };
 
+// Sa'i and tahallul share the mas'a, each with its own spots (D117).
+function masaSite(spots: SaiSpot[]): Site {
+  return {
+    model: "/models/masa.glb",
+    joints: false,
+    paths: () => [laneLines("marwah"), laneLines("safa")],
+    pathAt: (step) => ({ marwah: 0, safa: 1, none: null })[spots[step - 1].towards ?? "none"],
+    // On a hill, the marker stands on its slope, level with the high side of its disc.
+    markerAt: (step) => {
+      const { at } = spots[step - 1];
+      return at && [at[0], at[1], Math.max(...[-1.5, 0, 1.5].map((dx) => groundAt([at[0] + dx, at[1]])))];
+    },
+    namesAt: (step) => spots[step - 1].names,
+    anchor: (part) => saiNameAnchor(part as SaiPart),
+    push: (part, step) => saiNamePlace(part as SaiPart, spots[step - 1].view),
+    view: (step) => masaViewOf(spots[step - 1]),
+    move: alongHall,
+  };
+}
+
 const SITES: Record<Rite, Site> = {
   ihram: {
     model: "/models/birali.glb",
@@ -184,22 +204,8 @@ const SITES: Record<Rite, Site> = {
     view: viewOf,
     move: between,
   },
-  sai: {
-    model: "/models/masa.glb",
-    joints: false,
-    paths: () => [laneLines("marwah"), laneLines("safa")],
-    pathAt: (step) => ({ marwah: 0, safa: 1, none: null })[SAI_SPOTS[step - 1].towards ?? "none"],
-    // On a hill, the marker stands on its slope, level with the high side of its disc.
-    markerAt: (step) => {
-      const { at } = SAI_SPOTS[step - 1];
-      return at && [at[0], at[1], Math.max(...[-1.5, 0, 1.5].map((dx) => groundAt([at[0] + dx, at[1]])))];
-    },
-    namesAt: (step) => SAI_SPOTS[step - 1].names,
-    anchor: (part) => saiNameAnchor(part as SaiPart),
-    push: (part, step) => saiNamePlace(part as SaiPart, SAI_SPOTS[step - 1].view),
-    view: saiViewOf,
-    move: alongHall,
-  },
+  sai: masaSite(SAI_SPOTS),
+  tahallul: masaSite(TAHALLUL_SPOTS),
 };
 
 // The gold marker on the floor, with a pole and a pin that show it from far.

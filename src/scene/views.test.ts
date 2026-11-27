@@ -1,10 +1,10 @@
 import { PerspectiveCamera, Vector3 } from "three";
 import { describe, expect, it } from "vitest";
 import { IHRAM_SPOTS } from "./birali";
-import { SAI_SPOTS, groundAt, laneLine } from "./masa";
+import { SAI_SPOTS, TAHALLUL_SPOTS, groundAt, laneLine } from "./masa";
 import { SPOTS } from "./mataf";
 import plan from "./plan.json" with { type: "json" };
-import { alongHall, between, birAliNameAnchor, birAliViewOf, saiViewOf, viewOf, type V3, type View } from "./views";
+import { alongHall, between, birAliNameAnchor, birAliViewOf, masaViewOf, saiNameAnchor, viewOf, type V3, type View } from "./views";
 
 // The scene is about square on a projector at 960x540, and 1.5 times as wide as it is high on a phone.
 const onScreen = (view: View, aspect: number, [x, y, z]: V3) => {
@@ -64,6 +64,8 @@ describe("viewOf", () => {
     });
   });
 });
+
+const saiViewOf = (step: number) => masaViewOf(SAI_SPOTS[step - 1]);
 
 describe("the camera in the mas'a", () => {
   const { length, height } = plan.masa;
@@ -144,6 +146,56 @@ describe("the camera in the mas'a", () => {
         expect(shown, `step ${index + 1}, aspect ${aspect}`).toBeGreaterThanOrEqual(20);
       }
     });
+  });
+});
+
+describe("the camera of tahallul in the mas'a", () => {
+  const { height } = plan.masa;
+  const tahallulViewOf = (step: number) => masaViewOf(TAHALLUL_SPOTS[step - 1]);
+
+  it("stays above the walls on each view and on 10 points of each move", () => {
+    for (const [from, to] of [[1, 2], [2, 1]]) {
+      for (let point = 0; point <= 10; point += 1) {
+        const at = alongHall(tahallulViewOf(from), tahallulViewOf(to), point / 10).from;
+        expect(at[2], `step ${from} to step ${to}, point ${point}`).toBeGreaterThan(height + 1);
+      }
+    }
+  });
+
+  it("shows the marker past Marwah, on a projector and on a phone", () => {
+    TAHALLUL_SPOTS.forEach((spot, index) => {
+      for (const aspect of [1, 1.5]) {
+        expect(onScreen(tahallulViewOf(index + 1), aspect, [spot.at![0], spot.at![1], 0]), `step ${index + 1}, aspect ${aspect}`).toBe(true);
+      }
+    });
+  });
+
+  it("shows the name of each part of the step, on a projector and on a phone", () => {
+    TAHALLUL_SPOTS.forEach((spot, index) => {
+      if (spot.view === "wide") return;
+      for (const part of spot.names) {
+        for (const aspect of [1, 1.5]) {
+          expect(onScreen(tahallulViewOf(index + 1), aspect, saiNameAnchor(part)), `step ${index + 1}, ${part}, aspect ${aspect}`).toBe(true);
+        }
+      }
+    });
+  });
+
+  it("sees the marker over the Marwah rock", () => {
+    TAHALLUL_SPOTS.forEach((spot, index) => {
+      const { from } = tahallulViewOf(index + 1);
+      const target: V3 = [spot.at![0], spot.at![1], 0.5];
+      for (let s = 0.02; s <= 1; s += 0.02) {
+        const [x, y, z] = [0, 1, 2].map((axis) => target[axis] + (from[axis] - target[axis]) * s);
+        expect(z, `step ${index + 1}, at ${s.toFixed(2)} of the way to the camera`).toBeGreaterThan(groundAt([x, y]));
+      }
+    });
+  });
+
+  it("looks at the marker from inside the hall on step 1", () => {
+    const { from, to } = tahallulViewOf(1);
+    expect(from[0]).toBeLessThan(TAHALLUL_SPOTS[0].at![0]);
+    expect(to[0]).toBeGreaterThan(from[0]);
   });
 });
 

@@ -4,9 +4,9 @@ import { TAWAF, beadsAt } from "./tawaf";
 const LANGUAGES = ["ms", "en"] as const;
 
 describe("the steps of the walk", () => {
-  it("has 15 steps in each language", () => {
-    expect(TAWAF.ms).toHaveLength(15);
-    expect(TAWAF.en).toHaveLength(15);
+  it("has 16 steps in each language", () => {
+    expect(TAWAF.ms).toHaveLength(16);
+    expect(TAWAF.en).toHaveLength(16);
   });
 
   it("keeps each step text to 40 words or fewer", () => {
@@ -22,6 +22,7 @@ describe("the steps of the walk", () => {
     expect(TAWAF.ms[2].title).toBe("Tempat mula");
     expect(TAWAF.ms[8].title).toBe("Pusingan 2");
     expect(TAWAF.ms[14].title).toBe("Tawaf selesai");
+    expect(TAWAF.ms[15].title).toBe("Solat sunat tawaf dan zamzam");
     expect(TAWAF.en[5].title).toBe("Rukun Yamani");
   });
 
@@ -37,10 +38,10 @@ describe("the steps of the walk", () => {
     expect(TAWAF.ms[2].recitation!.sound).toBe("Bismillahi, Allahu Akbar");
   });
 
-  it("shows a note on steps 2, 5 and 13 only", () => {
+  it("shows a note on steps 2, 5, 13 and 16 only", () => {
     for (const language of LANGUAGES) {
       const withNote = TAWAF[language].flatMap((step, index) => (step.note ? [index + 1] : []));
-      expect(withNote).toEqual([2, 5, 13]);
+      expect(withNote).toEqual([2, 5, 13, 16]);
     }
     expect(TAWAF.ms[1].note).toBe(
       "Syafi'i, Maliki dan Hanbali: wuduk ialah syarat sah tawaf. Hanafi: wuduk wajib tetapi bukan syarat. Tawaf tanpa wuduk sah, dan dam dikenakan.",
@@ -66,5 +67,6 @@ describe("beadsAt", () => {
 
   it("marks all seven beads done at the end", () => {
     expect(beadsAt(15)).toEqual({ done: 7, now: null });
+    expect(beadsAt(16)).toEqual({ done: 7, now: null });
   });
 });

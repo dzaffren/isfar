@@ -28,8 +28,8 @@ for (const size of SIZES) {
     test.use({ viewport: size, locale: "ms-MY" });
 
     test("Aminah finishes the walk and checks what she learned", async ({ page }) => {
-      await page.goto("/#tawaf-15");
-      await expect(title(page)).toHaveText("Tawaf selesai");
+      await page.goto("/#tawaf-16");
+      await expect(title(page)).toHaveText("Solat sunat tawaf dan zamzam");
       await expect(page.locator(".walk__actions").getByRole("button", { name: MS.start })).toBeVisible();
       await expect(page.locator(".vh-panel").getByRole("button", { name: MS.startAgain })).toBeVisible();
       await expect(scene(page)).toHaveAttribute("data-state", "shown", { timeout: 15_000 });
@@ -74,6 +74,8 @@ for (const size of SIZES) {
       await expect(title(page)).toHaveText("6 daripada 7 betul");
       await expect(page.getByText("Ulang kaji langkah ini:", { exact: true })).toBeVisible();
       await expectBeads(page, 7, null);
+      await expect(page.locator(".walk__actions").getByRole("button", { name: "Teruskan ke sa'i" })).toBeVisible();
+      await expect(page.locator(".vh-panel").getByRole("button", { name: MS.again })).toBeVisible();
 
       await page.getByRole("button", { name: "Langkah 6 · Rukun Yamani" }).click();
       await expect(page).toHaveURL(/#tawaf-6$/);
@@ -99,9 +101,19 @@ test.describe("a wrong answer", () => {
 
     await page.getByRole("button", { name: MS.leave }).focus();
     await page.keyboard.press("Enter");
-    await expect(page).toHaveURL(/#tawaf-15$/);
-    await expect(title(page)).toHaveText("Tawaf selesai");
+    await expect(page).toHaveURL(/#tawaf-16$/);
+    await expect(title(page)).toHaveText("Solat sunat tawaf dan zamzam");
     await expect(page.getByRole("button", { name: MS.start }), "the focus moves to the walk's bar").toBeFocused();
+  });
+
+  test("Aminah tries the check again from the result by keyboard", async ({ page }) => {
+    await page.goto("/#semak");
+    await answerTo(page, 7);
+    await expect(title(page)).toHaveText("7 daripada 7 betul");
+    await page.locator(".vh-panel").getByRole("button", { name: MS.again }).focus();
+    await page.keyboard.press("Enter");
+    await expect(header(page)).toHaveText("Semakan · Soalan 1 daripada 7");
+    await expect(options(page).first(), "the focus moves to the first answer").toBeFocused();
   });
 });
 
@@ -113,7 +125,7 @@ test.describe("a projector", () => {
     page.on("request", (request) => {
       if (request.url().endsWith("/models/mataf.glb")) modelLoads += 1;
     });
-    await page.goto("/#tawaf-15");
+    await page.goto("/#tawaf-16");
     await expect(scene(page)).toHaveAttribute("data-state", "shown", { timeout: 15_000 });
     await page.keyboard.press("PageDown");
     await expect(page).toHaveURL(/#semak$/);
@@ -138,8 +150,8 @@ test.describe("a projector", () => {
     await expect(page.locator('.vh-option[aria-pressed="true"]')).toHaveCount(0);
 
     await page.goBack();
-    await expect(page).toHaveURL(/#tawaf-15$/);
-    await expect(title(page)).toHaveText("Tawaf selesai");
+    await expect(page).toHaveURL(/#tawaf-16$/);
+    await expect(title(page)).toHaveText("Solat sunat tawaf dan zamzam");
   });
 });
 
