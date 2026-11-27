@@ -314,7 +314,8 @@ No data crosses a trust boundary. The only new input is the address, which `read
 | `e2e/umrah.spec.ts` (new) | The five scenarios, at the four sizes. | All |
 | `e2e/walk.spec.ts:31,166,226,240,280` | `page.goto("/")` becomes `page.goto("/#tawaf-1")`. Step 15 is "Langkah 15 daripada 16". The last step is 16. | Scenario 5 |
 | `e2e/check.spec.ts:31,102,116,141` | The check opens from `#tawaf-16`, and "Keluar" goes to `#tawaf-16`. "Cuba semula" is a quiet button in the result panel. | D107, D113 |
-| `e2e/sai-check.spec.ts`, `e2e/ihram-check.spec.ts` | On the result, "Cuba semula" sits in the panel, and the gold button opens the next part. | D107 |
+| `e2e/sai-check.spec.ts`, `e2e/ihram-check.spec.ts` | No change. They find "Cuba semula" by its name, wherever it sits. `e2e/umrah.spec.ts` checks the gold button on each result. | D107 |
+| `e2e/ihram.spec.ts` | The rite switch has four buttons. | D94 |
 | `e2e/sai.spec.ts` | Sa'i step 13 shows "Teruskan ke tahallul" in the panel. | D111 |
 | `preview/`, `src/preview/` (deleted) | The preview goes when `e2e/umrah.spec.ts` passes, in a commit of its own. | Nothing ships them |
 | `CHANGELOG.md` | One "Added" line. | The repo's rule |
