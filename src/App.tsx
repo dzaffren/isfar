@@ -195,7 +195,11 @@ export function App() {
               onPick={(answer) => setPicks((before) => before.map((pick, index) => (index === (at as number) - 1 ? answer : pick)))}
               onNext={nextQuestion}
               onLeave={() => goTo(rite, total)}
-              onAgain={restart}
+              // "Cuba semula" in the panel goes away with the result, so the first answer takes the focus.
+              onAgain={() => {
+                restart();
+                setMoved(true);
+              }}
               onStep={(question) => goTo(rite, question)}
               onward={walk.panel ? { label: words[walk.panel.label], onAct: () => (location.hash = walk.panel!.hash) } : undefined}
               focusFirst={moved}

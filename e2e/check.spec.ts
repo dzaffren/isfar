@@ -105,6 +105,16 @@ test.describe("a wrong answer", () => {
     await expect(title(page)).toHaveText("Solat sunat tawaf dan zamzam");
     await expect(page.getByRole("button", { name: MS.start }), "the focus moves to the walk's bar").toBeFocused();
   });
+
+  test("Aminah tries the check again from the result by keyboard", async ({ page }) => {
+    await page.goto("/#semak");
+    await answerTo(page, 7);
+    await expect(title(page)).toHaveText("7 daripada 7 betul");
+    await page.locator(".vh-panel").getByRole("button", { name: MS.again }).focus();
+    await page.keyboard.press("Enter");
+    await expect(header(page)).toHaveText("Semakan · Soalan 1 daripada 7");
+    await expect(options(page).first(), "the focus moves to the first answer").toBeFocused();
+  });
 });
 
 test.describe("a projector", () => {
