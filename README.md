@@ -25,6 +25,7 @@ People who prepare to go for hajj or umrah use it.
 - After the sa'i walk, the person answers seven questions on where each step of sa'i happens and what to do there, and the result shows on screen.
 - The site leads a person through ihram in 8 steps, in a 3D Bir Ali, from the bath and the clothes to the talbiyah on the bus to Makkah.
 - After the ihram walk, the person answers seven questions on where each step of ihram happens at Bir Ali and what to do there, and the result shows on screen.
+- The walk starts with ihram and ends with tahallul, so a person walks one whole umrah from the first step to the last. Each check opens at the end of its rite, and its result then goes on to the next part.
 
 ## Docs
 

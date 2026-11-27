@@ -13,3 +13,4 @@
 - Run `git switch -c` alone, and commit in a later Bash call. ([branch-before-commit-in-its-own-call](branch-before-commit-in-its-own-call.md))
 - Test that each name of a step shows in a new camera view, not only the marker. ([test-the-names-in-each-new-view](test-the-names-in-each-new-view.md))
 - Read the Blender script of a place before you ask where a spot stands in it; the map is not the model. ([check-the-model-before-a-place-question](check-the-model-before-a-place-question.md))
+- Press a button by keyboard in a test when its press removes it, and check where the focus goes. ([test-the-focus-after-a-button-that-goes-away](test-the-focus-after-a-button-that-goes-away.md))
