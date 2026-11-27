@@ -232,7 +232,7 @@ This is a draft in the Shafi'i school (D24). The user corrects it here.
 | Key | Malay | English |
 | --- | --- | --- |
 | `riteTahallul` | Tahallul | Tahallul |
-| `tahallulProgress` | Tahallul · Langkah {n} daripada {total} | Tahallul · Step {n} of {total} |
+| `tahallulProgress` | Tahallul · Langkah *n* daripada *total* | Tahallul · Step *n* of *total* |
 | `goSai` | Teruskan ke sa'i | Go on to sa'i |
 | `goTahallul` | Teruskan ke tahallul | Go on to tahallul |
 | `umrahAgain` | Mula semula umrah | Start the umrah again |
