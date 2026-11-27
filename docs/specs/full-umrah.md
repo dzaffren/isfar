@@ -391,6 +391,15 @@ Recorded as D116, D117, D118.
 
 Recorded as D106 to D115 at pause 2. D116 to D118 at /build.
 
+## Review
+
+2026-11-27 · 6 raw findings, 4 survived, 4 fixed.
+
+- correctness · `src/components/CheckSide.tsx:52` · "Cuba semula" in the result panel moves the focus to the first answer · `83784d1`
+- correctness · `tools/masa.py:68` · the arch count follows the longer hall, centred with 5 m clear at each end · `356b86c`
+- quality · `src/scene/masa.ts:18` · the comment on EXIT says open floor with no end wall · `4a027b6`
+- quality · `src/App.tsx:145` · the comment says the result shows the camera of the last step · `59ac31a`
+
 ## Open items
 
 | ID  | What | Type | Raised at | Owner | Status | Answer |
