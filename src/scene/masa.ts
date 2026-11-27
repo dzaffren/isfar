@@ -15,7 +15,7 @@ export const WALK = plan.masa.walk;
 // y is the middle of each lane. The lane to Marwah is on the right of a person at Safa who faces Marwah (D82).
 export const LANES = plan.masa.lanes;
 export const BARRIER = plan.masa.barrier;
-// A gap in the end wall behind Marwah, with a strip of open floor past it, where the pilgrim goes for tahallul (full-umrah O10).
+// The open floor past the Marwah rock, where the pilgrim goes for tahallul. The hall has no end wall (D116).
 export const EXIT = plan.masa.exit;
 
 // The path of one walk: off the hill, into its lane, along the barrier, and up onto the other hill.
